@@ -1,0 +1,9 @@
+{
+  "/api": {
+    "target": "https://j0in.weskakay.de",
+    "secure": true,
+    "changeOrigin": true,
+    "cookieDomainRewrite": "localhost",
+    "cookiePathRewrite": "/"
+  }
+}

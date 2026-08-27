@@ -1,0 +1,87 @@
+<main class="auth">
+  <section class="auth__card">
+    <h1 class="auth__brand">Konto anlegen</h1>
+    <p class="auth__lead">Danach steht dein Board bereit.</p>
+
+    @if (error()) {
+      <p class="auth__error" role="alert">{{ error() }}</p>
+    }
+
+    <form class="auth__form" [formGroup]="form" (ngSubmit)="submit()" novalidate>
+      <label class="auth__field">
+        <span class="auth__label">Name</span>
+        <input
+          class="auth__input"
+          type="text"
+          formControlName="name"
+          autocomplete="name"
+          [class.auth__input--error]="invalid('name')"
+        />
+        @if (invalid('name')) {
+          <span class="auth__hint">Bitte einen Namen eingeben</span>
+        }
+      </label>
+
+      <label class="auth__field">
+        <span class="auth__label">E-Mail</span>
+        <input
+          class="auth__input"
+          type="email"
+          formControlName="email"
+          autocomplete="email"
+          [class.auth__input--error]="invalid('email')"
+        />
+        @if (invalid('email')) {
+          <span class="auth__hint">Bitte eine gültige E-Mail-Adresse eingeben</span>
+        }
+      </label>
+
+      <label class="auth__field">
+        <span class="auth__label">Passwort</span>
+        <input
+          class="auth__input"
+          type="password"
+          formControlName="password"
+          autocomplete="new-password"
+          [class.auth__input--error]="invalid('password')"
+        />
+        @if (invalid('password')) {
+          <span class="auth__hint">Mindestens 8 Zeichen</span>
+        }
+      </label>
+
+      <label class="auth__field">
+        <span class="auth__label">Passwort wiederholen</span>
+        <input
+          class="auth__input"
+          type="password"
+          formControlName="repeat"
+          autocomplete="new-password"
+          [class.auth__input--error]="mismatch"
+        />
+        @if (mismatch) {
+          <span class="auth__hint">Die beiden Passwörter sind nicht gleich</span>
+        }
+      </label>
+
+      <label class="auth__check">
+        <input type="checkbox" formControlName="privacy" />
+        <span>Ich akzeptiere die <a routerLink="/privacy">Datenschutzerklärung</a></span>
+      </label>
+      @if (invalid('privacy')) {
+        <span class="auth__hint">Ohne Zustimmung geht es leider nicht</span>
+      }
+
+      <div class="auth__actions">
+        <button class="auth__btn auth__btn--primary" type="submit" [disabled]="busy()">
+          Konto anlegen
+        </button>
+      </div>
+    </form>
+
+    <p class="auth__foot">
+      Schon ein Konto?
+      <a routerLink="/login">Anmelden</a>
+    </p>
+  </section>
+</main>

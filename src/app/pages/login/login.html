@@ -1,4 +1,59 @@
-<main class="login">
-  <h1 class="login__brand">J0IN</h1>
-  <p class="login__note">Aufgaben und Projekte, selbst gebaut.</p>
+<main class="auth">
+  <section class="auth__card">
+    <h1 class="auth__brand">J0IN</h1>
+    <p class="auth__lead">Aufgaben und Projekte an einem Ort.</p>
+
+    @if (error()) {
+      <p class="auth__error" role="alert">{{ error() }}</p>
+    }
+
+    <form class="auth__form" [formGroup]="form" (ngSubmit)="submit()" novalidate>
+      <label class="auth__field">
+        <span class="auth__label">E-Mail</span>
+        <input
+          class="auth__input"
+          type="email"
+          formControlName="email"
+          autocomplete="email"
+          [class.auth__input--error]="invalid('email')"
+        />
+        @if (invalid('email')) {
+          <span class="auth__hint">Bitte eine gültige E-Mail-Adresse eingeben</span>
+        }
+      </label>
+
+      <label class="auth__field">
+        <span class="auth__label">Passwort</span>
+        <input
+          class="auth__input"
+          type="password"
+          formControlName="password"
+          autocomplete="current-password"
+          [class.auth__input--error]="invalid('password')"
+        />
+        @if (invalid('password')) {
+          <span class="auth__hint">Bitte das Passwort eingeben</span>
+        }
+      </label>
+
+      <label class="auth__check">
+        <input type="checkbox" formControlName="remember" />
+        <span>Angemeldet bleiben</span>
+      </label>
+
+      <div class="auth__actions">
+        <button class="auth__btn auth__btn--primary" type="submit" [disabled]="busy()">
+          Anmelden
+        </button>
+        <button class="auth__btn" type="button" [disabled]="busy()" (click)="enterAsGuest()">
+          Als Gast ansehen
+        </button>
+      </div>
+    </form>
+
+    <p class="auth__foot">
+      Noch kein Konto?
+      <a routerLink="/signup">Registrieren</a>
+    </p>
+  </section>
 </main>
