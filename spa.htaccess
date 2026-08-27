@@ -1,0 +1,8 @@
+# Goes into the web root as .htaccess after deploying.
+# Keeps /api/ untouched and routes everything else to index.html,
+# so deep links survive a reload.
+RewriteEngine On
+RewriteRule ^api/ - [L]
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^ index.html [L]

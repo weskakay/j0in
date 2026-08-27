@@ -1,0 +1,19 @@
+.login {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--j0in-space-sm);
+  min-height: 100dvh;
+  padding: var(--j0in-space-lg);
+}
+
+.login__brand {
+  font-size: var(--j0in-fs-title);
+  font-weight: var(--j0in-fw-bold);
+  letter-spacing: 0.04em;
+}
+
+.login__note {
+  color: var(--j0in-text-muted);
+}

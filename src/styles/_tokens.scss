@@ -1,0 +1,103 @@
+// Every colour, spacing, radius and font lives here and nowhere else.
+// Components only ever write var(--j0in-...), never a hex value.
+// Swapping the theme means swapping these values, nothing else.
+
+:root {
+  color-scheme: dark;
+
+  // Surfaces
+  --j0in-bg: #0d1620;
+  --j0in-surface: #172230;
+  --j0in-surface-raised: #1f2c3c;
+  --j0in-border: #2a3a4a;
+
+  // Text
+  --j0in-text: #ffffff;
+  --j0in-text-muted: #9aa8b8;
+  --j0in-text-inverse: #0d1620;
+
+  // Accents
+  --j0in-accent: #29abe2;
+  --j0in-accent-hover: #1d8fc0;
+  --j0in-success: #7ae582;
+  --j0in-warning: #ffa800;
+  --j0in-danger: #ff3d00;
+
+  // Priorities
+  --j0in-prio-urgent: #ff3d00;
+  --j0in-prio-medium: #ffa800;
+  --j0in-prio-low: #7ae582;
+
+  // Spacing
+  --j0in-space-xs: 4px;
+  --j0in-space-sm: 8px;
+  --j0in-space-md: 16px;
+  --j0in-space-lg: 24px;
+  --j0in-space-xl: 40px;
+
+  // Radii
+  --j0in-radius-sm: 8px;
+  --j0in-radius-md: 12px;
+  --j0in-radius-pill: 999px;
+
+  // Elevation
+  --j0in-shadow-sm: 0 2px 6px rgb(0 0 0 / 25%);
+  --j0in-shadow-md: 0 8px 24px rgb(0 0 0 / 35%);
+
+  // Type
+  --j0in-font: "Inter", system-ui, -apple-system, sans-serif;
+  --j0in-fs-sm: 14px;
+  --j0in-fs-body: 16px;
+  --j0in-fs-lg: 20px;
+  --j0in-fs-title: clamp(28px, 4vw, 44px);
+  --j0in-fw-regular: 400;
+  --j0in-fw-bold: 700;
+  --j0in-lh-body: 1.5;
+
+  // Layout
+  --j0in-tap-target: 44px;
+  --j0in-column-width: 280px;
+  --j0in-transition: 200ms;
+}
+
+// Light theme: only the values change, no component notices.
+:root[data-theme="light"] {
+  color-scheme: light;
+
+  --j0in-bg: #f6f7f8;
+  --j0in-surface: #ffffff;
+  --j0in-surface-raised: #ffffff;
+  --j0in-border: #d1d9e0;
+
+  --j0in-text: #0d1620;
+  --j0in-text-muted: #5a6b7c;
+  --j0in-text-inverse: #ffffff;
+
+  --j0in-shadow-sm: 0 2px 6px rgb(0 0 0 / 8%);
+  --j0in-shadow-md: 0 8px 24px rgb(0 0 0 / 12%);
+}
+
+// Follows the operating system when no explicit choice was made.
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme="dark"]) {
+    color-scheme: light;
+
+    --j0in-bg: #f6f7f8;
+    --j0in-surface: #ffffff;
+    --j0in-surface-raised: #ffffff;
+    --j0in-border: #d1d9e0;
+
+    --j0in-text: #0d1620;
+    --j0in-text-muted: #5a6b7c;
+    --j0in-text-inverse: #ffffff;
+
+    --j0in-shadow-sm: 0 2px 6px rgb(0 0 0 / 8%);
+    --j0in-shadow-md: 0 8px 24px rgb(0 0 0 / 12%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --j0in-transition: 0ms;
+  }
+}
