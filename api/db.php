@@ -10,7 +10,11 @@ function db(): PDO
     if ($pdo instanceof PDO) {
         return $pdo;
     }
-    $config = require __DIR__ . '/config.php';
+    $file = __DIR__ . '/config.php';
+    if (!is_file($file)) {
+        throw new RuntimeException('config.php is missing');
+    }
+    $config = require $file;
     $dsn = sprintf(
         'mysql:host=%s;dbname=%s;charset=%s',
         $config['host'],

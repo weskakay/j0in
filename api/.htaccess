@@ -1,3 +1,20 @@
+# Everything that is not an existing file goes through index.php.
 RewriteEngine On
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteRule ^ index.php [QSA,L]
+
+# Direct access to every PHP file except index.php is denied.
+# Without this the source of config.php would be served if PHP were ever
+# switched off for this domain, password included.
+<FilesMatch "\.php$">
+  Require all denied
+</FilesMatch>
+
+<Files "index.php">
+  Require all granted
+</Files>
+
+# Config and data files are never served, whatever happens to PHP.
+<FilesMatch "\.(sql|ini|log|md|zip)$">
+  Require all denied
+</FilesMatch>
