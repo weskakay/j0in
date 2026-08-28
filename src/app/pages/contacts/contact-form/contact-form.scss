@@ -1,0 +1,62 @@
+.cform {
+  display: flex;
+  flex-direction: column;
+  gap: var(--j0in-space-md);
+}
+
+.cform__field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--j0in-space-xs);
+}
+
+.cform__label {
+  color: var(--j0in-text-muted);
+  font-size: var(--j0in-fs-sm);
+}
+
+.cform__input {
+  width: 100%;
+  min-height: var(--j0in-tap-target);
+  padding: 0 var(--j0in-space-sm);
+  border: 1px solid var(--j0in-border);
+  border-radius: var(--j0in-radius-sm);
+  background: var(--j0in-bg);
+}
+
+.cform__hint {
+  color: var(--j0in-danger);
+  font-size: var(--j0in-fs-sm);
+}
+
+.cform__actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--j0in-space-sm);
+  padding-top: var(--j0in-space-md);
+  border-top: 1px solid var(--j0in-border);
+}
+
+.cform__btn {
+  min-height: var(--j0in-tap-target);
+  padding: 0 var(--j0in-space-lg);
+  border: 1px solid var(--j0in-border);
+  border-radius: var(--j0in-radius-pill);
+  background: transparent;
+}
+
+.cform__btn--primary {
+  border-color: var(--j0in-accent);
+  background: var(--j0in-accent);
+  color: var(--j0in-text-on-color);
+
+  &:hover {
+    background: var(--j0in-accent-hover);
+    border-color: var(--j0in-accent-hover);
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: default;
+  }
+}

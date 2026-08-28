@@ -44,6 +44,13 @@ export interface Contact {
   color: string;
 }
 
+/** What the contact form collects. */
+export interface ContactInput {
+  name: string;
+  email: string | null;
+  phone: string | null;
+}
+
 /** A card on the board. */
 export interface Task {
   id: string;

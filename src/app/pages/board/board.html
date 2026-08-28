@@ -25,7 +25,6 @@
 @if (ready()) {
   <div class="board__columns">
     @for (entry of board(); track entry.column.id) {
-                stroke-linecap="round"
       <section
         class="column"
         [class.column--over]="overColumn() === entry.column.id && dragged()"
@@ -100,7 +99,7 @@
 }
 
 @if (mode() !== 'none') {
-  <app-task-dialog [heading]="heading()" (closed)="closeDialog()">
+  <app-dialog [heading]="heading()" (closed)="closeDialog()">
     @if (mode() === 'wipeColumn' && doomed(); as column) {
       <app-column-delete
         [column]="column"
@@ -147,5 +146,5 @@
         (cancelled)="closeDialog()"
       />
     }
-  </app-task-dialog>
+  </app-dialog>
 }

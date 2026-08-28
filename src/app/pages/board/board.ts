@@ -2,7 +2,7 @@ import { Component, ElementRef, computed, effect, inject, signal, viewChild } fr
 import { BoardStore, type ColumnDisposal } from '../../core/board.store';
 import type { Category, Column, Task, TaskInput } from '../../data/models';
 import { TaskCard } from './task-card/task-card';
-import { TaskDialog } from './task-dialog/task-dialog';
+import { Dialog } from '../../layout/dialog/dialog';
 import { TaskDetail, type SubtaskToggle } from './task-detail/task-detail';
 import { TaskForm } from './task-form/task-form';
 import { BoardDrag, type Drop } from './drag/board-drag.service';
@@ -17,7 +17,7 @@ type DialogMode = 'none' | 'detail' | 'edit' | 'create' | 'wipeColumn' | 'wipeTa
 /** The board: every column with its cards, plus the task dialog. */
 @Component({
   selector: 'app-board',
-  imports: [TaskCard, TaskDialog, TaskDetail, TaskForm, DragCard, Loader, ColumnHead, ColumnDelete],
+  imports: [TaskCard, Dialog, TaskDetail, TaskForm, DragCard, Loader, ColumnHead, ColumnDelete],
   providers: [BoardDrag],
   templateUrl: './board.html',
   styleUrl: './board.scss',

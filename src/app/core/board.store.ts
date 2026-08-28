@@ -1,6 +1,14 @@
 import { Injectable, computed, inject, signal } from '@angular/core';
 import { Observable, tap } from 'rxjs';
-import type { BoardData, Category, Column, Contact, Task, TaskInput } from '../data/models';
+import type {
+  BoardData,
+  Category,
+  Column,
+  Contact,
+  ContactInput,
+  Task,
+  TaskInput,
+} from '../data/models';
 import { ApiService } from './api.service';
 
 /** A column together with the cards that sit in it, ready to render. */
@@ -71,6 +79,21 @@ export class BoardStore {
   /** Narrows the board to cards whose title or description match. */
   setSearch(term: string): void {
     this.query.set(term.trim().toLowerCase());
+  }
+
+  /** Adds a contact to the board. */
+  createContact(input: ContactInput): Observable<unknown> {
+    return this.api.post('/contacts', input).pipe(tap(() => this.load()));
+  }
+
+  /** Saves an edited contact. */
+  updateContact(contactId: string, input: ContactInput): Observable<unknown> {
+    return this.api.put(`/contacts/${contactId}`, input).pipe(tap(() => this.load()));
+  }
+
+  /** Removes a contact; its assignments fall away with it. */
+  deleteContact(contactId: string): Observable<unknown> {
+    return this.api.delete(`/contacts/${contactId}`).pipe(tap(() => this.load()));
   }
 
   /** Adds a column at the end of the board. */

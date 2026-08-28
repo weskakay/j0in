@@ -1,0 +1,29 @@
+<form class="cform" [formGroup]="form" (ngSubmit)="save()">
+  <label class="cform__field">
+    <span class="cform__label">Name</span>
+    <input class="cform__input" type="text" formControlName="name" autocomplete="off" />
+    @if (form.controls.name.touched && form.controls.name.invalid) {
+      <span class="cform__hint" role="alert">Bitte einen Namen eintragen</span>
+    }
+  </label>
+
+  <label class="cform__field">
+    <span class="cform__label">E-Mail</span>
+    <input class="cform__input" type="email" formControlName="email" autocomplete="off" />
+    @if (form.controls.email.touched && form.controls.email.invalid) {
+      <span class="cform__hint" role="alert">Diese Adresse sieht nicht richtig aus</span>
+    }
+  </label>
+
+  <label class="cform__field">
+    <span class="cform__label">Telefon</span>
+    <input class="cform__input" type="tel" formControlName="phone" autocomplete="off" />
+  </label>
+
+  <footer class="cform__actions">
+    <button class="cform__btn" type="button" (click)="cancelled.emit()">Abbrechen</button>
+    <button class="cform__btn cform__btn--primary" type="submit" [disabled]="saving()">
+      {{ saving() ? 'Speichert …' : saveLabel() }}
+    </button>
+  </footer>
+</form>

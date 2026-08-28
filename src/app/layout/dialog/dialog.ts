@@ -4,16 +4,16 @@ const FOCUSABLE =
   'a[href], button:not([disabled]), input:not([disabled]), select, textarea, [tabindex]:not([tabindex="-1"])';
 
 /**
- * The frame every task dialog sits in: dim backdrop, a panel that scrolls on
- * its own, Escape to leave and focus that cannot wander behind it.
+ * The frame every dialog sits in: dim backdrop, a panel that scrolls on its
+ * own, Escape to leave and focus that cannot wander behind it.
  */
 @Component({
-  selector: 'app-task-dialog',
+  selector: 'app-dialog',
   imports: [],
-  templateUrl: './task-dialog.html',
-  styleUrl: './task-dialog.scss',
+  templateUrl: './dialog.html',
+  styleUrl: './dialog.scss',
 })
-export class TaskDialog {
+export class Dialog {
   /** Heading of the dialog, read out as its accessible name. */
   readonly heading = input.required<string>();
 

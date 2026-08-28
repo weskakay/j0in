@@ -1,16 +1,204 @@
-.stub {
+.people__head {
   display: flex;
-  flex-direction: column;
-  align-items: flex-start;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
   gap: var(--j0in-space-md);
-  padding: var(--j0in-space-xl);
+  margin-bottom: var(--j0in-space-lg);
 }
 
-.stub__title {
+.people__title {
   font-size: var(--j0in-fs-title);
+}
+
+.people__new {
+  display: flex;
+  align-items: center;
+  gap: var(--j0in-space-sm);
+  min-height: var(--j0in-tap-target);
+  padding: 0 var(--j0in-space-md);
+  border: 1px solid var(--j0in-accent);
+  border-radius: var(--j0in-radius-pill);
+  background: var(--j0in-accent);
+  color: var(--j0in-text-on-color);
+  transition: background var(--j0in-transition);
+
+  &:hover {
+    background: var(--j0in-accent-hover);
+  }
+}
+
+.people__error {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--j0in-space-sm);
+  margin-bottom: var(--j0in-space-md);
+  color: var(--j0in-danger);
+}
+
+.people__retry {
+  min-height: var(--j0in-tap-target);
+  padding: 0 var(--j0in-space-md);
+  border: 1px solid var(--j0in-border);
+  border-radius: var(--j0in-radius-pill);
+  background: var(--j0in-surface);
+}
+
+.people__empty {
+  padding: var(--j0in-space-lg);
+  border: 1px dashed var(--j0in-border);
+  border-radius: var(--j0in-radius-md);
+  color: var(--j0in-text-muted);
+  text-align: center;
+}
+
+.people__group {
+  margin-bottom: var(--j0in-space-lg);
+}
+
+.people__letter {
+  padding-bottom: var(--j0in-space-xs);
+  border-bottom: 1px solid var(--j0in-border);
+  margin-bottom: var(--j0in-space-sm);
+  color: var(--j0in-text-muted);
+  font-size: var(--j0in-fs-sm);
+}
+
+.people__list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--j0in-space-xs);
+}
+
+.person {
+  display: flex;
+  align-items: center;
+  gap: var(--j0in-space-md);
+  width: 100%;
+  min-height: var(--j0in-tap-target);
+  padding: var(--j0in-space-sm);
+  border: 0;
+  border-radius: var(--j0in-radius-md);
+  background: transparent;
+  text-align: left;
+  transition: background var(--j0in-transition);
+
+  &:hover {
+    background: var(--j0in-surface-raised);
+  }
+}
+
+.person__avatar {
+  display: grid;
+  place-items: center;
+  flex: 0 0 auto;
+  width: 44px;
+  height: 44px;
+  border-radius: var(--j0in-radius-pill);
+  color: var(--j0in-text-on-color);
+  font-size: var(--j0in-fs-sm);
   font-weight: var(--j0in-fw-bold);
 }
 
-.stub__note {
+.person__text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.person__name {
+  font-weight: var(--j0in-fw-bold);
+}
+
+.person__mail {
   color: var(--j0in-text-muted);
+  font-size: var(--j0in-fs-sm);
+  overflow-wrap: anywhere;
+}
+
+.detail {
+  display: flex;
+  align-items: center;
+  gap: var(--j0in-space-lg);
+  flex-wrap: wrap;
+  margin-bottom: var(--j0in-space-lg);
+}
+
+.detail__avatar {
+  display: grid;
+  place-items: center;
+  width: 72px;
+  height: 72px;
+  border-radius: var(--j0in-radius-pill);
+  color: var(--j0in-text-on-color);
+  font-size: var(--j0in-fs-lg);
+  font-weight: var(--j0in-fw-bold);
+}
+
+.detail__facts {
+  display: flex;
+  flex-direction: column;
+  gap: var(--j0in-space-sm);
+  min-width: 0;
+}
+
+.detail__fact dt {
+  color: var(--j0in-text-muted);
+  font-size: var(--j0in-fs-sm);
+}
+
+.detail__fact dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.detail__confirm {
+  margin-bottom: var(--j0in-space-md);
+}
+
+.detail__actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--j0in-space-sm);
+  padding-top: var(--j0in-space-md);
+  border-top: 1px solid var(--j0in-border);
+}
+
+.detail__btn {
+  min-height: var(--j0in-tap-target);
+  padding: 0 var(--j0in-space-lg);
+  border: 1px solid var(--j0in-border);
+  border-radius: var(--j0in-radius-pill);
+  background: transparent;
+  transition:
+    background var(--j0in-transition),
+    color var(--j0in-transition);
+}
+
+.detail__btn--danger:hover {
+  border-color: var(--j0in-danger);
+  color: var(--j0in-danger);
+}
+
+.detail__btn--primary {
+  border-color: var(--j0in-accent);
+  background: var(--j0in-accent);
+  color: var(--j0in-text-on-color);
+
+  &:hover {
+    background: var(--j0in-accent-hover);
+    border-color: var(--j0in-accent-hover);
+  }
+}
+
+.detail__btn--wipe {
+  border-color: var(--j0in-danger);
+  background: var(--j0in-danger);
+  color: var(--j0in-text-on-color);
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: default;
+  }
 }
