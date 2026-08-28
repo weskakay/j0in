@@ -38,10 +38,13 @@ export class ApiService {
       .pipe(catchError(toMessage));
   }
 
-  /** DELETE a resource. */
-  delete<T>(path: string): Observable<T> {
+  /**
+   * DELETE a resource. A body is allowed, because removing a column also has
+   * to say what should happen to the cards inside it.
+   */
+  delete<T>(path: string, body?: unknown): Observable<T> {
     return this.http
-      .delete<T>(`${BASE}${path}`, { withCredentials: true })
+      .delete<T>(`${BASE}${path}`, { withCredentials: true, body })
       .pipe(catchError(toMessage));
   }
 }

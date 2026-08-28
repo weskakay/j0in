@@ -9,6 +9,12 @@ export interface ColumnWithTasks {
   tasks: Task[];
 }
 
+/** What happens to the cards of a column that is being removed. */
+export interface ColumnDisposal {
+  moveTo?: string;
+  deleteTasks?: boolean;
+}
+
 /**
  * Holds the whole board in memory. The API delivers it in one call, so the
  * screens read from here instead of fetching for themselves.
@@ -65,6 +71,24 @@ export class BoardStore {
   /** Narrows the board to cards whose title or description match. */
   setSearch(term: string): void {
     this.query.set(term.trim().toLowerCase());
+  }
+
+  /** Adds a column at the end of the board. */
+  createColumn(name: string): Observable<unknown> {
+    return this.api.post('/columns', { name }).pipe(tap(() => this.load()));
+  }
+
+  /** Gives a column another name. */
+  renameColumn(columnId: string, name: string): Observable<unknown> {
+    return this.api.put(`/columns/${columnId}`, { name }).pipe(tap(() => this.load()));
+  }
+
+  /**
+   * Removes a column. The server insists on knowing what happens to its
+   * cards, so the caller passes either a target column or an explicit delete.
+   */
+  deleteColumn(columnId: string, disposal: ColumnDisposal): Observable<unknown> {
+    return this.api.delete(`/columns/${columnId}`, disposal).pipe(tap(() => this.load()));
   }
 
   /** Creates a task, then reads the board back so positions stay right. */

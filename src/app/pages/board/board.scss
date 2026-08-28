@@ -63,54 +63,93 @@
   gap: var(--j0in-space-lg);
 }
 
-.column__head {
+.board__column-field {
+  min-height: var(--j0in-tap-target);
+  padding: 0 var(--j0in-space-md);
+  border: 1px solid var(--j0in-accent);
+  border-radius: var(--j0in-radius-md);
+  background: var(--j0in-bg);
+}
+
+.board__confirm {
+  margin-bottom: var(--j0in-space-md);
+}
+
+.board__confirm-actions {
   display: flex;
-  align-items: center;
+  justify-content: flex-end;
   gap: var(--j0in-space-sm);
-  margin-bottom: var(--j0in-space-sm);
+  padding-top: var(--j0in-space-md);
+  border-top: 1px solid var(--j0in-border);
 }
 
-.column__name {
-  flex: 1;
-  font-size: var(--j0in-fs-lg);
-}
-
-.column__add {
-  display: grid;
-  place-items: center;
-  width: var(--j0in-tap-target);
-  height: var(--j0in-tap-target);
+.board__confirm-btn {
+  min-height: var(--j0in-tap-target);
+  padding: 0 var(--j0in-space-lg);
   border: 1px solid var(--j0in-border);
-  border-radius: var(--j0in-radius-sm);
+  border-radius: var(--j0in-radius-pill);
   background: transparent;
-  color: var(--j0in-text-muted);
-  transition:
-    background var(--j0in-transition),
-    color var(--j0in-transition);
+}
 
-  &:hover {
-    background: var(--j0in-accent);
-    border-color: var(--j0in-accent);
-    color: var(--j0in-text-on-color);
+.board__confirm-btn--danger {
+  border-color: var(--j0in-danger);
+  background: var(--j0in-danger);
+  color: var(--j0in-text-on-color);
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: default;
   }
 }
 
-.column__count {
-  display: grid;
-  place-items: center;
-  min-width: 24px;
-  height: 24px;
-  padding: 0 var(--j0in-space-xs);
-  border-radius: var(--j0in-radius-pill);
-  background: var(--j0in-surface-raised);
+.board__add-column {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--j0in-space-sm);
+  min-height: var(--j0in-tap-target);
+  padding: 0 var(--j0in-space-md);
+  border: 1px dashed var(--j0in-border);
+  border-radius: var(--j0in-radius-md);
+  background: transparent;
   color: var(--j0in-text-muted);
   font-size: var(--j0in-fs-sm);
+  transition:
+    border-color var(--j0in-transition),
+    color var(--j0in-transition);
+
+  &:hover {
+    border-color: var(--j0in-accent);
+    color: var(--j0in-text);
+  }
 }
 
 .column__list {
   display: flex;
   flex-direction: column;
   gap: var(--j0in-space-md);
+}
+
+/* The column under the pointer while a card is being dragged. */
+.column--over .column__list {
+  outline: 2px dashed var(--j0in-accent);
+  outline-offset: var(--j0in-space-sm);
+  border-radius: var(--j0in-radius-md);
+}
+
+.column__dragging {
+  opacity: 0.4;
+}
+
+/* The card itself hangs on the pointer, lifted and slightly tilted, at the
+   spot where it was taken hold of. */
+.ghost {
+  position: fixed;
+  z-index: 50;
+  pointer-events: none;
+  transform: rotate(3deg) scale(1.02);
+  filter: drop-shadow(0 12px 24px rgb(0 0 0 / 35%));
+  cursor: grabbing;
 }
 
 .column__empty {

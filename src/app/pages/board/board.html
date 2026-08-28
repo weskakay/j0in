@@ -19,36 +19,34 @@
 }
 
 @if (loading() && !ready()) {
-  <p class="board__note">Board wird geladen …</p>
+  <app-loader label="Board wird geladen" />
 }
 
 @if (ready()) {
   <div class="board__columns">
     @for (entry of board(); track entry.column.id) {
-      <section class="column" [attr.aria-label]="entry.column.name">
-        <header class="column__head">
-          <h2 class="column__name">{{ entry.column.name }}</h2>
-          <span class="column__count">{{ entry.tasks.length }}</span>
-          <button
-            class="column__add"
-            type="button"
-            [attr.aria-label]="'Aufgabe in ' + entry.column.name + ' anlegen'"
-            (click)="openNew(entry.column.id)"
-          >
-            <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
-              <path
-                d="M12 5v14M5 12h14"
-                stroke="currentColor"
-                stroke-width="2"
                 stroke-linecap="round"
-              />
-            </svg>
-          </button>
-        </header>
+      <section
+        class="column"
+        [class.column--over]="overColumn() === entry.column.id && dragged()"
+        [attr.data-column-id]="entry.column.id"
+        [attr.aria-label]="entry.column.name"
+      >
+        <app-column-head
+          [column]="entry.column"
+          [count]="entry.tasks.length"
+          (renamed)="onRenameColumn(entry.column.id, $event)"
+          (removed)="askRemoveColumn(entry.column)"
+          (added)="openNew(entry.column.id)"
+        />
 
         <ul class="column__list">
           @for (task of entry.tasks; track task.id) {
-            <li>
+            <li
+              [appDragCard]="task"
+              [class.column__dragging]="dragged()?.id === task.id"
+              (dropped)="onDrop($event)"
+            >
               <app-task-card
                 [task]="task"
                 [category]="categoryOf(task)"
@@ -62,19 +60,80 @@
         </ul>
       </section>
     }
+
+    @if (namingColumn()) {
+      <input
+        class="board__column-field"
+        type="text"
+        placeholder="Name der Spalte"
+        aria-label="Name der neuen Spalte"
+        #columnField
+        (keydown)="onColumnKeydown($event)"
+        (blur)="addColumn($event)"
+      />
+    } @else {
+      <button class="board__add-column" type="button" (click)="startColumn()">
+        <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
+          <path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+        </svg>
+        Spalte hinzufügen
+      </button>
+    }
+  </div>
+}
+
+@if (dragged(); as task) {
+  <div
+    class="ghost"
+    [style.left.px]="dragPoint().x - dragGrab().dx"
+    [style.top.px]="dragPoint().y - dragGrab().dy"
+    [style.width.px]="dragGrab().width"
+    aria-hidden="true"
+  >
+    <app-task-card
+      [task]="task"
+      [category]="categoryOf(task)"
+      [contacts]="contacts()"
+      [preview]="true"
+    />
   </div>
 }
 
 @if (mode() !== 'none') {
   <app-task-dialog [heading]="heading()" (closed)="closeDialog()">
-    @if (mode() === 'detail' && current(); as task) {
+    @if (mode() === 'wipeColumn' && doomed(); as column) {
+      <app-column-delete
+        [column]="column"
+        [count]="doomedCount()"
+        [targets]="doomedTargets()"
+        [busy]="busy()"
+        (confirmed)="onRemoveColumn($event)"
+        (cancelled)="closeDialog()"
+      />
+    } @else if (mode() === 'wipeTask' && current(); as task) {
+      <p class="board__confirm">
+        Soll „{{ task.title }}" wirklich gelöscht werden? Die Teilaufgaben verschwinden mit.
+        Das lässt sich nicht rückgängig machen.
+      </p>
+      <footer class="board__confirm-actions">
+        <button class="board__confirm-btn" type="button" (click)="openTask(task)">Abbrechen</button>
+        <button
+          class="board__confirm-btn board__confirm-btn--danger"
+          type="button"
+          [disabled]="busy()"
+          (click)="onDelete()"
+        >
+          {{ busy() ? 'Löscht …' : 'Aufgabe löschen' }}
+        </button>
+      </footer>
+    } @else if (mode() === 'detail' && current(); as task) {
       <app-task-detail
         [task]="task"
         [category]="categoryOf(task)"
         [contacts]="contacts()"
         (toggled)="onToggle($event)"
         (edit)="startEdit()"
-        (remove)="onDelete()"
+        (remove)="askDelete()"
       />
     } @else {
       <app-task-form

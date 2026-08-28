@@ -25,6 +25,13 @@ export class TaskCard {
   /** All contacts of the board, to resolve the assignees. */
   readonly contacts = input<Contact[]>([]);
 
+  /**
+   * True for the copy that hangs on the pointer while dragging. It carries no
+   * grip and takes no focus, so it stays a picture of the card and not a
+   * second one you could operate.
+   */
+  readonly preview = input(false);
+
   /** Fires when the card is activated by click or keyboard. */
   readonly open = output<Task>();
 

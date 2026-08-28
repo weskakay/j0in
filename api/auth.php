@@ -120,6 +120,7 @@ function signInAsGuest(PDO $pdo): void
     if ($user === null) {
         $user = createGuestAccount($pdo);
     }
+    refillDemoIfEmpty($pdo, $user['id']);
     startSession($pdo, $user['id'], J0IN_DAYS_GUEST);
     respond(200, publicUser($user));
 }
@@ -135,6 +136,28 @@ function createGuestAccount(PDO $pdo): array
     $id = insertUser($pdo, 'Gast', J0IN_GUEST_EMAIL, $password, 'guest');
     createBoardFor($pdo, $id, 'Demo-Board', true);
     return ['id' => $id, 'name' => 'Gast', 'email' => J0IN_GUEST_EMAIL, 'role' => 'guest'];
+}
+
+/**
+ * Puts the demo cards back whenever the guest board stands empty. That covers
+ * the very first visitor as well as the one who arrives after someone before
+ * them deleted everything.
+ */
+function refillDemoIfEmpty(PDO $pdo, string $userId): void
+{
+    $stmt = $pdo->prepare(
+        'SELECT b.id, COUNT(t.id) AS cards
+         FROM join_boards b
+         LEFT JOIN join_columns c ON c.board_id = b.id
+         LEFT JOIN join_tasks t ON t.column_id = c.id
+         WHERE b.owner_user_id = ?
+         GROUP BY b.id LIMIT 1'
+    );
+    $stmt->execute([$userId]);
+    $row = $stmt->fetch();
+    if ($row && (int) $row['cards'] === 0) {
+        fillDemoBoard($pdo, (string) $row['id']);
+    }
 }
 
 /**

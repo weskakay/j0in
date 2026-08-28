@@ -1,3 +1,30 @@
+:host {
+  position: relative;
+  display: block;
+}
+
+/* The grip is the only spot where a finger starts a drag. Everything else on
+   the card stays scrollable, which matters on a phone where a card fills the
+   width. touch-action has to sit here from the start: the browser settles the
+   question at the moment of touch and ignores a later change. */
+.card__grip {
+  position: absolute;
+  top: var(--j0in-space-xs);
+  right: var(--j0in-space-xs);
+  z-index: 2;
+  display: grid;
+  place-items: center;
+  width: var(--j0in-tap-target);
+  height: var(--j0in-tap-target);
+  color: var(--j0in-text-muted);
+  touch-action: none;
+  cursor: grab;
+
+  &:hover {
+    color: var(--j0in-text);
+  }
+}
+
 .card {
   display: flex;
   flex-direction: column;
@@ -29,6 +56,7 @@
 }
 
 .card__title {
+  padding-right: var(--j0in-space-lg);
   font-size: var(--j0in-fs-body);
   font-weight: var(--j0in-fw-bold);
 }

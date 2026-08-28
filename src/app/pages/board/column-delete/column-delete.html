@@ -1,0 +1,41 @@
+@if (count() === 0) {
+  <p class="wipe__text">
+    Die Spalte „{{ column().name }}" ist leer und kann ohne Weiteres verschwinden.
+  </p>
+} @else {
+  <p class="wipe__text">
+    In „{{ column().name }}" liegen noch
+    <strong>{{ count() }} {{ count() === 1 ? 'Aufgabe' : 'Aufgaben' }}</strong>.
+    Was soll damit passieren?
+  </p>
+
+  @if (targets().length > 0) {
+    <label class="wipe__field">
+      <span class="wipe__label">Aufgaben verschieben nach</span>
+      <select class="wipe__select" (change)="pick($event)">
+        <option value="">nirgendwohin, mitlöschen</option>
+        @for (target of targets(); track target.id) {
+          <option [value]="target.id">{{ target.name }}</option>
+        }
+      </select>
+    </label>
+  }
+
+  @if (moveTo() === '') {
+    <p class="wipe__warning" role="alert">
+      Die Aufgaben werden mit der Spalte gelöscht. Das lässt sich nicht rückgängig machen.
+    </p>
+  }
+}
+
+<footer class="wipe__actions">
+  <button class="wipe__btn" type="button" (click)="cancelled.emit()">Abbrechen</button>
+  <button
+    class="wipe__btn wipe__btn--danger"
+    type="button"
+    [disabled]="busy()"
+    (click)="confirm()"
+  >
+    {{ busy() ? 'Löscht …' : 'Spalte löschen' }}
+  </button>
+</footer>

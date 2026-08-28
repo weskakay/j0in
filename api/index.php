@@ -15,6 +15,7 @@ require __DIR__ . '/board.php';
 require __DIR__ . '/columns.php';
 require __DIR__ . '/tasks.php';
 require __DIR__ . '/contacts.php';
+require __DIR__ . '/demo.php';
 require __DIR__ . '/routes.php';
 
 /** Turns an uncaught fatal error into a JSON 500 instead of an empty response. */

@@ -1,0 +1,53 @@
+.loader {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--j0in-space-sm);
+  padding: var(--j0in-space-xl) 0;
+}
+
+.loader__mark {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  font-size: 32px;
+  font-weight: var(--j0in-fw-bold);
+  letter-spacing: 2px;
+}
+
+.loader__zero {
+  display: grid;
+  place-items: center;
+}
+
+.loader__track {
+  stroke: var(--j0in-border);
+}
+
+/* The gap in the ring is what makes the turning visible. */
+.loader__arc {
+  stroke: var(--j0in-accent);
+  stroke-linecap: round;
+  stroke-dasharray: 46 107;
+  transform-origin: center;
+  animation: loader-turn 1.1s linear infinite;
+}
+
+.loader__text {
+  color: var(--j0in-text-muted);
+  font-size: var(--j0in-fs-sm);
+}
+
+@keyframes loader-turn {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Standing still, the ring simply reads as the zero it is. */
+@media (prefers-reduced-motion: reduce) {
+  .loader__arc {
+    animation: none;
+    stroke-dasharray: none;
+  }
+}
