@@ -5,11 +5,17 @@
 ini_set('display_errors', '0');
 ini_set('log_errors', '1');
 
+require __DIR__ . '/settings.php';
 require __DIR__ . '/http.php';
 require __DIR__ . '/db.php';
 require __DIR__ . '/session.php';
 require __DIR__ . '/ratelimit.php';
 require __DIR__ . '/auth.php';
+require __DIR__ . '/board.php';
+require __DIR__ . '/columns.php';
+require __DIR__ . '/tasks.php';
+require __DIR__ . '/contacts.php';
+require __DIR__ . '/routes.php';
 
 /** Turns an uncaught fatal error into a JSON 500 instead of an empty response. */
 register_shutdown_function(function (): void {
@@ -66,6 +72,9 @@ function handle(string $method, array $seg): void
     }
     if ($area === 'auth') {
         handleAuth(db(), $method, $seg[1] ?? '');
+    }
+    if (in_array($area, ['board', 'columns', 'categories', 'tasks', 'subtasks', 'contacts'], true)) {
+        handleBoardArea(db(), $method, $seg);
     }
     fail(404, 'Not found');
 }

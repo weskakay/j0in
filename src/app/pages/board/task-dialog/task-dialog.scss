@@ -1,0 +1,85 @@
+.dialog {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  display: grid;
+  place-items: end center;
+  padding: 0;
+}
+
+/* A real button, so closing by clicking beside the panel is reachable by
+   keyboard too instead of being a click handler on a plain div. */
+.dialog__backdrop {
+  position: absolute;
+  inset: 0;
+  border: 0;
+  background: rgb(0 0 0 / 55%);
+}
+
+.dialog__panel {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-height: 92dvh;
+  background: var(--j0in-surface);
+  border-radius: var(--j0in-radius-md) var(--j0in-radius-md) 0 0;
+  box-shadow: var(--j0in-shadow-md);
+}
+
+.dialog__head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--j0in-space-md);
+  padding: var(--j0in-space-md);
+  border-bottom: 1px solid var(--j0in-border);
+}
+
+.dialog__title {
+  font-size: var(--j0in-fs-lg);
+}
+
+.dialog__close {
+  display: grid;
+  place-items: center;
+  flex: 0 0 auto;
+  width: var(--j0in-tap-target);
+  height: var(--j0in-tap-target);
+  border: 0;
+  border-radius: var(--j0in-radius-pill);
+  background: transparent;
+  color: var(--j0in-text-muted);
+  transition:
+    background var(--j0in-transition),
+    color var(--j0in-transition);
+
+  &:hover {
+    background: var(--j0in-surface-raised);
+    color: var(--j0in-text);
+  }
+}
+
+.dialog__body {
+  overflow-y: auto;
+  padding: var(--j0in-space-md);
+}
+
+/* Phone: the panel rises from the bottom. Wider: it sits centred. */
+@media (min-width: 700px) {
+  .dialog {
+    place-items: center;
+    padding: var(--j0in-space-lg);
+  }
+
+  .dialog__panel {
+    max-width: 640px;
+    max-height: 86dvh;
+    border-radius: var(--j0in-radius-md);
+  }
+
+  .dialog__head,
+  .dialog__body {
+    padding: var(--j0in-space-lg);
+  }
+}

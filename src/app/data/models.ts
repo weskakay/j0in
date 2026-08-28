@@ -58,6 +58,24 @@ export interface Task {
   contactIds: string[];
 }
 
+/** A subtask on its way to the server, before it has an id. */
+export interface SubtaskInput {
+  title: string;
+  isDone: boolean;
+}
+
+/** What the task form collects, for both creating and editing. */
+export interface TaskInput {
+  columnId: string;
+  categoryId: string | null;
+  title: string;
+  description: string | null;
+  dueDate: string;
+  priority: Priority;
+  contactIds: string[];
+  subtasks: SubtaskInput[];
+}
+
 /** Everything the board screen needs, delivered in one call. */
 export interface BoardData {
   columns: Column[];

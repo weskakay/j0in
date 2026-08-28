@@ -10,6 +10,9 @@ function signUp(PDO $pdo, array $body): void
     $name = bodyString($body, 'name');
     $email = strtolower(bodyString($body, 'email'));
     $password = (string) ($body['password'] ?? '');
+    if (!J0IN_SIGNUP_OPEN) {
+        fail(403, 'Registration is currently closed');
+    }
     requireValidSignUp($pdo, $name, $email, $password);
     $userId = insertUser($pdo, $name, $email, $password, 'user');
     createBoardFor($pdo, $userId, 'Mein Board', false);
@@ -110,6 +113,9 @@ function findUserByEmail(PDO $pdo, string $email): ?array
 /** Signs in as the shared guest, creating that account on first use. */
 function signInAsGuest(PDO $pdo): void
 {
+    if (!J0IN_GUEST_OPEN) {
+        fail(403, 'Guest access is currently closed');
+    }
     $user = findUserByEmail($pdo, J0IN_GUEST_EMAIL);
     if ($user === null) {
         $user = createGuestAccount($pdo);

@@ -1,0 +1,114 @@
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--j0in-space-sm);
+  width: 100%;
+  padding: var(--j0in-space-md);
+  border: 1px solid var(--j0in-border);
+  border-radius: var(--j0in-radius-md);
+  background: var(--j0in-surface-raised);
+  box-shadow: var(--j0in-shadow-sm);
+  text-align: left;
+  transition:
+    transform var(--j0in-transition),
+    box-shadow var(--j0in-transition);
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--j0in-shadow-md);
+  }
+}
+
+.card__category {
+  align-self: flex-start;
+  padding: var(--j0in-space-xs) var(--j0in-space-sm);
+  border-radius: var(--j0in-radius-sm);
+  color: var(--j0in-text-on-color);
+  font-size: var(--j0in-fs-sm);
+  font-weight: var(--j0in-fw-bold);
+}
+
+.card__title {
+  font-size: var(--j0in-fs-body);
+  font-weight: var(--j0in-fw-bold);
+}
+
+.card__text {
+  display: -webkit-box;
+  overflow: hidden;
+  color: var(--j0in-text-muted);
+  font-size: var(--j0in-fs-sm);
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.card__progress {
+  display: flex;
+  align-items: center;
+  gap: var(--j0in-space-sm);
+}
+
+.card__bar {
+  flex: 1;
+  height: 8px;
+  border-radius: var(--j0in-radius-pill);
+  background: var(--j0in-border);
+}
+
+.card__bar-fill {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--j0in-accent);
+  transition: width var(--j0in-transition);
+}
+
+.card__progress-label {
+  color: var(--j0in-text-muted);
+  font-size: var(--j0in-fs-sm);
+  white-space: nowrap;
+}
+
+.card__foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--j0in-space-sm);
+}
+
+.card__people {
+  display: flex;
+  padding-right: 6px;
+}
+
+.card__avatar {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  /* Slight overlap so a row of people stays compact without hiding a letter. */
+  margin-right: -6px;
+  border: 2px solid var(--j0in-surface-raised);
+  border-radius: var(--j0in-radius-pill);
+  color: var(--j0in-text-on-color);
+  font-size: 12px;
+  font-weight: var(--j0in-fw-bold);
+}
+
+.card__prio {
+  font-size: var(--j0in-fs-sm);
+  font-weight: var(--j0in-fw-bold);
+  text-transform: capitalize;
+}
+
+.card__prio--urgent {
+  color: var(--j0in-prio-urgent);
+}
+
+.card__prio--medium {
+  color: var(--j0in-prio-medium);
+}
+
+.card__prio--low {
+  color: var(--j0in-prio-low);
+}

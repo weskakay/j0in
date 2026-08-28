@@ -1,0 +1,35 @@
+<button class="card" type="button" (click)="activate()">
+  @if (category(); as label) {
+    <span class="card__category" [style.background]="label.color">{{ label.name }}</span>
+  }
+
+  <h3 class="card__title">{{ task().title }}</h3>
+
+  @if (task().description) {
+    <p class="card__text">{{ task().description }}</p>
+  }
+
+  @if (task().subtasks.length > 0) {
+    <p class="card__progress">
+      <span class="card__bar" aria-hidden="true">
+        <span class="card__bar-fill" [style.width.%]="percent()"></span>
+      </span>
+      <span class="card__progress-label">
+        {{ done() }}/{{ task().subtasks.length }} Teilaufgaben
+      </span>
+    </p>
+  }
+
+  <span class="card__foot">
+    <span class="card__people">
+      @for (person of assignees(); track person.id) {
+        <span class="card__avatar" [style.background]="person.color" [title]="person.name">
+          {{ initials(person) }}
+        </span>
+      }
+    </span>
+    <span class="card__prio card__prio--{{ task().priority }}">
+      {{ priority() }}
+    </span>
+  </span>
+</button>

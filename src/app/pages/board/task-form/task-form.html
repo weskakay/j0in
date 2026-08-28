@@ -1,0 +1,118 @@
+<form class="form" [formGroup]="form" (ngSubmit)="save()">
+  <label class="form__field">
+    <span class="form__label">Titel</span>
+    <input class="form__input" type="text" formControlName="title" autocomplete="off" />
+    @if (form.controls.title.touched && form.controls.title.invalid) {
+      <span class="form__hint" role="alert">Bitte einen Titel eintragen</span>
+    }
+  </label>
+
+  <label class="form__field">
+    <span class="form__label">Beschreibung</span>
+    <textarea class="form__input form__input--area" rows="3" formControlName="description"></textarea>
+  </label>
+
+  <div class="form__row">
+    <label class="form__field">
+      <span class="form__label">Spalte</span>
+      <select class="form__input" formControlName="columnId">
+        @for (column of columns(); track column.id) {
+          <option [value]="column.id">{{ column.name }}</option>
+        }
+      </select>
+    </label>
+
+    <label class="form__field">
+      <span class="form__label">Kategorie</span>
+      <select class="form__input" formControlName="categoryId">
+        <option value="">ohne Kategorie</option>
+        @for (category of categories(); track category.id) {
+          <option [value]="category.id">{{ category.name }}</option>
+        }
+      </select>
+    </label>
+  </div>
+
+  <div class="form__row">
+    <label class="form__field">
+      <span class="form__label">Fällig am</span>
+      <input class="form__input" type="date" formControlName="dueDate" />
+      @if (form.controls.dueDate.touched && form.controls.dueDate.invalid) {
+        <span class="form__hint" role="alert">Bitte ein Datum wählen</span>
+      }
+    </label>
+
+    <label class="form__field">
+      <span class="form__label">Priorität</span>
+      <select class="form__input" formControlName="priority">
+        <option value="urgent">Dringend</option>
+        <option value="medium">Mittel</option>
+        <option value="low">Niedrig</option>
+      </select>
+    </label>
+  </div>
+
+  @if (contacts().length > 0) {
+    <fieldset class="form__field form__fieldset">
+      <legend class="form__label">Zuweisen an</legend>
+      <ul class="form__people">
+        @for (person of contacts(); track person.id) {
+          <li>
+            <button
+              class="form__person"
+              type="button"
+              [class.form__person--on]="isPicked(person.id)"
+              [attr.aria-pressed]="isPicked(person.id)"
+              (click)="togglePicked(person.id)"
+            >
+              <span class="form__avatar" [style.background]="person.color">
+                {{ initials(person) }}
+              </span>
+              {{ person.name }}
+            </button>
+          </li>
+        }
+      </ul>
+    </fieldset>
+  }
+
+  <fieldset class="form__field form__fieldset">
+    <legend class="form__label">Teilaufgaben</legend>
+    <ul class="form__subtasks">
+      @for (subtask of subtasks(); track $index) {
+        <li class="form__subtask">
+          <input
+            class="form__input"
+            type="text"
+            [value]="subtask.title"
+            placeholder="Was ist zu tun?"
+            (input)="renameSubtask($index, $event)"
+          />
+          <button
+            class="form__drop"
+            type="button"
+            [attr.aria-label]="'Teilaufgabe ' + ($index + 1) + ' entfernen'"
+            (click)="removeSubtask($index)"
+          >
+            <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+              <path
+                d="M6 6l12 12M18 6L6 18"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+              />
+            </svg>
+          </button>
+        </li>
+      }
+    </ul>
+    <button class="form__add" type="button" (click)="addSubtask()">Teilaufgabe hinzufügen</button>
+  </fieldset>
+
+  <footer class="form__actions">
+    <button class="form__btn" type="button" (click)="cancelled.emit()">Abbrechen</button>
+    <button class="form__btn form__btn--primary" type="submit" [disabled]="saving()">
+      {{ saving() ? 'Speichert …' : saveLabel() }}
+    </button>
+  </footer>
+</form>

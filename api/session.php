@@ -63,3 +63,29 @@ function endSession(PDO $pdo): void
     }
     sendCookie('', new DateTimeImmutable('-1 day'));
 }
+
+/** Returns the signed-in user or ends the request with 401. */
+function requireUser(PDO $pdo): array
+{
+    $user = currentUser($pdo);
+    if ($user === null) {
+        fail(401, 'Not signed in');
+    }
+    return $user;
+}
+
+/**
+ * The board that belongs to the signed-in user.
+ * Every read and write is scoped through this, so nobody can reach a
+ * board that is not theirs.
+ */
+function requireBoardId(PDO $pdo, string $userId): string
+{
+    $stmt = $pdo->prepare('SELECT id FROM join_boards WHERE owner_user_id = ? LIMIT 1');
+    $stmt->execute([$userId]);
+    $id = $stmt->fetchColumn();
+    if ($id === false) {
+        fail(404, 'No board for this account');
+    }
+    return (string) $id;
+}
