@@ -1,0 +1,29 @@
+<section class="strip">
+  <h3 class="strip__caption">{{ caption() }}</h3>
+
+  @if (total() === 0) {
+    <p class="strip__empty">Nichts zu zeigen.</p>
+  } @else {
+    <div class="strip__bar" aria-hidden="true">
+      @for (piece of pieces(); track piece.row.label) {
+        <span
+          class="strip__piece"
+          [style.flex-grow]="piece.share"
+          [style.background]="piece.row.color"
+          [title]="piece.row.label + ': ' + piece.row.count"
+        ></span>
+      }
+    </div>
+
+    <ul class="strip__legend">
+      @for (row of rows(); track row.label) {
+        <li class="strip__item" [class.strip__item--none]="row.count === 0">
+          <span class="strip__dot" [style.background]="row.color" aria-hidden="true"></span>
+          <span class="strip__label">{{ row.label }}</span>
+          <span class="strip__count">{{ row.count }}</span>
+          <span class="strip__share">{{ share(row) }} %</span>
+        </li>
+      }
+    </ul>
+  }
+</section>

@@ -5,25 +5,45 @@ function handleBoardArea(PDO $pdo, string $method, array $seg): void
 {
     $user = requireUser($pdo);
     $boardId = requireBoardId($pdo, $user['id']);
-    $body = jsonBody();
-    $area = $seg[0];
+    dispatchArea($pdo, $boardId, $method, $seg, jsonBody(), $user);
+}
+
+/** Picks the handler for the area named by the first path segment. */
+function dispatchArea(
+    PDO $pdo,
+    string $boardId,
+    string $method,
+    array $seg,
+    array $body,
+    array $user
+): void {
     $id = $seg[1] ?? '';
-    $sub = $seg[2] ?? '';
-    match ($area) {
-        'board'      => routeBoard($pdo, $boardId, $method),
+    match ($seg[0]) {
+        'board'      => routeBoard($pdo, $boardId, $method, $id, $body, $user),
         'columns'    => routeColumns($pdo, $boardId, $method, $id, $body),
         'categories' => routeCategories($pdo, $boardId, $method, $id, $body),
-        'tasks'      => routeTasks($pdo, $boardId, $method, $id, $sub, $body),
+        'tasks'      => routeTasks($pdo, $boardId, $method, $id, $seg[2] ?? '', $body),
         'subtasks'   => routeSubtasks($pdo, $boardId, $method, $id, $body),
         'contacts'   => routeContacts($pdo, $boardId, $method, $id, $body),
         default      => fail(404, 'Not found'),
     };
 }
 
-/** GET /api/board */
-function routeBoard(PDO $pdo, string $boardId, string $method): void
-{
-    $method === 'GET' ? readBoard($pdo, $boardId) : fail(405, 'Method not allowed');
+/** GET, PUT and the reset of /api/board */
+function routeBoard(
+    PDO $pdo,
+    string $boardId,
+    string $method,
+    string $id,
+    array $body,
+    array $user
+): void {
+    match (true) {
+        $method === 'GET' && $id === ''    => readBoard($pdo, $boardId),
+        $method === 'PUT' && $id === ''    => renameBoard($pdo, $boardId, $body),
+        $method === 'POST' && $id === 'reset' => resetDemoBoard($pdo, $boardId, $user),
+        default => fail(405, 'Method not allowed'),
+    };
 }
 
 /** POST, PUT and DELETE on /api/columns */

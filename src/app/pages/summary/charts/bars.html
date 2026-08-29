@@ -1,0 +1,28 @@
+<section class="bars">
+  <h3 class="bars__caption">{{ caption() }}</h3>
+
+  @if (total() === 0) {
+    <p class="bars__empty">Nichts zu zeigen.</p>
+  } @else {
+    <ul class="bars__list">
+      @for (row of rows(); track row.label) {
+        <li class="bars__row">
+          <span class="bars__head">
+            <span class="bars__label">{{ row.label }}</span>
+            <span class="bars__value">
+              {{ row.count }}
+              <span class="bars__share">{{ share(row) }} %</span>
+            </span>
+          </span>
+          <span class="bars__track" aria-hidden="true">
+            <span
+              class="bars__fill"
+              [style.width.%]="width(row)"
+              [style.background]="row.color"
+            ></span>
+          </span>
+        </li>
+      }
+    </ul>
+  }
+</section>

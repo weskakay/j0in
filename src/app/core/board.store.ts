@@ -42,6 +42,9 @@ export class BoardStore {
   /** Whether anything has been loaded yet. */
   readonly ready = computed(() => this.data() !== null);
 
+  /** The name of the board. */
+  readonly name = computed(() => this.data()?.name ?? '');
+
   /** The board's columns in their stored order. */
   readonly columns = computed<Column[]>(() => this.data()?.columns ?? []);
 
@@ -79,6 +82,16 @@ export class BoardStore {
   /** Narrows the board to cards whose title or description match. */
   setSearch(term: string): void {
     this.query.set(term.trim().toLowerCase());
+  }
+
+  /** Gives the board another name. */
+  renameBoard(name: string): Observable<unknown> {
+    return this.api.put('/board', { name }).pipe(tap(() => this.load()));
+  }
+
+  /** Puts the demo board back to how a visitor first finds it. */
+  resetDemo(): Observable<unknown> {
+    return this.api.post('/board/reset').pipe(tap(() => this.load()));
   }
 
   /** Adds a contact to the board. */

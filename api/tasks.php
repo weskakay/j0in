@@ -2,22 +2,36 @@
 
 const J0IN_PRIORITIES = ['urgent', 'medium', 'low'];
 
+/**
+ * Runs the given work inside one transaction and rolls it back on failure.
+ * Several writes belong together here, and half of them would be worse than
+ * none at all.
+ */
+function inTransaction(PDO $pdo, callable $work): mixed
+{
+    $pdo->beginTransaction();
+    try {
+        $result = $work();
+        $pdo->commit();
+        return $result;
+    } catch (Throwable $e) {
+        $pdo->rollBack();
+        throw $e;
+    }
+}
+
 /** Creates a task with its subtasks and assignees in one transaction. */
 function createTask(PDO $pdo, string $boardId, array $body): void
 {
     $columnId = bodyString($body, 'columnId');
     requireOwnColumn($pdo, $boardId, $columnId);
     requireValidTask($body);
-    $pdo->beginTransaction();
-    try {
+    $id = inTransaction($pdo, function () use ($pdo, $columnId, $boardId, $body) {
         $id = insertTaskRow($pdo, $columnId, $body);
         replaceSubtasks($pdo, $id, $body['subtasks'] ?? []);
         replaceAssignees($pdo, $boardId, $id, $body['contactIds'] ?? []);
-        $pdo->commit();
-    } catch (Throwable $e) {
-        $pdo->rollBack();
-        throw $e;
-    }
+        return $id;
+    });
     respond(201, ['id' => $id]);
 }
 
@@ -105,16 +119,11 @@ function updateTask(PDO $pdo, string $boardId, string $taskId, array $body): voi
 {
     requireOwnTask($pdo, $boardId, $taskId);
     requireValidTask($body);
-    $pdo->beginTransaction();
-    try {
+    inTransaction($pdo, function () use ($pdo, $taskId, $boardId, $body) {
         applyTaskFields($pdo, $taskId, $body);
         replaceSubtasks($pdo, $taskId, $body['subtasks'] ?? []);
         replaceAssignees($pdo, $boardId, $taskId, $body['contactIds'] ?? []);
-        $pdo->commit();
-    } catch (Throwable $e) {
-        $pdo->rollBack();
-        throw $e;
-    }
+    });
     respond(200, ['ok' => true]);
 }
 
@@ -141,16 +150,11 @@ function moveTask(PDO $pdo, string $boardId, string $taskId, array $body): void
     $columnId = bodyString($body, 'columnId');
     requireOwnColumn($pdo, $boardId, $columnId);
     $position = max(1, (int) ($body['position'] ?? 1));
-    $pdo->beginTransaction();
-    try {
+    inTransaction($pdo, function () use ($pdo, $columnId, $position, $taskId) {
         shiftPositions($pdo, $columnId, $position);
         $pdo->prepare('UPDATE join_tasks SET column_id = ?, position = ? WHERE id = ?')
             ->execute([$columnId, $position, $taskId]);
-        $pdo->commit();
-    } catch (Throwable $e) {
-        $pdo->rollBack();
-        throw $e;
-    }
+    });
     respond(200, ['ok' => true]);
 }
 

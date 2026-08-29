@@ -1,0 +1,40 @@
+<section class="ring">
+  <h3 class="ring__caption">{{ caption() }}</h3>
+
+  <div class="ring__body">
+    <div class="ring__figure">
+      <svg viewBox="0 0 140 140" class="ring__svg" aria-hidden="true">
+        <circle class="ring__track" cx="70" cy="70" r="54" fill="none" stroke-width="16" />
+        @for (arc of arcs(); track arc.row.label) {
+          <circle
+            class="ring__arc"
+            cx="70"
+            cy="70"
+            r="54"
+            fill="none"
+            stroke-width="16"
+            stroke-linecap="round"
+            [attr.stroke]="arc.row.color"
+            [attr.stroke-dasharray]="arc.dash"
+            [attr.stroke-dashoffset]="arc.offset"
+          />
+        }
+      </svg>
+      <span class="ring__middle">
+        <span class="ring__total">{{ total() }}</span>
+        <span class="ring__unit">{{ unit() }}</span>
+      </span>
+    </div>
+
+    <ul class="ring__legend">
+      @for (row of rows(); track row.label) {
+        <li class="ring__item">
+          <span class="ring__dot" [style.background]="row.color" aria-hidden="true"></span>
+          <span class="ring__label">{{ row.label }}</span>
+          <span class="ring__count">{{ row.count }}</span>
+          <span class="ring__share">{{ share(row) }} %</span>
+        </li>
+      }
+    </ul>
+  </div>
+</section>

@@ -7,26 +7,45 @@
 function db(): PDO
 {
     static $pdo = null;
-    if ($pdo instanceof PDO) {
-        return $pdo;
+    if (!$pdo instanceof PDO) {
+        $pdo = connect(readConfig());
     }
+    return $pdo;
+}
+
+/**
+ * Reads the credentials. Throws when the file is missing, so a broken deploy
+ * fails loudly instead of answering half-way.
+ *
+ * @return array<string, string>
+ */
+function readConfig(): array
+{
     $file = __DIR__ . '/config.php';
     if (!is_file($file)) {
         throw new RuntimeException('config.php is missing');
     }
-    $config = require $file;
+    return require $file;
+}
+
+/**
+ * Opens the connection itself.
+ *
+ * @param array<string, string> $config
+ */
+function connect(array $config): PDO
+{
     $dsn = sprintf(
         'mysql:host=%s;dbname=%s;charset=%s',
         $config['host'],
         $config['dbname'],
         $config['charset']
     );
-    $pdo = new PDO($dsn, $config['user'], $config['pass'], [
+    return new PDO($dsn, $config['user'], $config['pass'], [
         PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
         PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
         PDO::ATTR_EMULATE_PREPARES   => false,
     ]);
-    return $pdo;
 }
 
 /** Returns a version 4 UUID for use as a primary key. */

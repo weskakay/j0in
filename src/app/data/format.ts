@@ -44,6 +44,25 @@ export function germanDate(value: string | null): string {
   return `${day}.${month}.${year}`;
 }
 
+/** Today as the API writes dates, so due dates can be compared as strings. */
+export function today(): string {
+  const now = new Date();
+  const month = `${now.getMonth() + 1}`.padStart(2, '0');
+  const day = `${now.getDate()}`.padStart(2, '0');
+  return `${now.getFullYear()}-${month}-${day}`;
+}
+
+/** Morning, afternoon or evening, for the greeting on the summary. */
+export function greeting(hour: number): string {
+  if (hour < 11) {
+    return 'Guten Morgen';
+  }
+  if (hour < 18) {
+    return 'Guten Tag';
+  }
+  return 'Guten Abend';
+}
+
 /** Picks the contacts a task is assigned to, in board order. */
 export function assigneesOf(task: Task, contacts: Contact[]): Contact[] {
   return contacts.filter((contact) => task.contactIds.includes(contact.id));

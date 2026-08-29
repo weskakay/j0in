@@ -8,11 +8,56 @@
 function readBoard(PDO $pdo, string $boardId): void
 {
     respond(200, [
+        'name'       => boardName($pdo, $boardId),
         'columns'    => readColumns($pdo, $boardId),
         'categories' => readCategories($pdo, $boardId),
         'tasks'      => readTasks($pdo, $boardId),
         'contacts'   => readContacts($pdo, $boardId),
     ]);
+}
+
+/** The name the board carries. */
+function boardName(PDO $pdo, string $boardId): string
+{
+    $stmt = $pdo->prepare('SELECT name FROM join_boards WHERE id = ?');
+    $stmt->execute([$boardId]);
+    return (string) $stmt->fetchColumn();
+}
+
+/** Gives the board another name. */
+function renameBoard(PDO $pdo, string $boardId, array $body): void
+{
+    $name = bodyString($body, 'name');
+    if ($name === '') {
+        fail(422, 'A board needs a name');
+    }
+    $pdo->prepare('UPDATE join_boards SET name = ? WHERE id = ?')->execute([$name, $boardId]);
+    respond(200, ['ok' => true]);
+}
+
+/**
+ * Empties the demo board and fills it again. Only the shared guest may do
+ * this: on a real board it would be a way to lose everything by mis-click.
+ */
+function resetDemoBoard(PDO $pdo, string $boardId, array $user): void
+{
+    if (($user['role'] ?? '') !== 'guest') {
+        fail(403, 'Only the demo board can be reset');
+    }
+    clearBoard($pdo, $boardId);
+    $pdo->prepare('UPDATE join_boards SET name = ? WHERE id = ?')
+        ->execute(['Demo-Board', $boardId]);
+    fillDemoBoard($pdo, $boardId);
+    respond(200, ['ok' => true]);
+}
+
+/** Removes every card and contact of a board, leaving its columns alone. */
+function clearBoard(PDO $pdo, string $boardId): void
+{
+    $pdo->prepare(
+        'DELETE t FROM join_tasks t JOIN join_columns c ON c.id = t.column_id WHERE c.board_id = ?'
+    )->execute([$boardId]);
+    $pdo->prepare('DELETE FROM join_contacts WHERE board_id = ?')->execute([$boardId]);
 }
 
 /** @return list<array<string, mixed>> */

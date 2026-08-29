@@ -1,2 +1,76 @@
-<h1 class="stub__title">Einstellungen</h1>
-<p class="stub__note">Dieser Bildschirm kommt in einer späteren Etappe.</p>
+<h1 class="conf__title">Einstellungen</h1>
+
+@if (error(); as message) {
+  <p class="conf__error" role="alert">{{ message }}</p>
+}
+
+@if (done(); as message) {
+  <p class="conf__done" role="status">{{ message }}</p>
+}
+
+<section class="conf__block">
+  <h2 class="conf__heading">Aussehen</h2>
+  <p class="conf__note">Gilt nur auf diesem Gerät und bleibt beim nächsten Besuch erhalten.</p>
+
+  <ul class="conf__choices">
+    @for (choice of choices; track choice.value) {
+      <li>
+        <button
+          class="choice"
+          type="button"
+          [class.choice--on]="theme() === choice.value"
+          [attr.aria-pressed]="theme() === choice.value"
+          (click)="pickTheme(choice.value)"
+        >
+          <span class="choice__label">{{ choice.label }}</span>
+          <span class="choice__note">{{ choice.note }}</span>
+        </button>
+      </li>
+    }
+  </ul>
+</section>
+
+@if (ready()) {
+  <section class="conf__block">
+    <h2 class="conf__heading">Board</h2>
+    <label class="conf__field">
+      <span class="conf__label">Name des Boards</span>
+      <input
+        class="conf__input"
+        type="text"
+        [value]="boardName()"
+        [disabled]="busy()"
+        (blur)="renameBoard($event)"
+      />
+    </label>
+    <p class="conf__note">Wird beim Verlassen des Feldes gespeichert.</p>
+  </section>
+
+  @if (isGuest()) {
+    <section class="conf__block">
+      <h2 class="conf__heading">Demo</h2>
+      <p class="conf__note">
+        Setzt das Gast-Board auf die Beispielkarten zurück. Alles, was Besucher hier angelegt
+        haben, verschwindet dabei.
+      </p>
+      <button class="conf__btn" type="button" [disabled]="busy()" (click)="resetDemo()">
+        {{ busy() ? 'Setzt zurück …' : 'Demo zurücksetzen' }}
+      </button>
+    </section>
+  }
+}
+
+<section class="conf__block">
+  <h2 class="conf__heading">Konto</h2>
+  <dl class="conf__facts">
+    <div class="conf__fact">
+      <dt>Angemeldet als</dt>
+      <dd>{{ user()?.name }}</dd>
+    </div>
+    <div class="conf__fact">
+      <dt>E-Mail</dt>
+      <dd>{{ user()?.email }}</dd>
+    </div>
+  </dl>
+  <button class="conf__btn" type="button" (click)="signOut()">Abmelden</button>
+</section>

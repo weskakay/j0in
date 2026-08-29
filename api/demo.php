@@ -3,8 +3,8 @@
 // The cards a visitor finds on the guest board. Kept here so the demo can be
 // changed without touching the sign-in code.
 const J0IN_DEMO_CONTACTS = [
-    ['Lena Brandt', 'lena.brandt@example.org'],
-    ['Tobias Reuter', 'tobias.reuter@example.org'],
+    ['Josefin Brandt', 'josefin.brandt@example.org'],
+    ['Nuno Sanchez', 'nuno.sanchez@example.org'],
     ['Marek Nowak', 'marek.nowak@example.org'],
 ];
 

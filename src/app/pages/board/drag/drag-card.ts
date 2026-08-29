@@ -25,6 +25,7 @@ export class DragCard {
 
   private readonly drag = inject(BoardDrag);
   private readonly host = inject(ElementRef<HTMLElement>);
+  /** Where a mouse press started, until it becomes a drag. */
   private origin: { x: number; y: number } | null = null;
   private active = false;
   private justDragged = false;
@@ -39,6 +40,7 @@ export class DragCard {
     }
   }
 
+  /** Starts a drag from the grip, or arms one for the mouse. */
   @HostListener('pointerdown', ['$event'])
   protected onDown(event: PointerEvent): void {
     if (event.button !== 0) {
@@ -54,6 +56,7 @@ export class DragCard {
     }
   }
 
+  /** Follows the pointer while dragging, or waits for the mouse to commit. */
   @HostListener('pointermove', ['$event'])
   protected onMove(event: PointerEvent): void {
     if (this.active) {
@@ -64,6 +67,7 @@ export class DragCard {
     this.considerStarting(event);
   }
 
+  /** Ends the drag and reports where the card was let go. */
   @HostListener('pointerup')
   @HostListener('pointercancel')
   protected onUp(): void {

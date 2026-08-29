@@ -1,0 +1,108 @@
+:host {
+  display: block;
+  height: 100%;
+}
+
+.ring {
+  height: 100%;
+  padding: var(--j0in-space-lg);
+  border: 1px solid var(--j0in-border);
+  border-radius: var(--j0in-radius-md);
+  background: var(--j0in-surface);
+}
+
+.ring__caption {
+  margin-bottom: var(--j0in-space-lg);
+  font-size: var(--j0in-fs-body);
+}
+
+.ring__body {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--j0in-space-lg);
+}
+
+.ring__figure {
+  position: relative;
+  flex: 0 0 auto;
+  width: 148px;
+  height: 148px;
+}
+
+/* The ring starts at twelve o'clock instead of three. */
+.ring__svg {
+  width: 100%;
+  height: 100%;
+  transform: rotate(-90deg);
+}
+
+.ring__track {
+  stroke: var(--j0in-bg);
+}
+
+.ring__arc {
+  transition: stroke-dasharray var(--j0in-transition);
+}
+
+.ring__middle {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.ring__total {
+  font-size: 34px;
+  font-weight: var(--j0in-fw-bold);
+  line-height: 1;
+}
+
+.ring__unit {
+  color: var(--j0in-text-muted);
+  font-size: var(--j0in-fs-sm);
+}
+
+.ring__legend {
+  display: flex;
+  flex-direction: column;
+  gap: var(--j0in-space-sm);
+  flex: 1 1 180px;
+  min-width: 0;
+}
+
+.ring__item {
+  display: grid;
+  grid-template-columns: 10px 1fr auto auto;
+  align-items: center;
+  gap: var(--j0in-space-sm);
+}
+
+.ring__dot {
+  width: 10px;
+  height: 10px;
+  border-radius: var(--j0in-radius-pill);
+}
+
+.ring__label {
+  overflow: hidden;
+  color: var(--j0in-text-muted);
+  font-size: var(--j0in-fs-sm);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ring__count {
+  font-variant-numeric: tabular-nums;
+  font-weight: var(--j0in-fw-bold);
+}
+
+.ring__share {
+  min-width: 3.2rem;
+  color: var(--j0in-text-muted);
+  font-size: var(--j0in-fs-sm);
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+}

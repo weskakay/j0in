@@ -85,6 +85,7 @@ export interface TaskInput {
 
 /** Everything the board screen needs, delivered in one call. */
 export interface BoardData {
+  name: string;
   columns: Column[];
   categories: Category[];
   tasks: Task[];
