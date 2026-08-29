@@ -1,0 +1,93 @@
+<ul class="cats__list">
+  @for (category of categories(); track category.id) {
+    <li class="cats__row">
+      @if (editing() === category.id) {
+        <div class="cats__form">
+          <label class="cats__field">
+            <span class="cats__label">Name</span>
+            <input
+              class="cats__input"
+              type="text"
+              [value]="draftName()"
+              (input)="onName($event)"
+            />
+          </label>
+
+          <app-color-picker [value]="draftColor()" (picked)="pickColor($event)" />
+
+          <span class="cats__actions">
+            <button class="cats__btn" type="button" (click)="cancel()">Abbrechen</button>
+            <button
+              class="cats__btn cats__btn--primary"
+              type="button"
+              [disabled]="busy()"
+              (click)="saveEdit(category.id)"
+            >
+              Speichern
+            </button>
+          </span>
+        </div>
+      } @else {
+        <span class="cats__chip" [style.background]="category.color">{{ category.name }}</span>
+        <span class="cats__count">
+          {{ countFor(category) }} {{ countFor(category) === 1 ? 'Aufgabe' : 'Aufgaben' }}
+        </span>
+        <button
+          class="cats__icon"
+          type="button"
+          [attr.aria-label]="'Kategorie ' + category.name + ' bearbeiten'"
+          (click)="startEditing(category)"
+        >
+          <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+            <path d="M4 20h4l10-10-4-4L4 16v4zM14 6l4 4" stroke="currentColor"
+              stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+        </button>
+        <button
+          class="cats__icon cats__icon--danger"
+          type="button"
+          [attr.aria-label]="'Kategorie ' + category.name + ' löschen'"
+          (click)="removed.emit(category)"
+        >
+          <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+            <path d="M6 6l12 12M18 6L6 18" stroke="currentColor"
+              stroke-width="2" stroke-linecap="round" />
+          </svg>
+        </button>
+      }
+    </li>
+  } @empty {
+    <li class="cats__empty">Noch keine Kategorien.</li>
+  }
+</ul>
+
+@if (adding()) {
+  <div class="cats__form cats__form--new">
+    <label class="cats__field">
+      <span class="cats__label">Name</span>
+      <input
+        class="cats__input"
+        type="text"
+        placeholder="Wofür steht die Kategorie?"
+        [value]="draftName()"
+        (input)="onName($event)"
+      />
+    </label>
+
+    <app-color-picker [value]="draftColor()" (picked)="pickColor($event)" />
+
+    <span class="cats__actions">
+      <button class="cats__btn" type="button" (click)="cancel()">Abbrechen</button>
+      <button
+        class="cats__btn cats__btn--primary"
+        type="button"
+        [disabled]="busy()"
+        (click)="saveNew()"
+      >
+        Anlegen
+      </button>
+    </span>
+  </div>
+} @else {
+  <button class="cats__add" type="button" (click)="startAdding()">Kategorie hinzufügen</button>
+}

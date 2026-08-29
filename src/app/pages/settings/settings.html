@@ -12,6 +12,16 @@
   <h2 class="conf__heading">Aussehen</h2>
   <p class="conf__note">Gilt nur auf diesem Gerät und bleibt beim nächsten Besuch erhalten.</p>
 
+  <app-color-picker
+    caption="Akzentfarbe"
+    [value]="accent()"
+    (picked)="pickAccent($event)"
+  />
+  <p class="conf__note">
+    Färbt Navigation, Knöpfe und Diagramme. Noch einmal auf dieselbe Farbe tippen stellt die
+    Standardfarbe wieder her.
+  </p>
+
   <ul class="conf__choices">
     @for (choice of choices; track choice.value) {
       <li>
@@ -31,6 +41,22 @@
 </section>
 
 @if (ready()) {
+  <section class="conf__block">
+    <h2 class="conf__heading">Kategorien</h2>
+    <p class="conf__note">
+      Das farbige Etikett auf jeder Karte. Wird eine Kategorie gelöscht, bleiben ihre Aufgaben
+      bestehen und verlieren nur das Etikett.
+    </p>
+    <app-category-manager
+      [categories]="categories()"
+      [usage]="categoryUsage()"
+      [busy]="busy()"
+      (created)="addCategory($event)"
+      (edited)="saveCategory($event)"
+      (removed)="removeCategory($event)"
+    />
+  </section>
+
   <section class="conf__block">
     <h2 class="conf__heading">Board</h2>
     <label class="conf__field">

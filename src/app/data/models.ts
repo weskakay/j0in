@@ -27,6 +27,12 @@ export interface Category {
   position: number;
 }
 
+/** What the category form collects. */
+export interface CategoryInput {
+  name: string;
+  color: string;
+}
+
 /** One step inside a task. */
 export interface Subtask {
   id: string;

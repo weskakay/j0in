@@ -3,6 +3,7 @@ import { Observable, tap } from 'rxjs';
 import type {
   BoardData,
   Category,
+  CategoryInput,
   Column,
   Contact,
   ContactInput,
@@ -92,6 +93,21 @@ export class BoardStore {
   /** Puts the demo board back to how a visitor first finds it. */
   resetDemo(): Observable<unknown> {
     return this.api.post('/board/reset').pipe(tap(() => this.load()));
+  }
+
+  /** Adds a category to the board. */
+  createCategory(input: CategoryInput): Observable<unknown> {
+    return this.api.post('/categories', input).pipe(tap(() => this.load()));
+  }
+
+  /** Saves an edited category. */
+  updateCategory(categoryId: string, input: CategoryInput): Observable<unknown> {
+    return this.api.put(`/categories/${categoryId}`, input).pipe(tap(() => this.load()));
+  }
+
+  /** Removes a category; the cards keep existing and simply lose it. */
+  deleteCategory(categoryId: string): Observable<unknown> {
+    return this.api.delete(`/categories/${categoryId}`).pipe(tap(() => this.load()));
   }
 
   /** Adds a contact to the board. */

@@ -1,0 +1,16 @@
+<fieldset class="swatches">
+  <legend class="swatches__caption">{{ caption() }}</legend>
+  <span class="swatches__row">
+    @for (swatch of swatches; track swatch.value) {
+      <button
+        class="swatches__item"
+        type="button"
+        [class.swatches__item--on]="value() === swatch.value"
+        [style.background]="swatch.value"
+        [attr.aria-label]="swatch.label"
+        [attr.aria-pressed]="value() === swatch.value"
+        (click)="picked.emit(swatch.value)"
+      ></button>
+    }
+  </span>
+</fieldset>

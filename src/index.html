@@ -9,8 +9,14 @@
   <script>
     // Applies the stored theme before the first paint, so nothing flashes.
     try {
+      var r = document.documentElement;
       var t = localStorage.getItem('j0in-theme');
-      if (t === 'light' || t === 'dark') document.documentElement.setAttribute('data-theme', t);
+      if (t === 'light' || t === 'dark') r.setAttribute('data-theme', t);
+      var a = localStorage.getItem('j0in-accent');
+      if (a && /^#[0-9a-f]{6}$/i.test(a)) {
+        r.style.setProperty('--j0in-accent', a);
+        r.style.setProperty('--j0in-accent-hover', 'color-mix(in srgb, ' + a + ' 82%, black)');
+      }
     } catch (e) {}
   </script>
 </head>

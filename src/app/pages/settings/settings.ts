@@ -3,6 +3,24 @@ import { Router } from '@angular/router';
 import { AuthService } from '../../core/auth.service';
 import { BoardStore } from '../../core/board.store';
 import { ThemeService, type Theme } from '../../core/theme.service';
+import type { Category } from '../../data/models';
+import { ColorPicker } from '../../layout/color-picker/color-picker';
+import {
+  CategoryManager,
+  type CategoryDraft,
+  type CategoryEdit,
+} from './category-manager/category-manager';
+
+/** How many cards carry each category, keyed by its id. */
+function countByCategory(tasks: { categoryId: string | null }[]): Record<string, number> {
+  const counts: Record<string, number> = {};
+  for (const task of tasks) {
+    if (task.categoryId) {
+      counts[task.categoryId] = (counts[task.categoryId] ?? 0) + 1;
+    }
+  }
+  return counts;
+}
 
 /** One choice in the appearance switch. */
 interface ThemeChoice {
@@ -14,7 +32,7 @@ interface ThemeChoice {
 /** Appearance, the board's name, and what belongs to the account. */
 @Component({
   selector: 'app-settings',
-  imports: [],
+  imports: [ColorPicker, CategoryManager],
   templateUrl: './settings.html',
   styleUrl: './settings.scss',
 })
@@ -32,6 +50,15 @@ export class Settings {
 
   /** The current appearance choice. */
   protected readonly theme = this.themes.theme;
+
+  /** The accent colour in use, empty for the built-in one. */
+  protected readonly accent = this.themes.accent;
+
+  /** The categories of the board. */
+  protected readonly categories = this.store.categories;
+
+  /** How many cards carry each category, keyed by its id. */
+  protected readonly categoryUsage = computed(() => countByCategory(this.store.tasks()));
 
   /** The name of the board. */
   protected readonly boardName = this.store.name;
@@ -57,6 +84,39 @@ export class Settings {
 
   constructor() {
     this.store.load();
+  }
+
+  /** Switches the accent colour. */
+  protected pickAccent(color: string): void {
+    this.themes.setAccent(color === this.accent() ? '' : color);
+    this.done.set('Akzentfarbe geändert');
+  }
+
+  /** Adds a category to the board. */
+  protected addCategory(draft: CategoryDraft): void {
+    this.busy.set(true);
+    this.store.createCategory(draft).subscribe({
+      next: () => this.finish('Kategorie angelegt'),
+      error: () => this.busy.set(false),
+    });
+  }
+
+  /** Saves the changed name or colour of a category. */
+  protected saveCategory(edit: CategoryEdit): void {
+    this.busy.set(true);
+    this.store.updateCategory(edit.id, { name: edit.name, color: edit.color }).subscribe({
+      next: () => this.finish('Kategorie gespeichert'),
+      error: () => this.busy.set(false),
+    });
+  }
+
+  /** Removes a category; the cards keep existing and simply lose it. */
+  protected removeCategory(category: Category): void {
+    this.busy.set(true);
+    this.store.deleteCategory(category.id).subscribe({
+      next: () => this.finish('Kategorie gelöscht'),
+      error: () => this.busy.set(false),
+    });
   }
 
   /** Switches the appearance. */

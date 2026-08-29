@@ -1,0 +1,35 @@
+.swatches {
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.swatches__caption {
+  padding: 0;
+  color: var(--j0in-text-muted);
+  font-size: var(--j0in-fs-sm);
+}
+
+.swatches__row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--j0in-space-sm);
+  margin-top: var(--j0in-space-xs);
+}
+
+/* The tap area stays 44px while the visible dot is smaller, so the target is
+   comfortable without the row looking heavy. */
+.swatches__item {
+  position: relative;
+  width: var(--j0in-tap-target);
+  height: var(--j0in-tap-target);
+  border: 0;
+  border-radius: var(--j0in-radius-pill);
+  background-clip: content-box;
+  padding: 6px;
+  transition: box-shadow var(--j0in-transition);
+}
+
+.swatches__item--on {
+  box-shadow: 0 0 0 2px var(--j0in-surface), 0 0 0 4px var(--j0in-text);
+}
