@@ -61,6 +61,15 @@ a {
   color: var(--j0in-accent);
 }
 
+/* Impressum and privacy, side by side wherever they appear. */
+.legal-links {
+  display: flex;
+  justify-content: center;
+  gap: var(--j0in-space-lg);
+  padding: var(--j0in-space-md) 0;
+  font-size: var(--j0in-fs-sm);
+}
+
 :focus-visible {
   outline: 2px solid var(--j0in-accent);
   outline-offset: 2px;

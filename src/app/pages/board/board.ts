@@ -1,5 +1,5 @@
 import { Component, ElementRef, computed, effect, inject, signal, viewChild } from '@angular/core';
-import { BoardStore, type ColumnDisposal } from '../../core/board.store';
+import { BoardStore, type ColumnDisposal, type ColumnWithTasks } from '../../core/board.store';
 import type { Category, Column, Task, TaskInput } from '../../data/models';
 import { TaskCard } from './task-card/task-card';
 import { Dialog } from '../../layout/dialog/dialog';
@@ -37,6 +37,12 @@ export class Board {
 
   /** Where the card was grabbed, so it stays put under the hand. */
   protected readonly dragGrab = this.drag.grab;
+
+  /** The gap the card would drop into. */
+  protected readonly dropIndex = this.drag.overIndex;
+
+  /** The name of the board, shown as the heading of the screen. */
+  protected readonly boardName = this.store.name;
 
   /** Columns together with the cards that belong in them. */
   protected readonly board = this.store.board;
@@ -176,11 +182,33 @@ export class Board {
   }
 
   /**
-   * Moves a dropped card into its new column. The board is redrawn from the
-   * server afterwards, so the positions match what was really stored.
+   * Moves a card with the keyboard. Alt and an arrow key shifts it, which
+   * keeps the plain arrows free for scrolling and reading.
+   */
+  protected onCardKeydown(event: KeyboardEvent, task: Task): void {
+    if (!event.altKey || !ARROWS.includes(event.key)) {
+      return;
+    }
+    event.preventDefault();
+    const target = nextPlace(this.board(), task, event.key);
+    if (target) {
+      this.store.moveTask(task.id, target.columnId, target.position).subscribe({
+        next: () => this.store.load(),
+      });
+    }
+  }
+
+  /** Whether the insertion marker belongs in front of the given card. */
+  protected showSlot(columnId: string, index: number): boolean {
+    return !!this.dragged() && this.overColumn() === columnId && this.dropIndex() === index;
+  }
+
+  /**
+   * Moves a dropped card to where it was let go. The board is redrawn from
+   * the server afterwards, so the order matches what was really stored.
    */
   protected onDrop(drop: Drop): void {
-    this.store.moveTask(drop.task.id, drop.columnId, 1).subscribe({
+    this.store.moveTask(drop.task.id, drop.columnId, drop.position).subscribe({
       next: () => this.store.load(),
     });
   }
@@ -264,6 +292,51 @@ const HEADINGS: Partial<Record<DialogMode, string>> = {
   create: 'Neue Aufgabe',
   edit: 'Aufgabe bearbeiten',
 };
+
+const ARROWS = ['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown'];
+
+/** Where a card goes when it is nudged, or null when it cannot move there. */
+function nextPlace(
+  board: ColumnWithTasks[],
+  task: Task,
+  key: string,
+): { columnId: string; position: number } | null {
+  const column = board.findIndex((entry) => entry.column.id === task.columnId);
+  if (column < 0) {
+    return null;
+  }
+  const row = board[column].tasks.findIndex((one) => one.id === task.id);
+  return key === 'ArrowUp' || key === 'ArrowDown'
+    ? withinColumn(board[column], row, key)
+    : acrossColumns(board, column, row, key);
+}
+
+/** One place up or down inside the same column. */
+function withinColumn(
+  entry: ColumnWithTasks,
+  row: number,
+  key: string,
+): { columnId: string; position: number } | null {
+  const target = key === 'ArrowUp' ? row - 1 : row + 1;
+  if (target < 0 || target >= entry.tasks.length) {
+    return null;
+  }
+  return { columnId: entry.column.id, position: target + 1 };
+}
+
+/** Into the neighbouring column, at the same height. */
+function acrossColumns(
+  board: ColumnWithTasks[],
+  column: number,
+  row: number,
+  key: string,
+): { columnId: string; position: number } | null {
+  const target = key === 'ArrowLeft' ? column - 1 : column + 1;
+  if (target < 0 || target >= board.length) {
+    return null;
+  }
+  return { columnId: board[target].column.id, position: Math.min(row + 1, board[target].tasks.length + 1) };
+}
 
 /** The heading the dialog carries in each of its uses. */
 function headingFor(mode: DialogMode, task: Task | null): string {

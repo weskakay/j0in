@@ -7,7 +7,7 @@ import { Loader } from '../../layout/loader/loader';
 import { ContactForm } from './contact-form/contact-form';
 
 /** One letter of the alphabet with the contacts filed under it. */
-export interface ContactGroup {
+interface ContactGroup {
   letter: string;
   contacts: Contact[];
 }

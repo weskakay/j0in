@@ -22,7 +22,7 @@ const COLORS = {
 };
 
 /** One column with the number of cards in it. */
-export interface ColumnCount {
+interface ColumnCount {
   name: string;
   count: number;
 }
@@ -51,6 +51,9 @@ export class Summary {
   protected readonly hello = computed(
     () => `${greeting(new Date().getHours())}, ${this.auth.user()?.name ?? ''}`,
   );
+
+  /** The name of the board, so the line below the greeting names it. */
+  protected readonly boardName = this.store.name;
 
   /** How many cards there are in total. */
   protected readonly total = computed(() => this.store.tasks().length);

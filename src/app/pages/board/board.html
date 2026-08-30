@@ -1,14 +1,35 @@
 <header class="board__head">
-  <h1 class="board__title">Board</h1>
-  <label class="board__search">
+  <h1 class="board__title">{{ boardName() || 'Board' }}</h1>
+  <div class="board__tools">
+    <label class="board__search">
     <span class="board__search-label">Aufgabe suchen</span>
     <input
       class="board__search-field"
       type="search"
       placeholder="Aufgabe suchen"
-      (input)="onSearch($event)"
-    />
-  </label>
+        (input)="onSearch($event)"
+      />
+    </label>
+
+    @if (namingColumn()) {
+      <input
+        class="board__column-field"
+        type="text"
+        placeholder="Name der Spalte"
+        aria-label="Name der neuen Spalte"
+        #columnField
+        (keydown)="onColumnKeydown($event)"
+        (blur)="addColumn($event)"
+      />
+    } @else {
+      <button class="board__add-column" type="button" (click)="startColumn()">
+        <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
+          <path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+        </svg>
+        Spalte hinzufügen
+      </button>
+    }
+  </div>
 </header>
 
 @if (error(); as message) {
@@ -40,9 +61,13 @@
         />
 
         <ul class="column__list">
-          @for (task of entry.tasks; track task.id) {
+          @for (task of entry.tasks; track task.id; let i = $index) {
+            @if (showSlot(entry.column.id, i)) {
+              <li class="column__slot" aria-hidden="true"></li>
+            }
             <li
               [appDragCard]="task"
+              [attr.data-task-id]="task.id"
               [class.column__dragging]="dragged()?.id === task.id"
               (dropped)="onDrop($event)"
             >
@@ -51,33 +76,19 @@
                 [category]="categoryOf(task)"
                 [contacts]="contacts()"
                 (open)="openTask($event)"
+                (keyed)="onCardKeydown($event, task)"
               />
             </li>
           } @empty {
             <li class="column__empty">Keine Aufgaben</li>
           }
+          @if (showSlot(entry.column.id, entry.tasks.length)) {
+            <li class="column__slot" aria-hidden="true"></li>
+          }
         </ul>
       </section>
     }
 
-    @if (namingColumn()) {
-      <input
-        class="board__column-field"
-        type="text"
-        placeholder="Name der Spalte"
-        aria-label="Name der neuen Spalte"
-        #columnField
-        (keydown)="onColumnKeydown($event)"
-        (blur)="addColumn($event)"
-      />
-    } @else {
-      <button class="board__add-column" type="button" (click)="startColumn()">
-        <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
-          <path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
-        </svg>
-        Spalte hinzufügen
-      </button>
-    }
   </div>
 }
 

@@ -5,7 +5,8 @@
   <title>J0IN</title>
   <base href="/">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="icon" type="image/x-icon" href="favicon.ico">
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png">
   <script>
     // Applies the stored theme before the first paint, so nothing flashes.
     try {
@@ -19,8 +20,69 @@
       }
     } catch (e) {}
   </script>
+  <style>
+    /* Shown until Angular has booted. The colours are repeated here on
+       purpose: the stylesheet may not have arrived yet. */
+    .boot {
+      position: fixed;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      background: #0d1620;
+      color: #ffffff;
+      font-family: "Inter", system-ui, -apple-system, sans-serif;
+    }
+
+    :root[data-theme="light"] .boot { background: #f6f7f8; color: #0d1620; }
+
+    @media (prefers-color-scheme: light) {
+      :root:not([data-theme="dark"]) .boot { background: #f6f7f8; color: #0d1620; }
+    }
+
+    .boot__mark {
+      display: flex;
+      align-items: center;
+      gap: 2px;
+      font-size: 32px;
+      font-weight: 700;
+      letter-spacing: 2px;
+    }
+
+    .boot__arc {
+      stroke: var(--j0in-accent, #29abe2);
+      stroke-linecap: round;
+      stroke-dasharray: 46 107;
+      transform-origin: center;
+      animation: boot-turn 1.1s linear infinite;
+    }
+
+    .boot__track { stroke: rgb(128 128 128 / 30%); }
+
+    .boot__text { font-size: 14px; opacity: 0.6; }
+
+    @keyframes boot-turn { to { transform: rotate(360deg); } }
+
+    @media (prefers-reduced-motion: reduce) {
+      .boot__arc { animation: none; stroke-dasharray: none; }
+    }
+  </style>
 </head>
 <body>
-  <app-root></app-root>
+  <app-root>
+    <p class="boot" role="status">
+      <span class="boot__mark" aria-hidden="true">
+        J
+        <svg viewBox="0 0 44 44" width="28" height="28">
+          <circle class="boot__track" cx="22" cy="22" r="17" fill="none" stroke-width="6" />
+          <circle class="boot__arc" cx="22" cy="22" r="17" fill="none" stroke-width="6" />
+        </svg>
+        IN
+      </span>
+      <span class="boot__text">wird geladen</span>
+    </p>
+  </app-root>
 </body>
 </html>

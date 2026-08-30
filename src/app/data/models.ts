@@ -1,8 +1,8 @@
 /** Which kind of account is signed in. */
-export type UserRole = 'user' | 'guest' | 'owner';
+type UserRole = 'user' | 'guest' | 'owner';
 
 /** Where a request for access stands. */
-export type AccessStatus = 'pending' | 'approved' | 'rejected';
+type AccessStatus = 'pending' | 'approved' | 'rejected';
 
 /** Someone who asked to use the app, as the owner's screen shows them. */
 export interface AccessRequest {

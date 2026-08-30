@@ -12,7 +12,13 @@
   </span>
 }
 
-<button class="card" type="button" [attr.tabindex]="preview() ? -1 : null" (click)="activate()">
+<button
+  class="card"
+  type="button"
+  [attr.tabindex]="preview() ? -1 : null"
+  (click)="activate()"
+  (keydown)="keyed.emit($event)"
+>
   @if (category(); as label) {
     <span class="card__category" [style.background]="label.color">{{ label.name }}</span>
   }

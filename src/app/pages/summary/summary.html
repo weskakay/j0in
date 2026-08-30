@@ -1,5 +1,5 @@
 <h1 class="sum__hello">{{ hello() }}</h1>
-<p class="sum__sub">Das steht heute auf deinem Board.</p>
+<p class="sum__sub">Das steht heute auf {{ boardName() || 'deinem Board' }}.</p>
 
 @if (error(); as message) {
   <p class="sum__error" role="alert">

@@ -1,9 +1,11 @@
+/* Two lines high, whether the name needs them or not: otherwise a long name
+   pushes its own cards lower than those of the neighbouring columns. */
 .head {
   display: flex;
   align-items: center;
   gap: var(--j0in-space-xs);
   margin-bottom: var(--j0in-space-sm);
-  min-height: var(--j0in-tap-target);
+  min-height: calc(var(--j0in-tap-target) + var(--j0in-fs-lg));
 }
 
 .head__name {

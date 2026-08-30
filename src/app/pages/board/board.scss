@@ -11,6 +11,15 @@
   font-size: var(--j0in-fs-title);
 }
 
+/* Search and the button for a new column sit together, both belong to the
+   board as a whole rather than to one column. */
+.board__tools {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--j0in-space-sm);
+}
+
 .board__search {
   position: relative;
   flex: 1 1 220px;
@@ -107,6 +116,9 @@
   align-items: center;
   justify-content: center;
   gap: var(--j0in-space-sm);
+  flex: 0 0 auto;
+  align-self: flex-start;
+  white-space: nowrap;
   min-height: var(--j0in-tap-target);
   padding: 0 var(--j0in-space-md);
   border: 1px dashed var(--j0in-border);
@@ -139,6 +151,13 @@
 
 .column__dragging {
   opacity: 0.4;
+}
+
+/* Shows where the card would land, in the gap the pointer is over. */
+.column__slot {
+  height: 4px;
+  border-radius: var(--j0in-radius-pill);
+  background: var(--j0in-accent);
 }
 
 /* The card itself hangs on the pointer, lifted and slightly tilted, at the

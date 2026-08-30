@@ -35,6 +35,9 @@ export class TaskCard {
   /** Fires when the card is activated by click or keyboard. */
   readonly open = output<Task>();
 
+  /** Fires on every key pressed while the card has focus. */
+  readonly keyed = output<KeyboardEvent>();
+
   /** The people this task is assigned to. */
   protected readonly assignees = computed(() => assigneesOf(this.task(), this.contacts()));
 

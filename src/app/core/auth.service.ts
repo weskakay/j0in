@@ -4,14 +4,14 @@ import { ApiService } from './api.service';
 import type { User } from '../data/models';
 
 /** What the sign-up form sends. */
-export interface SignUpInput {
+interface SignUpInput {
   name: string;
   email: string;
   password: string;
 }
 
 /** What the sign-in form sends. */
-export interface SignInInput {
+interface SignInInput {
   email: string;
   password: string;
   remember: boolean;

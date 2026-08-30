@@ -17,6 +17,7 @@ export interface Point {
 export interface Drop {
   task: Task;
   columnId: string;
+  position: number;
 }
 
 /**
@@ -41,6 +42,9 @@ export class BoardDrag {
   /** Id of the column under the pointer, or null. */
   readonly overColumn = signal<string | null>(null);
 
+  /** Where in that column the card would land, counted from zero. */
+  readonly overIndex = signal(0);
+
   /** Current pointer position in the viewport. */
   readonly point = signal<Point>({ x: 0, y: 0 });
 
@@ -54,7 +58,7 @@ export class BoardDrag {
     this.task.set(task);
     this.point.set(at);
     this.grab.set(grab);
-    this.overColumn.set(columnUnder(at));
+    this.aimAt(at);
     this.frame = requestAnimationFrame(() => this.creepAlong());
   }
 
@@ -69,7 +73,7 @@ export class BoardDrag {
     const down = y > window.innerHeight - EDGE;
     if (up || down) {
       window.scrollBy(0, up ? -STEP : STEP);
-      this.overColumn.set(columnUnder(this.point()));
+      this.aimAt(this.point());
     }
     this.frame = requestAnimationFrame(() => this.creepAlong());
   }
@@ -77,21 +81,30 @@ export class BoardDrag {
   /** Follows the pointer and notes which column it is over. */
   move(at: Point): void {
     this.point.set(at);
-    this.overColumn.set(columnUnder(at));
+    this.aimAt(at);
+  }
+
+  /** Works out which column and which gap the pointer is over. */
+  private aimAt(at: Point): void {
+    const column = columnUnder(at);
+    this.overColumn.set(column);
+    this.overIndex.set(column === null ? 0 : gapUnder(column, at, this.task()?.id ?? ''));
   }
 
   /**
    * Ends the drag. Returns what to move where, or null when the card was
-   * dropped outside a column or back into the one it came from.
+   * let go outside any column. A drop into its own column is allowed, that
+   * is how a card is reordered.
    */
   end(): Drop | null {
     const task = this.task();
     const columnId = this.overColumn();
+    const position = this.overIndex() + 1;
     this.cancel();
-    if (!task || !columnId || columnId === task.columnId) {
+    if (!task || !columnId) {
       return null;
     }
-    return { task, columnId };
+    return { task, columnId, position };
   }
 
   /** Drops the drag without moving anything. */
@@ -103,6 +116,26 @@ export class BoardDrag {
     this.task.set(null);
     this.overColumn.set(null);
   }
+}
+
+/**
+ * The gap the pointer sits over, counted from zero. Every card is split at
+ * its middle: above it the card lands before, below it after. The card being
+ * dragged is skipped, otherwise it would count itself.
+ */
+function gapUnder(columnId: string, at: Point, draggedId: string): number {
+  const column = document.querySelector(`[data-column-id="${columnId}"]`);
+  const cards = [...(column?.querySelectorAll('[data-task-id]') ?? [])].filter(
+    (card) => card.getAttribute('data-task-id') !== draggedId,
+  );
+  const before = cards.filter((card) => at.y > middleOf(card));
+  return before.length;
+}
+
+/** The vertical middle of an element. */
+function middleOf(element: Element): number {
+  const box = element.getBoundingClientRect();
+  return box.top + box.height / 2;
 }
 
 /** Id of the column the given point sits over, or null. */

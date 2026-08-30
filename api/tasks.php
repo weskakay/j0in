@@ -140,9 +140,9 @@ function applyTaskFields(PDO $pdo, string $taskId, array $body): void
 }
 
 /**
- * Moves a task to another column and position. This is its own endpoint
- * because several positions change at once and that belongs in one
- * transaction on the server, not in five separate calls.
+ * Moves a task to a column and a place within it. This is its own endpoint
+ * because both columns are renumbered afterwards, and that belongs in one
+ * transaction on the server rather than in a handful of separate calls.
  */
 function moveTask(PDO $pdo, string $boardId, string $taskId, array $body): void
 {
@@ -150,19 +150,61 @@ function moveTask(PDO $pdo, string $boardId, string $taskId, array $body): void
     $columnId = bodyString($body, 'columnId');
     requireOwnColumn($pdo, $boardId, $columnId);
     $position = max(1, (int) ($body['position'] ?? 1));
-    inTransaction($pdo, function () use ($pdo, $columnId, $position, $taskId) {
-        shiftPositions($pdo, $columnId, $position);
-        $pdo->prepare('UPDATE join_tasks SET column_id = ?, position = ? WHERE id = ?')
-            ->execute([$columnId, $position, $taskId]);
+    $from = columnOfTask($pdo, $taskId);
+    inTransaction($pdo, function () use ($pdo, $columnId, $position, $taskId, $from) {
+        placeTask($pdo, $columnId, $taskId, $position);
+        if ($from !== $columnId) {
+            renumber($pdo, $from);
+        }
     });
     respond(200, ['ok' => true]);
 }
 
-/** Makes room at the target position by pushing the others down. */
-function shiftPositions(PDO $pdo, string $columnId, int $position): void
+/** The column a task currently sits in. */
+function columnOfTask(PDO $pdo, string $taskId): string
 {
-    $pdo->prepare('UPDATE join_tasks SET position = position + 1 WHERE column_id = ? AND position >= ?')
-        ->execute([$columnId, $position]);
+    $stmt = $pdo->prepare('SELECT column_id FROM join_tasks WHERE id = ?');
+    $stmt->execute([$taskId]);
+    return (string) $stmt->fetchColumn();
+}
+
+/**
+ * Puts the task at the wanted place in its column and renumbers the whole
+ * column from one upwards, so no two cards ever share a position.
+ */
+function placeTask(PDO $pdo, string $columnId, string $taskId, int $position): void
+{
+    $pdo->prepare('UPDATE join_tasks SET column_id = ? WHERE id = ?')->execute([$columnId, $taskId]);
+    $ids = orderedIds($pdo, $columnId, $taskId);
+    array_splice($ids, min($position - 1, count($ids)), 0, [$taskId]);
+    writePositions($pdo, $ids);
+}
+
+/**
+ * The ids of a column in their current order, without the one being placed.
+ *
+ * @return list<string>
+ */
+function orderedIds(PDO $pdo, string $columnId, string $without): array
+{
+    $stmt = $pdo->prepare('SELECT id FROM join_tasks WHERE column_id = ? ORDER BY position, id');
+    $stmt->execute([$columnId]);
+    return array_values(array_diff(array_column($stmt->fetchAll(), 'id'), [$without]));
+}
+
+/** Writes 1, 2, 3 and so on onto the given ids, in that order. */
+function writePositions(PDO $pdo, array $ids): void
+{
+    $stmt = $pdo->prepare('UPDATE join_tasks SET position = ? WHERE id = ?');
+    foreach (array_values($ids) as $index => $id) {
+        $stmt->execute([$index + 1, $id]);
+    }
+}
+
+/** Closes the gaps a departed card left behind. */
+function renumber(PDO $pdo, string $columnId): void
+{
+    writePositions($pdo, orderedIds($pdo, $columnId, ''));
 }
 
 /** Deletes a task; its subtasks and assignments fall with it. */

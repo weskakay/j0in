@@ -18,6 +18,9 @@ export interface ColumnWithTasks {
   tasks: Task[];
 }
 
+/** How long the loading state stays on screen once it has been shown. */
+const MIN_WAIT = 400;
+
 /** What happens to the cards of a column that is being removed. */
 export interface ColumnDisposal {
   moveTo?: string;
@@ -74,10 +77,24 @@ export class BoardStore {
   load(): void {
     this.loading.set(true);
     this.error.set(null);
+    const started = Date.now();
     this.api.get<BoardData>('/board').subscribe({
-      next: (board) => this.accept(board),
-      error: (failure: Error) => this.reject(failure),
+      next: (board) => this.after(started, () => this.accept(board)),
+      error: (failure: Error) => this.after(started, () => this.reject(failure)),
     });
+  }
+
+  /**
+   * Holds a very fast answer back for a moment. A spinner that appears and
+   * vanishes within a blink reads as a glitch, not as progress.
+   */
+  private after(started: number, done: () => void): void {
+    const left = MIN_WAIT - (Date.now() - started);
+    if (left <= 0) {
+      done();
+      return;
+    }
+    setTimeout(done, left);
   }
 
   /** Narrows the board to cards whose title or description match. */
