@@ -1,5 +1,18 @@
 /** Which kind of account is signed in. */
-export type UserRole = 'user' | 'guest';
+export type UserRole = 'user' | 'guest' | 'owner';
+
+/** Where a request for access stands. */
+export type AccessStatus = 'pending' | 'approved' | 'rejected';
+
+/** Someone who asked to use the app, as the owner's screen shows them. */
+export interface AccessRequest {
+  id: string;
+  name: string;
+  email: string;
+  status: AccessStatus;
+  created_at: string;
+  decided_at: string | null;
+}
 
 /** The signed-in user as the API returns it; never carries a password. */
 export interface User {
@@ -7,6 +20,8 @@ export interface User {
   name: string;
   email: string;
   role: UserRole;
+  /** Open access requests, counted only for the owner. */
+  pending?: number;
 }
 
 /** How urgent a task is. */

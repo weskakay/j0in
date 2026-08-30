@@ -140,6 +140,21 @@
   flex: 1;
 }
 
+/* Sits next to the label, so an open request is visible from every screen. */
+.shell__badge {
+  display: grid;
+  place-items: center;
+  min-width: 20px;
+  height: 20px;
+  margin-left: var(--j0in-space-xs);
+  padding: 0 6px;
+  border-radius: var(--j0in-radius-pill);
+  background: var(--j0in-danger);
+  color: var(--j0in-text-on-color);
+  font-size: 12px;
+  font-weight: var(--j0in-fw-bold);
+}
+
 .shell__nav-link--active {
   color: var(--j0in-accent);
   font-weight: var(--j0in-fw-bold);

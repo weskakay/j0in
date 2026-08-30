@@ -86,6 +86,23 @@
   }
 }
 
+@if (isOwner()) {
+  <section class="conf__block">
+    <h2 class="conf__heading">Zugänge</h2>
+    <p class="conf__note">
+      Wer sich registriert, landet zuerst hier. Erst nach der Freigabe kann sich die Adresse
+      anmelden und bekommt ein eigenes Board.
+    </p>
+    <app-access-list
+      [requests]="requests()"
+      [loading]="requestsLoading()"
+      [deciding]="deciding()"
+      (approved)="approve($event)"
+      (declined)="decline($event)"
+    />
+  </section>
+}
+
 <section class="conf__block">
   <h2 class="conf__heading">Konto</h2>
   <dl class="conf__facts">

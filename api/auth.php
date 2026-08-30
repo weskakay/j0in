@@ -14,33 +14,66 @@ function signUp(PDO $pdo, array $body): void
         fail(403, 'Registration is currently closed');
     }
     requireValidSignUp($pdo, $name, $email, $password);
-    $userId = insertUser($pdo, $name, $email, $password, 'user');
-    createBoardFor($pdo, $userId, 'Mein Board', false);
-    startSession($pdo, $userId, J0IN_DAYS_REMEMBER);
-    respond(201, ['id' => $userId, 'name' => $name, 'email' => $email, 'role' => 'user']);
+    reopenOrInsert($pdo, $name, $email, $password);
+    notifyOwner($pdo, $name, $email);
+    respond(202, ['pending' => true]);
 }
 
-/** Rejects anything the sign-up form should have caught, plus duplicates. */
+/**
+ * Rejects anything the sign-up form should have caught. An address that is
+ * already in use is turned away; one that was declined earlier is not, it may
+ * ask again and lands on the owner's desk a second time.
+ */
 function requireValidSignUp(PDO $pdo, string $name, string $email, string $password): void
 {
     if ($name === '' || !filter_var($email, FILTER_VALIDATE_EMAIL) || strlen($password) < 8) {
         fail(422, 'Please provide a name, a valid email and a password of at least 8 characters');
     }
-    $stmt = $pdo->prepare('SELECT 1 FROM join_users WHERE email = ?');
-    $stmt->execute([$email]);
-    if ($stmt->fetch()) {
-        fail(409, 'This email is already registered');
+    if (statusOf($pdo, $email) === 'approved') {
+        fail(409, 'Diese Adresse hat bereits einen Zugang');
     }
 }
 
-/** Stores the user with a BCRYPT hash; the plain password is never kept. */
-function insertUser(PDO $pdo, string $name, string $email, string $password, string $role): string
+/** The state of an account with this address, or an empty string. */
+function statusOf(PDO $pdo, string $email): string
 {
+    $stmt = $pdo->prepare('SELECT status FROM join_users WHERE email = ?');
+    $stmt->execute([$email]);
+    return (string) ($stmt->fetchColumn() ?: '');
+}
+
+/**
+ * Files the request. An address that asked before is put back on the pile
+ * with its new password, so a change of mind on either side is possible.
+ */
+function reopenOrInsert(PDO $pdo, string $name, string $email, string $password): void
+{
+    if (statusOf($pdo, $email) === '') {
+        insertUser($pdo, $name, $email, $password, 'user', 'pending');
+        return;
+    }
+    $stmt = $pdo->prepare(
+        "UPDATE join_users SET name = ?, password_hash = ?, status = 'pending', decided_at = NULL
+         WHERE email = ?"
+    );
+    $stmt->execute([$name, password_hash($password, PASSWORD_BCRYPT), $email]);
+}
+
+/** Stores the user with a BCRYPT hash; the plain password is never kept. */
+function insertUser(
+    PDO $pdo,
+    string $name,
+    string $email,
+    string $password,
+    string $role,
+    string $status = 'approved'
+): string {
     $id = uuid();
     $stmt = $pdo->prepare(
-        'INSERT INTO join_users (id, name, email, password_hash, role) VALUES (?, ?, ?, ?, ?)'
+        'INSERT INTO join_users (id, name, email, password_hash, role, status)
+         VALUES (?, ?, ?, ?, ?, ?)'
     );
-    $stmt->execute([$id, $name, $email, password_hash($password, PASSWORD_BCRYPT), $role]);
+    $stmt->execute([$id, $name, $email, password_hash($password, PASSWORD_BCRYPT), $role, $status]);
     return $id;
 }
 
@@ -90,10 +123,23 @@ function signIn(PDO $pdo, array $body): void
         countFailure($pdo, $ip);
         fail(401, 'Email or password is wrong');
     }
+    requireApproved($user);
     clearFailures($pdo, $ip);
     $days = ($body['remember'] ?? false) ? J0IN_DAYS_REMEMBER : 1;
     startSession($pdo, $user['id'], $days);
     respond(200, publicUser($user));
+}
+
+/** Refuses a sign-in while the account is not approved. */
+function requireApproved(array $user): void
+{
+    $status = $user['status'] ?? 'approved';
+    if ($status === 'pending') {
+        fail(403, 'Dieser Zugang wartet noch auf die Freigabe');
+    }
+    if ($status !== 'approved') {
+        fail(403, 'Dieser Zugang ist nicht freigegeben');
+    }
 }
 
 /**
@@ -104,7 +150,7 @@ function signIn(PDO $pdo, array $body): void
 function findUserByEmail(PDO $pdo, string $email): ?array
 {
     $stmt = $pdo->prepare(
-        'SELECT id, name, email, role, password_hash FROM join_users WHERE email = ?'
+        'SELECT id, name, email, role, status, password_hash FROM join_users WHERE email = ?'
     );
     $stmt->execute([$email]);
     return $stmt->fetch() ?: null;
@@ -168,9 +214,10 @@ function refillDemoIfEmpty(PDO $pdo, string $userId): void
 function publicUser(array $user): array
 {
     return [
-        'id'    => $user['id'],
-        'name'  => $user['name'],
-        'email' => $user['email'],
-        'role'  => $user['role'],
+        'id'      => $user['id'],
+        'name'    => $user['name'],
+        'email'   => $user['email'],
+        'role'    => $user['role'],
+        'pending' => ($user['role'] ?? '') === 'owner' ? countPending(db()) : 0,
     ];
 }

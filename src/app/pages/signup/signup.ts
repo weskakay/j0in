@@ -1,11 +1,14 @@
 import { Component, inject, signal } from '@angular/core';
 import { AbstractControl, FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Router, RouterLink } from '@angular/router';
+import { RouterLink } from '@angular/router';
 import { AuthService } from '../../core/auth.service';
 
 const MIN_PASSWORD = 8;
 
-/** Registration screen. The account gets a board with starting columns. */
+/**
+ * Registration screen. Signing up files a request rather than creating a
+ * usable account; the owner decides, and only then does the board appear.
+ */
 @Component({
   selector: 'app-signup',
   imports: [ReactiveFormsModule, RouterLink],
@@ -14,11 +17,13 @@ const MIN_PASSWORD = 8;
 })
 export class Signup {
   private readonly auth = inject(AuthService);
-  private readonly router = inject(Router);
   private readonly fb = inject(FormBuilder);
 
   protected readonly error = signal('');
   protected readonly busy = signal(false);
+
+  /** True once the request has been filed, which ends the form's job. */
+  protected readonly filed = signal(false);
 
   protected readonly form = this.fb.nonNullable.group(
     {
@@ -53,9 +58,15 @@ export class Signup {
     this.error.set('');
     const { name, email, password } = this.form.getRawValue();
     this.auth.signUp({ name, email, password }).subscribe({
-      next: () => void this.router.navigate(['/summary']),
+      next: () => this.showFiled(),
       error: (e: Error) => this.showError(e),
     });
+  }
+
+  /** Replaces the form with the note that the request is waiting. */
+  private showFiled(): void {
+    this.busy.set(false);
+    this.filed.set(true);
   }
 
   /** Puts the server's message on screen and frees the button again. */

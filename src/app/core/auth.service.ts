@@ -46,9 +46,12 @@ export class AuthService {
       .pipe(tap((result) => this.applyRestored(result)));
   }
 
-  /** Registers a new account and signs it in. */
-  signUp(input: SignUpInput): Observable<User> {
-    return this.api.post<User>('/auth/signup', input).pipe(tap((u) => this.currentUser.set(u)));
+  /**
+   * Files a request for access. Nobody is signed in by this: the account only
+   * becomes usable once the owner has approved it.
+   */
+  signUp(input: SignUpInput): Observable<{ pending: boolean }> {
+    return this.api.post<{ pending: boolean }>('/auth/signup', input);
   }
 
   /** Signs in with email and password. */

@@ -2,9 +2,11 @@ import { Component, computed, inject, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthService } from '../../core/auth.service';
 import { BoardStore } from '../../core/board.store';
+import { AccessService } from '../../core/access.service';
 import { ThemeService, type Theme } from '../../core/theme.service';
-import type { Category } from '../../data/models';
+import type { AccessRequest, Category } from '../../data/models';
 import { ColorPicker } from '../../layout/color-picker/color-picker';
+import { AccessList } from './access-list/access-list';
 import {
   CategoryManager,
   type CategoryDraft,
@@ -32,7 +34,7 @@ interface ThemeChoice {
 /** Appearance, the board's name, and what belongs to the account. */
 @Component({
   selector: 'app-settings',
-  imports: [ColorPicker, CategoryManager],
+  imports: [ColorPicker, CategoryManager, AccessList],
   templateUrl: './settings.html',
   styleUrl: './settings.scss',
 })
@@ -41,12 +43,25 @@ export class Settings {
   private readonly store = inject(BoardStore);
   private readonly auth = inject(AuthService);
   private readonly router = inject(Router);
+  private readonly access = inject(AccessService);
 
   /** The signed-in user. */
   protected readonly user = this.auth.user;
 
   /** Whether this is the shared guest account. */
   protected readonly isGuest = computed(() => this.user()?.role === 'guest');
+
+  /** Whether this account decides who may use the app. */
+  protected readonly isOwner = computed(() => this.user()?.role === 'owner');
+
+  /** The requests for access, for the owner's cards. */
+  protected readonly requests = this.access.requests;
+
+  /** True while the request list is being fetched. */
+  protected readonly requestsLoading = this.access.loading;
+
+  /** Id of the request a decision is currently running for. */
+  protected readonly deciding = signal('');
 
   /** The current appearance choice. */
   protected readonly theme = this.themes.theme;
@@ -84,6 +99,37 @@ export class Settings {
 
   constructor() {
     this.store.load();
+    if (this.isOwner()) {
+      this.access.load();
+    }
+  }
+
+  /** Lets one address in. */
+  protected approve(request: AccessRequest): void {
+    this.deciding.set(request.id);
+    this.access.approve(request.id).subscribe({
+      next: () => this.decided(`${request.email} freigegeben`),
+      error: () => this.deciding.set(''),
+    });
+  }
+
+  /** Turns one request down. */
+  protected decline(request: AccessRequest): void {
+    this.deciding.set(request.id);
+    this.access.decline(request.id).subscribe({
+      next: () => this.decided(`${request.email} abgelehnt`),
+      error: () => this.deciding.set(''),
+    });
+  }
+
+  /**
+   * Clears the running decision, says what happened, and reads the account
+   * back so the badge in the navigation matches what is left.
+   */
+  private decided(message: string): void {
+    this.deciding.set('');
+    this.done.set(message);
+    this.auth.restore().subscribe();
   }
 
   /** Switches the accent colour. */

@@ -1,0 +1,44 @@
+@if (loading() && requests().length === 0) {
+  <p class="acc__note">Anfragen werden geladen …</p>
+}
+
+<ul class="acc__list">
+  @for (request of requests(); track request.id) {
+    <li class="acc__card" [class.acc__card--closed]="!isOpen(request)">
+      <span class="acc__avatar">{{ initials(request) }}</span>
+
+      <span class="acc__text">
+        <span class="acc__name">{{ request.name }}</span>
+        <a class="acc__mail" [href]="'mailto:' + request.email">{{ request.email }}</a>
+        <span class="acc__when">gefragt am {{ asked(request) }}</span>
+      </span>
+
+      @if (isOpen(request)) {
+        <span class="acc__actions">
+          <button
+            class="acc__btn"
+            type="button"
+            [disabled]="deciding() === request.id"
+            (click)="declined.emit(request)"
+          >
+            Ablehnen
+          </button>
+          <button
+            class="acc__btn acc__btn--yes"
+            type="button"
+            [disabled]="deciding() === request.id"
+            (click)="approved.emit(request)"
+          >
+            Freigeben
+          </button>
+        </span>
+      } @else {
+        <span class="acc__state">abgelehnt</span>
+      }
+    </li>
+  } @empty {
+    @if (!loading()) {
+      <li class="acc__note">Keine offenen Anfragen.</li>
+    }
+  }
+</ul>

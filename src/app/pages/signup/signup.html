@@ -1,11 +1,23 @@
 <main class="auth">
   <section class="auth__card">
-    <h1 class="auth__brand">Konto anlegen</h1>
-    <p class="auth__lead">Danach steht dein Board bereit.</p>
+    <h1 class="auth__brand">Zugang anfragen</h1>
 
-    @if (error()) {
-      <p class="auth__error" role="alert">{{ error() }}</p>
-    }
+    @if (filed()) {
+      <p class="auth__lead">
+        Deine Anfrage ist eingegangen. Sobald sie freigegeben ist, kannst du dich mit deiner
+        Mailadresse anmelden. Bis dahin passiert nichts weiter.
+      </p>
+      <p class="auth__switch">
+        <a routerLink="/login">Zur Anmeldung</a>
+      </p>
+    } @else {
+      <p class="auth__lead">
+        Zugänge werden von Hand freigegeben. Du legst hier eine Anfrage an, kein fertiges Konto.
+      </p>
+
+      @if (error()) {
+        <p class="auth__error" role="alert">{{ error() }}</p>
+      }
 
     <form class="auth__form" [formGroup]="form" (ngSubmit)="submit()" novalidate>
       <label class="auth__field">
@@ -83,5 +95,6 @@
       Schon ein Konto?
       <a routerLink="/login">Anmelden</a>
     </p>
+    }
   </section>
 </main>

@@ -39,6 +39,11 @@
             (click)="closeMenu()"
           >
             {{ item.label }}
+            @if (item.path === '/settings' && pending() > 0) {
+              <span class="shell__badge" [attr.aria-label]="pending() + ' offene Anfragen'">
+                {{ pending() }}
+              </span>
+            }
           </a>
         </li>
       }

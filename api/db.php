@@ -14,18 +14,22 @@ function db(): PDO
 }
 
 /**
- * Reads the credentials. Throws when the file is missing, so a broken deploy
- * fails loudly instead of answering half-way.
+ * Reads the credentials.
+ *
+ * They are looked for outside the web root first. A file up there cannot be
+ * fetched over HTTP at all, and it survives emptying the web directory before
+ * a deploy, so the password never has to travel in a package.
  *
  * @return array<string, string>
  */
 function readConfig(): array
 {
-    $file = __DIR__ . '/config.php';
-    if (!is_file($file)) {
-        throw new RuntimeException('config.php is missing');
+    foreach ([__DIR__ . '/../../private/config.php', __DIR__ . '/config.php'] as $file) {
+        if (is_file($file)) {
+            return require $file;
+        }
     }
-    return require $file;
+    throw new RuntimeException('config.php is missing');
 }
 
 /**

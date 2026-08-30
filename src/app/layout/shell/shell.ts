@@ -1,4 +1,4 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
 import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { AuthService } from '../../core/auth.service';
 import { BoardStore } from '../../core/board.store';
@@ -38,6 +38,9 @@ export class Shell {
     { path: '/contacts', label: 'Kontakte' },
     { path: '/settings', label: 'Einstellungen' },
   ];
+
+  /** How many access requests are waiting, shown as a badge. */
+  protected readonly pending = computed(() => this.user()?.pending ?? 0);
 
   /** Letters on the avatar button. */
   protected initials(): string {

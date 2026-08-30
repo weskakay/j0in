@@ -15,6 +15,7 @@ require __DIR__ . '/board.php';
 require __DIR__ . '/columns.php';
 require __DIR__ . '/tasks.php';
 require __DIR__ . '/contacts.php';
+require __DIR__ . '/access.php';
 require __DIR__ . '/demo.php';
 require __DIR__ . '/routes.php';
 
@@ -36,9 +37,16 @@ function handleAuth(PDO $pdo, string $method, string $action): void
         $method === 'POST' && $action === 'login'  => signIn($pdo, $body),
         $method === 'POST' && $action === 'guest'  => signInAsGuest($pdo),
         $method === 'POST' && $action === 'logout' => logoutAndRespond($pdo),
-        $method === 'GET'  && $action === 'me'     => respond(200, currentUser($pdo) ?? []),
+        $method === 'GET'  && $action === 'me'     => respondWithUser($pdo),
         default => fail(405, 'Method not allowed'),
     };
+}
+
+/** Answers with the signed-in user, or an empty object when there is none. */
+function respondWithUser(PDO $pdo): void
+{
+    $user = currentUser($pdo);
+    respond(200, $user === null ? [] : publicUser($user));
 }
 
 /** Ends the session and confirms it. */
@@ -64,20 +72,34 @@ function handleHealth(): void
     respond(200, ['ok' => true, 'php' => PHP_VERSION, 'database' => $db]);
 }
 
+/** Routes everything under /api/access, which only the owner may reach. */
+function handleAccess(PDO $pdo, string $method, array $seg): void
+{
+    $user = requireUser($pdo);
+    $id = $seg[1] ?? '';
+    $action = $seg[2] ?? '';
+    match (true) {
+        $method === 'GET' && $id === ''             => readRequests($pdo, $user),
+        $method === 'POST' && $action === 'approve' => approveRequest($pdo, $user, $id),
+        $method === 'POST' && $action === 'reject'  => rejectRequest($pdo, $user, $id),
+        default => fail(405, 'Method not allowed'),
+    };
+}
+
+/** The areas that need a signed-in user and their board. */
+const J0IN_BOARD_AREAS = ['board', 'columns', 'categories', 'tasks', 'subtasks', 'contacts'];
+
 /** Entry point: picks the area from the first path segment. */
 function handle(string $method, array $seg): void
 {
     $area = $seg[0] ?? '';
-    if ($area === 'health') {
-        handleHealth();
-    }
-    if ($area === 'auth') {
-        handleAuth(db(), $method, $seg[1] ?? '');
-    }
-    if (in_array($area, ['board', 'columns', 'categories', 'tasks', 'subtasks', 'contacts'], true)) {
-        handleBoardArea(db(), $method, $seg);
-    }
-    fail(404, 'Not found');
+    match (true) {
+        $area === 'health' => handleHealth(),
+        $area === 'auth'   => handleAuth(db(), $method, $seg[1] ?? ''),
+        $area === 'access' => handleAccess(db(), $method, $seg),
+        in_array($area, J0IN_BOARD_AREAS, true) => handleBoardArea(db(), $method, $seg),
+        default => fail(404, 'Not found'),
+    };
 }
 
 try {
