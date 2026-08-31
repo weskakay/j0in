@@ -1,5 +1,15 @@
-import { Component, ElementRef, effect, input, output, signal, viewChild } from '@angular/core';
+import {
+  Component,
+  ElementRef,
+  effect,
+  inject,
+  input,
+  output,
+  signal,
+  viewChild,
+} from '@angular/core';
 import type { Column } from '../../../data/models';
+import { LanguageService } from '../../../core/language.service';
 
 /** Heading of one column: its name, its card count and what can be done to it. */
 @Component({
@@ -9,6 +19,11 @@ import type { Column } from '../../../data/models';
   styleUrl: './column-head.scss',
 })
 export class ColumnHead {
+  private readonly language = inject(LanguageService);
+
+  /** Every piece of text, in the language currently on screen. */
+  protected readonly t = this.language.dict;
+
   /** The column this heading belongs to. */
   readonly column = input.required<Column>();
 

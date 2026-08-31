@@ -69,7 +69,7 @@ function requireUser(PDO $pdo): array
 {
     $user = currentUser($pdo);
     if ($user === null) {
-        fail(401, 'Not signed in');
+        fail(401, 'session.signed_out');
     }
     return $user;
 }
@@ -85,7 +85,7 @@ function requireBoardId(PDO $pdo, string $userId): string
     $stmt->execute([$userId]);
     $id = $stmt->fetchColumn();
     if ($id === false) {
-        fail(404, 'No board for this account');
+        fail(404, 'session.no_board');
     }
     return (string) $id;
 }

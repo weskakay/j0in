@@ -1,21 +1,21 @@
 <h1 class="sum__hello">{{ hello() }}</h1>
-<p class="sum__sub">Das steht heute auf {{ boardName() || 'deinem Board' }}.</p>
+<p class="sum__sub">{{ t().summary.sub }} {{ boardName() || t().summary.subFallback }}.</p>
 
 @if (error(); as message) {
   <p class="sum__error" role="alert">
     {{ message }}
-    <button class="sum__retry" type="button" (click)="retry()">Erneut laden</button>
+    <button class="sum__retry" type="button" (click)="retry()">{{ t().common.retry }}</button>
   </p>
 }
 
 @if (loading() && !ready()) {
-  <app-loader label="Übersicht wird geladen" />
+  <app-loader [label]="t().common.loading" />
 }
 
 @if (ready()) {
   @if (total() === 0) {
     <p class="sum__empty">
-      Noch keine Aufgaben. Auf dem <a routerLink="/board">Board</a> legst du die erste an.
+      {{ t().summary.empty }} <a routerLink="/board">{{ t().summary.emptyLink }}</a>.
     </p>
   } @else {
     <div class="sum__grid">
@@ -23,12 +23,12 @@
         <span class="tile__figure tile__figure--urgent">{{ urgent().length }}</span>
         <span class="tile__text">
           <span class="tile__label">
-            {{ urgent().length === 1 ? 'dringende Aufgabe' : 'dringende Aufgaben' }}
+            {{ urgent().length === 1 ? t().summary.urgentOne : t().summary.urgentMany }}
           </span>
           @if (nextDue()) {
-            <span class="tile__note">nächste Frist am {{ nextDue() }}</span>
+            <span class="tile__note">{{ t().summary.nextDue }} {{ nextDue() }}</span>
           } @else {
-            <span class="tile__note">keine Frist gesetzt</span>
+            <span class="tile__note">{{ t().summary.noDue }}</span>
           }
         </span>
       </a>
@@ -37,7 +37,7 @@
         <a class="tile tile--warn" routerLink="/board">
           <span class="tile__figure">{{ overdue().length }}</span>
           <span class="tile__label">
-            {{ overdue().length === 1 ? 'Frist überschritten' : 'Fristen überschritten' }}
+            {{ overdue().length === 1 ? t().summary.overdueOne : t().summary.overdueMany }}
           </span>
         </a>
       }
@@ -45,7 +45,7 @@
       <a class="tile" routerLink="/board">
         <span class="tile__figure">{{ total() }}</span>
         <span class="tile__label">
-          {{ total() === 1 ? 'Aufgabe insgesamt' : 'Aufgaben insgesamt' }}
+          {{ total() === 1 ? t().summary.totalOne : t().summary.totalMany }}
         </span>
       </a>
 
@@ -59,7 +59,7 @@
       @if (subtasksTotal() > 0) {
         <a class="tile" routerLink="/board">
           <span class="tile__figure">{{ subtasksDone() }}/{{ subtasksTotal() }}</span>
-          <span class="tile__label">Teilaufgaben erledigt</span>
+          <span class="tile__label">{{ t().summary.subtasksDone }}</span>
         </a>
       }
     </div>
@@ -68,11 +68,11 @@
 
 @if (ready() && total() > 0) {
   <section class="sum__stats">
-    <h2 class="sum__stats-title">Auswertung</h2>
+    <h2 class="sum__stats-title">{{ t().summary.breakdown }}</h2>
     <div class="sum__stats-grid">
-      <app-donut caption="Prioritäten" [rows]="byPriority()" />
-      <app-bars caption="Verteilung auf die Spalten" [rows]="byColumn()" />
-      <app-segments class="sum__wide" caption="Fristen" [rows]="byDeadline()" />
+      <app-donut [caption]="t().summary.byPriority" [unit]="t().summary.tasksUnit" [rows]="byPriority()" />
+      <app-bars [caption]="t().summary.byColumn" [rows]="byColumn()" />
+      <app-segments class="sum__wide" [caption]="t().summary.byDeadline" [rows]="byDeadline()" />
     </div>
   </section>
 }

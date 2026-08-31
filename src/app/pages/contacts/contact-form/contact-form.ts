@@ -1,5 +1,6 @@
 import { Component, type OnInit, computed, inject, input, output } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { LanguageService } from '../../../core/language.service';
 import type { Contact, ContactInput } from '../../../data/models';
 
 /** Collects a contact's details, for adding as well as editing. */
@@ -11,6 +12,10 @@ import type { Contact, ContactInput } from '../../../data/models';
 })
 export class ContactForm implements OnInit {
   private readonly fb = inject(FormBuilder);
+  private readonly language = inject(LanguageService);
+
+  /** Every piece of text, in the language currently on screen. */
+  protected readonly t = this.language.dict;
 
   /** The contact being edited, or null when a new one is added. */
   readonly contact = input<Contact | null>(null);
@@ -32,7 +37,9 @@ export class ContactForm implements OnInit {
   });
 
   /** Text of the saving button, which differs between the two uses. */
-  protected readonly saveLabel = computed(() => (this.contact() ? 'Speichern' : 'Anlegen'));
+  protected readonly saveLabel = computed(() =>
+    this.contact() ? this.t().common.save : this.t().category.create,
+  );
 
   /** Inputs are only set after construction, so the form is filled here. */
   ngOnInit(): void {

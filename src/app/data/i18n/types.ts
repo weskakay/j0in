@@ -1,0 +1,245 @@
+/** The two languages the interface is offered in. */
+export type Lang = 'de' | 'en';
+
+/**
+ * The codes the API answers with instead of sentences. Listing them here means
+ * a dictionary that forgets one no longer compiles.
+ */
+export type ErrorCode =
+  | 'access.owner_only'
+  | 'access.request_not_found'
+  | 'auth.bad_credentials'
+  | 'auth.email_taken'
+  | 'auth.guest_closed'
+  | 'auth.pending'
+  | 'auth.rejected'
+  | 'auth.signup_closed'
+  | 'auth.signup_invalid'
+  | 'board.demo_only'
+  | 'board.name_required'
+  | 'category.name_required'
+  | 'category.not_found'
+  | 'column.has_tasks'
+  | 'column.name_required'
+  | 'column.not_found'
+  | 'column.nothing_to_change'
+  | 'contact.name_required'
+  | 'contact.not_found'
+  | 'http.method_not_allowed'
+  | 'http.not_found'
+  | 'rate.too_many'
+  | 'server.error'
+  | 'session.no_board'
+  | 'session.signed_out'
+  | 'subtask.not_found'
+  | 'task.bad_priority'
+  | 'task.due_required'
+  | 'task.not_found'
+  | 'task.title_required'
+  | 'network.offline'
+  | 'network.unknown';
+
+/** Every piece of text the interface shows, in one shape per language. */
+export interface Dictionary {
+  common: {
+    save: string;
+    cancel: string;
+    close: string;
+    delete: string;
+    edit: string;
+    loading: string;
+    retry: string;
+    language: string;
+  };
+  nav: {
+    label: string;
+    summary: string;
+    board: string;
+    contacts: string;
+    settings: string;
+    account: string;
+    logout: string;
+    pending: string;
+  };
+  auth: {
+    lead: string;
+    email: string;
+    emailInvalid: string;
+    password: string;
+    passwordMissing: string;
+    passwordShort: string;
+    passwordRepeat: string;
+    passwordMismatch: string;
+    stayed: string;
+    signIn: string;
+    asGuest: string;
+    noAccount: string;
+    signUp: string;
+    haveAccount: string;
+    name: string;
+    nameMissing: string;
+    requestAccess: string;
+    requestNote: string;
+    requestSent: string;
+    toSignIn: string;
+    createAccount: string;
+    acceptPrefix: string;
+    privacyPolicy: string;
+    acceptMissing: string;
+    imprint: string;
+    privacy: string;
+  };
+  board: {
+    search: string;
+    addColumn: string;
+    columnName: string;
+    empty: string;
+    newTask: string;
+    editColumn: string;
+    rename: string;
+    deleteColumn: string;
+    moveCard: string;
+    columnEmpty: string;
+    stillHolds: string;
+    moveTo: string;
+    deleteWithColumn: string;
+    warnDeletes: string;
+    confirmTask: string;
+    deleteTask: string;
+    deleting: string;
+  };
+  task: {
+    newTask: string;
+    editTask: string;
+    deleteTask: string;
+    title: string;
+    titleMissing: string;
+    description: string;
+    column: string;
+    category: string;
+    noCategory: string;
+    due: string;
+    dueMissing: string;
+    noDue: string;
+    priority: string;
+    urgent: string;
+    medium: string;
+    low: string;
+    assignTo: string;
+    assignedTo: string;
+    subtasks: string;
+    subtaskAdd: string;
+    subtaskPlaceholder: string;
+    subtaskRemove: string;
+    create: string;
+    saving: string;
+  };
+  summary: {
+    morning: string;
+    day: string;
+    evening: string;
+    sub: string;
+    subFallback: string;
+    empty: string;
+    emptyLink: string;
+    urgentOne: string;
+    urgentMany: string;
+    nextDue: string;
+    noDue: string;
+    overdueOne: string;
+    overdueMany: string;
+    totalOne: string;
+    totalMany: string;
+    subtasksDone: string;
+    breakdown: string;
+    byColumn: string;
+    byPriority: string;
+    byDeadline: string;
+    tasksUnit: string;
+    nothing: string;
+    overdue: string;
+    today: string;
+    thisWeek: string;
+    later: string;
+    noDate: string;
+  };
+  settings: {
+    title: string;
+    appearance: string;
+    appearanceNote: string;
+    accent: string;
+    accentNote: string;
+    system: string;
+    systemNote: string;
+    light: string;
+    lightNote: string;
+    dark: string;
+    darkNote: string;
+    categories: string;
+    categoriesNote: string;
+    board: string;
+    boardName: string;
+    boardNameNote: string;
+    demo: string;
+    demoNote: string;
+    demoReset: string;
+    demoResetting: string;
+    access: string;
+    accessNote: string;
+    legal: string;
+    account: string;
+    signedInAs: string;
+    email: string;
+    signOut: string;
+    savedName: string;
+    savedTheme: string;
+    savedAccent: string;
+    savedDemo: string;
+    savedCategory: string;
+    addedCategory: string;
+    removedCategory: string;
+    approved: string;
+    declined: string;
+  };
+  contacts: {
+    title: string;
+    newContact: string;
+    editContact: string;
+    deleteContact: string;
+    loading: string;
+    empty: string;
+    name: string;
+    nameMissing: string;
+    email: string;
+    emailInvalid: string;
+    phone: string;
+    notGiven: string;
+    assigned: string;
+    taskOne: string;
+    taskMany: string;
+    confirmPrefix: string;
+    confirmSuffix: string;
+    alsoDropsFrom: string;
+    tasksStay: string;
+    saving: string;
+    deletingNow: string;
+  };
+  access: {
+    loading: string;
+    empty: string;
+    askedOn: string;
+    approve: string;
+    decline: string;
+    declined: string;
+  };
+  category: {
+    name: string;
+    placeholder: string;
+    empty: string;
+    add: string;
+    create: string;
+    editOne: string;
+    deleteOne: string;
+  };
+  errors: Record<ErrorCode, string>;
+}

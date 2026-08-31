@@ -4,7 +4,7 @@
       @if (editing() === category.id) {
         <div class="cats__form">
           <label class="cats__field">
-            <span class="cats__label">Name</span>
+            <span class="cats__label">{{ t().category.name }}</span>
             <input
               class="cats__input"
               type="text"
@@ -16,26 +16,26 @@
           <app-color-picker [value]="draftColor()" (picked)="pickColor($event)" />
 
           <span class="cats__actions">
-            <button class="cats__btn" type="button" (click)="cancel()">Abbrechen</button>
+            <button class="cats__btn" type="button" (click)="cancel()">{{ t().common.cancel }}</button>
             <button
               class="cats__btn cats__btn--primary"
               type="button"
               [disabled]="busy()"
               (click)="saveEdit(category.id)"
             >
-              Speichern
+              {{ t().common.save }}
             </button>
           </span>
         </div>
       } @else {
         <span class="cats__chip" [style.background]="category.color">{{ category.name }}</span>
         <span class="cats__count">
-          {{ countFor(category) }} {{ countFor(category) === 1 ? 'Aufgabe' : 'Aufgaben' }}
+          {{ countFor(category) }} {{ taskWord(category) }}
         </span>
         <button
           class="cats__icon"
           type="button"
-          [attr.aria-label]="'Kategorie ' + category.name + ' bearbeiten'"
+          [attr.aria-label]="category.name + ' ' + t().category.editOne"
           (click)="startEditing(category)"
         >
           <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
@@ -46,7 +46,7 @@
         <button
           class="cats__icon cats__icon--danger"
           type="button"
-          [attr.aria-label]="'Kategorie ' + category.name + ' löschen'"
+          [attr.aria-label]="category.name + ' ' + t().category.deleteOne"
           (click)="removed.emit(category)"
         >
           <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
@@ -57,18 +57,18 @@
       }
     </li>
   } @empty {
-    <li class="cats__empty">Noch keine Kategorien.</li>
+    <li class="cats__empty">{{ t().category.empty }}</li>
   }
 </ul>
 
 @if (adding()) {
   <div class="cats__form cats__form--new">
     <label class="cats__field">
-      <span class="cats__label">Name</span>
+      <span class="cats__label">{{ t().category.name }}</span>
       <input
         class="cats__input"
         type="text"
-        placeholder="Wofür steht die Kategorie?"
+        [placeholder]="t().category.placeholder"
         [value]="draftName()"
         (input)="onName($event)"
       />
@@ -77,17 +77,17 @@
     <app-color-picker [value]="draftColor()" (picked)="pickColor($event)" />
 
     <span class="cats__actions">
-      <button class="cats__btn" type="button" (click)="cancel()">Abbrechen</button>
+      <button class="cats__btn" type="button" (click)="cancel()">{{ t().common.cancel }}</button>
       <button
         class="cats__btn cats__btn--primary"
         type="button"
         [disabled]="busy()"
         (click)="saveNew()"
       >
-        Anlegen
+        {{ t().category.create }}
       </button>
     </span>
   </div>
 } @else {
-  <button class="cats__add" type="button" (click)="startAdding()">Kategorie hinzufügen</button>
+  <button class="cats__add" type="button" (click)="startAdding()">{{ t().category.add }}</button>
 }

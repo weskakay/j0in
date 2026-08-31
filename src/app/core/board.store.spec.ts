@@ -94,6 +94,20 @@ describe('BoardStore', () => {
     expect(store.tasks().length).toBe(2);
   });
 
+  it('meldet nur dann keinen Treffer, wenn wirklich gesucht wurde', () => {
+    deliverBoard();
+    expect(store.noMatches()).toBe(false);
+
+    store.setSearch('dach');
+    expect(store.noMatches()).toBe(false);
+
+    store.setSearch('gibt es nicht');
+    expect(store.noMatches()).toBe(true);
+
+    store.setSearch('   ');
+    expect(store.noMatches()).toBe(false);
+  });
+
   it('lässt die Spalten stehen, auch wenn keine Karte passt', () => {
     deliverBoard();
     store.setSearch('gibt es nicht');

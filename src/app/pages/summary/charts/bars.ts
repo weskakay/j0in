@@ -1,4 +1,5 @@
-import { Component, computed, input } from '@angular/core';
+import { Component, computed, inject, input } from '@angular/core';
+import { LanguageService } from '../../../core/language.service';
 import { type ChartRow, shareOf, sumOf } from './chart-row';
 
 /** Horizontal bars, one per row, scaled against the largest of them. */
@@ -9,6 +10,11 @@ import { type ChartRow, shareOf, sumOf } from './chart-row';
   styleUrl: './bars.scss',
 })
 export class Bars {
+  private readonly language = inject(LanguageService);
+
+  /** Every piece of text, in the language currently on screen. */
+  protected readonly t = this.language.dict;
+
   /** Heading above the bars. */
   readonly caption = input.required<string>();
 

@@ -5,7 +5,7 @@
       #field
       type="text"
       [value]="column().name"
-      [attr.aria-label]="'Name der Spalte ' + column().name"
+      [attr.aria-label]="t().board.columnName"
       (keydown)="onKeydown($event)"
       (blur)="confirm()"
     />
@@ -19,7 +19,7 @@
         type="button"
         [attr.aria-expanded]="menuOpen()"
         aria-haspopup="menu"
-        [attr.aria-label]="'Spalte ' + column().name + ' bearbeiten'"
+        [attr.aria-label]="column().name + ' ' + t().board.editColumn"
         (click)="toggleMenu()"
       >
         <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
@@ -31,7 +31,7 @@
       @if (menuOpen()) {
         <div class="head__menu" role="menu">
           <button class="head__menu-item" type="button" role="menuitem" (click)="startEdit()">
-            Umbenennen
+            {{ t().board.rename }}
           </button>
           <button
             class="head__menu-item head__menu-item--danger"
@@ -39,7 +39,7 @@
             role="menuitem"
             (click)="requestRemove()"
           >
-            Spalte löschen
+            {{ t().board.deleteColumn }}
           </button>
         </div>
       }
@@ -48,7 +48,7 @@
     <button
       class="head__btn"
       type="button"
-      [attr.aria-label]="'Aufgabe in ' + column().name + ' anlegen'"
+      [attr.aria-label]="t().board.newTask + ': ' + column().name"
       (click)="added.emit()"
     >
       <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">

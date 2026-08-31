@@ -1,6 +1,8 @@
 import { Component, ElementRef, computed, effect, inject, signal, viewChild } from '@angular/core';
 import { BoardStore, type ColumnDisposal, type ColumnWithTasks } from '../../core/board.store';
+import { LanguageService } from '../../core/language.service';
 import type { Category, Column, Task, TaskInput } from '../../data/models';
+import type { Dictionary } from '../../data/i18n';
 import { TaskCard } from './task-card/task-card';
 import { Dialog } from '../../layout/dialog/dialog';
 import { TaskDetail, type SubtaskToggle } from './task-detail/task-detail';
@@ -25,6 +27,10 @@ type DialogMode = 'none' | 'detail' | 'edit' | 'create' | 'wipeColumn' | 'wipeTa
 export class Board {
   private readonly store = inject(BoardStore);
   private readonly drag = inject(BoardDrag);
+  private readonly language = inject(LanguageService);
+
+  /** Every piece of text, in the language currently on screen. */
+  protected readonly t = this.language.dict;
 
   /** The card being dragged, or null. Drives the preview under the pointer. */
   protected readonly dragged = this.drag.task;
@@ -46,6 +52,9 @@ export class Board {
 
   /** Columns together with the cards that belong in them. */
   protected readonly board = this.store.board;
+
+  /** The search found nothing, so the board says so instead of staying blank. */
+  protected readonly noMatches = this.store.noMatches;
 
   /** All columns, offered in the form. */
   protected readonly columns = this.store.columns;
@@ -91,7 +100,9 @@ export class Board {
   });
 
   /** Heading of the open dialog. */
-  protected readonly heading = computed(() => headingFor(this.mode(), this.current()));
+  protected readonly heading = computed(() =>
+    headingFor(this.mode(), this.current(), this.t()),
+  );
 
   /** How many cards sit in the column that is about to go. */
   protected readonly doomedCount = computed(
@@ -286,13 +297,6 @@ export class Board {
   }
 }
 
-const HEADINGS: Partial<Record<DialogMode, string>> = {
-  wipeColumn: 'Spalte löschen',
-  wipeTask: 'Aufgabe löschen',
-  create: 'Neue Aufgabe',
-  edit: 'Aufgabe bearbeiten',
-};
-
 const ARROWS = ['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown'];
 
 /** Where a card goes when it is nudged, or null when it cannot move there. */
@@ -339,8 +343,14 @@ function acrossColumns(
 }
 
 /** The heading the dialog carries in each of its uses. */
-function headingFor(mode: DialogMode, task: Task | null): string {
-  return HEADINGS[mode] ?? task?.title ?? '';
+function headingFor(mode: DialogMode, task: Task | null, t: Dictionary): string {
+  const fixed: Partial<Record<DialogMode, string>> = {
+    wipeColumn: t.board.deleteColumn,
+    wipeTask: t.task.deleteTask,
+    create: t.task.newTask,
+    edit: t.task.editTask,
+  };
+  return fixed[mode] ?? task?.title ?? '';
 }
 
 /** Copy of a task in which one subtask carries its new state. */

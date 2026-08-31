@@ -57,6 +57,11 @@
   color: var(--j0in-danger);
 }
 
+.board__empty {
+  margin-bottom: var(--j0in-space-md);
+  color: var(--j0in-text-muted);
+}
+
 .board__retry {
   min-height: var(--j0in-tap-target);
   padding: 0 var(--j0in-space-md);

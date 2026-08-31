@@ -2,6 +2,7 @@ import { Component, type OnInit, computed, inject, input, output, signal } from 
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import type { Category, Column, Contact, SubtaskInput, Task, TaskInput } from '../../../data/models';
 import { initialsOf } from '../../../data/format';
+import { LanguageService } from '../../../core/language.service';
 
 /** Collects everything a task needs, for creating as well as editing. */
 @Component({
@@ -12,6 +13,10 @@ import { initialsOf } from '../../../data/format';
 })
 export class TaskForm implements OnInit {
   private readonly fb = inject(FormBuilder);
+  private readonly language = inject(LanguageService);
+
+  /** Every piece of text, in the language currently on screen. */
+  protected readonly t = this.language.dict;
 
   /** The task being edited, or null when a new one is created. */
   readonly task = input<Task | null>(null);
@@ -54,7 +59,9 @@ export class TaskForm implements OnInit {
   });
 
   /** Text of the button that saves, which differs between the two uses. */
-  protected readonly saveLabel = computed(() => (this.task() ? 'Speichern' : 'Anlegen'));
+  protected readonly saveLabel = computed(() =>
+    this.task() ? this.t().common.save : this.t().task.create,
+  );
 
   /** Inputs are only set after construction, so the form is filled here. */
   ngOnInit(): void {

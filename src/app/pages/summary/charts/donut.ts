@@ -1,4 +1,5 @@
-import { Component, computed, input } from '@angular/core';
+import { Component, computed, inject, input } from '@angular/core';
+import { LanguageService } from '../../../core/language.service';
 import { type ChartRow, shareOf, sumOf } from './chart-row';
 
 /** Radius and stroke of the ring, in the units of its own viewBox. */
@@ -21,11 +22,16 @@ interface Arc {
   styleUrl: './donut.scss',
 })
 export class Donut {
+  private readonly language = inject(LanguageService);
+
+  /** Every piece of text, in the language currently on screen. */
+  protected readonly t = this.language.dict;
+
   /** Heading above the ring. */
   readonly caption = input.required<string>();
 
   /** What the number in the middle counts. */
-  readonly unit = input('Aufgaben');
+  readonly unit = input('');
 
   /** The slices, in the order they should be drawn. */
   readonly rows = input<ChartRow[]>([]);

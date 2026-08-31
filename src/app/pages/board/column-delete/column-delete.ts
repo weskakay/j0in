@@ -1,6 +1,7 @@
-import { Component, input, output, signal } from '@angular/core';
+import { Component, inject, input, output, signal } from '@angular/core';
 import type { ColumnDisposal } from '../../../core/board.store';
 import type { Column } from '../../../data/models';
+import { LanguageService } from '../../../core/language.service';
 
 /**
  * Asks what happens to the cards before a column disappears. The server
@@ -14,6 +15,11 @@ import type { Column } from '../../../data/models';
   styleUrl: './column-delete.scss',
 })
 export class ColumnDelete {
+  private readonly language = inject(LanguageService);
+
+  /** Every piece of text, in the language currently on screen. */
+  protected readonly t = this.language.dict;
+
   /** The column that is about to go. */
   readonly column = input.required<Column>();
 

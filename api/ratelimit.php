@@ -12,7 +12,7 @@ function requireNotBlocked(PDO $pdo, string $ip): void
     $stmt->execute([$ip]);
     $row = $stmt->fetch();
     if ($row && $row['blocked_until'] !== null && strtotime($row['blocked_until']) > time()) {
-        fail(429, 'Too many attempts, please wait a moment');
+        fail(429, 'rate.too_many');
     }
 }
 

@@ -3,7 +3,9 @@ import { RouterLink } from '@angular/router';
 import { AuthService } from '../../core/auth.service';
 import { BoardStore } from '../../core/board.store';
 import type { Task } from '../../data/models';
-import { germanDate, greeting, today } from '../../data/format';
+import type { Dictionary } from '../../data/i18n';
+import { dateIn, today } from '../../data/format';
+import { LanguageService } from '../../core/language.service';
 import { Loader } from '../../layout/loader/loader';
 import { Bars } from './charts/bars';
 import { Donut } from './charts/donut';
@@ -37,6 +39,10 @@ interface ColumnCount {
 export class Summary {
   private readonly store = inject(BoardStore);
   private readonly auth = inject(AuthService);
+  private readonly language = inject(LanguageService);
+
+  /** Every piece of text, in the language currently on screen. */
+  protected readonly t = this.language.dict;
 
   /** True while a load is running. */
   protected readonly loading = this.store.loading;
@@ -49,7 +55,7 @@ export class Summary {
 
   /** Time of day plus the name, as the heading of the screen. */
   protected readonly hello = computed(
-    () => `${greeting(new Date().getHours())}, ${this.auth.user()?.name ?? ''}`,
+    () => `${greetingFrom(new Date().getHours(), this.t())}, ${this.auth.user()?.name ?? ''}`,
   );
 
   /** The name of the board, so the line below the greeting names it. */
@@ -74,7 +80,7 @@ export class Summary {
   );
 
   /** The nearest due date still ahead, written out in German. */
-  protected readonly nextDue = computed(() => germanDate(earliestFrom(this.urgent())));
+  protected readonly nextDue = computed(() => dateIn(earliestFrom(this.urgent()), this.language.lang()));
 
   /** How many subtasks are ticked off across the whole board. */
   protected readonly subtasksDone = computed(() =>
@@ -99,22 +105,24 @@ export class Summary {
   protected readonly byPriority = computed<ChartRow[]>(() => {
     const tasks = this.store.tasks();
     const count = (name: string) => tasks.filter((task) => task.priority === name).length;
+    const words = this.t().task;
     return [
-      { label: 'Dringend', count: count('urgent'), color: COLORS.urgent },
-      { label: 'Mittel', count: count('medium'), color: COLORS.medium },
-      { label: 'Niedrig', count: count('low'), color: COLORS.low },
+      { label: words.urgent, count: count('urgent'), color: COLORS.urgent },
+      { label: words.medium, count: count('medium'), color: COLORS.medium },
+      { label: words.low, count: count('low'), color: COLORS.low },
     ];
   });
 
   /** How near the deadlines are, from overdue to no date at all. */
   protected readonly byDeadline = computed<ChartRow[]>(() => {
     const buckets = countDeadlines(this.store.tasks());
+    const words = this.t().summary;
     return [
-      { label: 'Überfällig', count: buckets.overdue, color: COLORS.urgent },
-      { label: 'Heute', count: buckets.today, color: COLORS.warn },
-      { label: 'Diese Woche', count: buckets.week, color: COLORS.accent },
-      { label: 'Später', count: buckets.later, color: COLORS.done },
-      { label: 'Ohne Datum', count: buckets.none, color: COLORS.muted },
+      { label: words.overdue, count: buckets.overdue, color: COLORS.urgent },
+      { label: words.today, count: buckets.today, color: COLORS.warn },
+      { label: words.thisWeek, count: buckets.week, color: COLORS.accent },
+      { label: words.later, count: buckets.later, color: COLORS.done },
+      { label: words.noDate, count: buckets.none, color: COLORS.muted },
     ];
   });
 
@@ -126,6 +134,14 @@ export class Summary {
   protected retry(): void {
     this.store.load();
   }
+}
+
+/** Morning, afternoon or evening, in the language currently on screen. */
+function greetingFrom(hour: number, t: Dictionary): string {
+  if (hour < 11) {
+    return t.summary.morning;
+  }
+  return hour < 18 ? t.summary.day : t.summary.evening;
 }
 
 /** How many cards fall into each deadline window. */

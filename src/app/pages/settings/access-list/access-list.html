@@ -1,5 +1,5 @@
 @if (loading() && requests().length === 0) {
-  <p class="acc__note">Anfragen werden geladen …</p>
+  <p class="acc__note">{{ t().access.loading }}</p>
 }
 
 <ul class="acc__list">
@@ -10,7 +10,7 @@
       <span class="acc__text">
         <span class="acc__name">{{ request.name }}</span>
         <a class="acc__mail" [href]="'mailto:' + request.email">{{ request.email }}</a>
-        <span class="acc__when">gefragt am {{ asked(request) }}</span>
+        <span class="acc__when">{{ t().access.askedOn }} {{ asked(request) }}</span>
       </span>
 
       @if (isOpen(request)) {
@@ -21,7 +21,7 @@
             [disabled]="deciding() === request.id"
             (click)="declined.emit(request)"
           >
-            Ablehnen
+            {{ t().access.decline }}
           </button>
           <button
             class="acc__btn acc__btn--yes"
@@ -29,16 +29,16 @@
             [disabled]="deciding() === request.id"
             (click)="approved.emit(request)"
           >
-            Freigeben
+            {{ t().access.approve }}
           </button>
         </span>
       } @else {
-        <span class="acc__state">abgelehnt</span>
+        <span class="acc__state">{{ t().access.declined }}</span>
       }
     </li>
   } @empty {
     @if (!loading()) {
-      <li class="acc__note">Keine offenen Anfragen.</li>
+      <li class="acc__note">{{ t().access.empty }}</li>
     }
   }
 </ul>

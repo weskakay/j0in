@@ -11,7 +11,7 @@ function signUp(PDO $pdo, array $body): void
     $email = strtolower(bodyString($body, 'email'));
     $password = (string) ($body['password'] ?? '');
     if (!J0IN_SIGNUP_OPEN) {
-        fail(403, 'Registration is currently closed');
+        fail(403, 'auth.signup_closed');
     }
     requireValidSignUp($pdo, $name, $email, $password);
     reopenOrInsert($pdo, $name, $email, $password);
@@ -27,10 +27,10 @@ function signUp(PDO $pdo, array $body): void
 function requireValidSignUp(PDO $pdo, string $name, string $email, string $password): void
 {
     if ($name === '' || !filter_var($email, FILTER_VALIDATE_EMAIL) || strlen($password) < 8) {
-        fail(422, 'Please provide a name, a valid email and a password of at least 8 characters');
+        fail(422, 'auth.signup_invalid');
     }
     if (statusOf($pdo, $email) === 'approved') {
-        fail(409, 'Diese Adresse hat bereits einen Zugang');
+        fail(409, 'auth.email_taken');
     }
 }
 
@@ -121,7 +121,7 @@ function signIn(PDO $pdo, array $body): void
     $user = findUserByEmail($pdo, $email);
     if ($user === null || !password_verify((string) ($body['password'] ?? ''), $user['password_hash'])) {
         countFailure($pdo, $ip);
-        fail(401, 'Email or password is wrong');
+        fail(401, 'auth.bad_credentials');
     }
     requireApproved($user);
     clearFailures($pdo, $ip);
@@ -135,10 +135,10 @@ function requireApproved(array $user): void
 {
     $status = $user['status'] ?? 'approved';
     if ($status === 'pending') {
-        fail(403, 'Dieser Zugang wartet noch auf die Freigabe');
+        fail(403, 'auth.pending');
     }
     if ($status !== 'approved') {
-        fail(403, 'Dieser Zugang ist nicht freigegeben');
+        fail(403, 'auth.rejected');
     }
 }
 
@@ -157,16 +157,17 @@ function findUserByEmail(PDO $pdo, string $email): ?array
 }
 
 /** Signs in as the shared guest, creating that account on first use. */
-function signInAsGuest(PDO $pdo): void
+function signInAsGuest(PDO $pdo, array $body = []): void
 {
     if (!J0IN_GUEST_OPEN) {
-        fail(403, 'Guest access is currently closed');
+        fail(403, 'auth.guest_closed');
     }
+    $lang = bodyString($body, 'lang');
     $user = findUserByEmail($pdo, J0IN_GUEST_EMAIL);
     if ($user === null) {
-        $user = createGuestAccount($pdo);
+        $user = createGuestAccount($pdo, $lang);
     }
-    refillDemoIfEmpty($pdo, $user['id']);
+    refillDemoIfEmpty($pdo, $user['id'], $lang);
     startSession($pdo, $user['id'], J0IN_DAYS_GUEST);
     respond(200, publicUser($user));
 }
@@ -176,11 +177,11 @@ function signInAsGuest(PDO $pdo): void
  *
  * @return array<string, mixed>
  */
-function createGuestAccount(PDO $pdo): array
+function createGuestAccount(PDO $pdo, string $lang = 'de'): array
 {
     $password = bin2hex(random_bytes(16));
     $id = insertUser($pdo, 'Gast', J0IN_GUEST_EMAIL, $password, 'guest');
-    createBoardFor($pdo, $id, 'Demo-Board', true);
+    createBoardFor($pdo, $id, boardNameIn($lang), true);
     return ['id' => $id, 'name' => 'Gast', 'email' => J0IN_GUEST_EMAIL, 'role' => 'guest'];
 }
 
@@ -189,7 +190,7 @@ function createGuestAccount(PDO $pdo): array
  * the very first visitor as well as the one who arrives after someone before
  * them deleted everything.
  */
-function refillDemoIfEmpty(PDO $pdo, string $userId): void
+function refillDemoIfEmpty(PDO $pdo, string $userId, string $lang = 'de'): void
 {
     $stmt = $pdo->prepare(
         'SELECT b.id, COUNT(t.id) AS cards
@@ -202,7 +203,7 @@ function refillDemoIfEmpty(PDO $pdo, string $userId): void
     $stmt->execute([$userId]);
     $row = $stmt->fetch();
     if ($row && (int) $row['cards'] === 0) {
-        fillDemoBoard($pdo, (string) $row['id']);
+        fillDemoBoard($pdo, (string) $row['id'], $lang);
     }
 }
 

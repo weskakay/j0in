@@ -1,4 +1,5 @@
-import { Component, input, output, signal } from '@angular/core';
+import { Component, inject, input, output, signal } from '@angular/core';
+import { LanguageService } from '../../../core/language.service';
 import type { Category } from '../../../data/models';
 import { DEFAULT_SWATCH } from '../../../data/palette';
 import { ColorPicker } from '../../../layout/color-picker/color-picker';
@@ -22,6 +23,11 @@ export interface CategoryEdit extends CategoryDraft {
   styleUrl: './category-manager.scss',
 })
 export class CategoryManager {
+  private readonly language = inject(LanguageService);
+
+  /** Every piece of text, in the language currently on screen. */
+  protected readonly t = this.language.dict;
+
   /** The categories of the board, in their stored order. */
   readonly categories = input<Category[]>([]);
 
@@ -39,6 +45,11 @@ export class CategoryManager {
 
   /** Fires when a category should be removed. */
   readonly removed = output<Category>();
+
+  /** Singular or plural of "task", for the count next to each category. */
+  protected taskWord(category: Category): string {
+    return this.countFor(category) === 1 ? this.t().contacts.taskOne : this.t().contacts.taskMany;
+  }
 
   /** Id of the category being edited, or empty. */
   protected readonly editing = signal('');

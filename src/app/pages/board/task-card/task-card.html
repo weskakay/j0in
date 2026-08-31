@@ -3,7 +3,7 @@
     class="card__grip"
     data-drag-handle
     aria-hidden="true"
-    title="Karte verschieben"
+    [title]="t().board.moveCard"
   >
     <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
       <path d="M9 6h.01M9 12h.01M9 18h.01M15 6h.01M15 12h.01M15 18h.01"
@@ -35,7 +35,7 @@
         <span class="card__bar-fill" [style.width.%]="percent()"></span>
       </span>
       <span class="card__progress-label">
-        {{ done() }}/{{ task().subtasks.length }} Teilaufgaben
+        {{ done() }}/{{ task().subtasks.length }} {{ t().task.subtasks }}
       </span>
     </p>
   }

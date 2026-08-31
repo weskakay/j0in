@@ -25,7 +25,7 @@ function dispatchArea(
         'tasks'      => routeTasks($pdo, $boardId, $method, $id, $seg[2] ?? '', $body),
         'subtasks'   => routeSubtasks($pdo, $boardId, $method, $id, $body),
         'contacts'   => routeContacts($pdo, $boardId, $method, $id, $body),
-        default      => fail(404, 'Not found'),
+        default      => fail(404, 'http.not_found'),
     };
 }
 
@@ -41,8 +41,9 @@ function routeBoard(
     match (true) {
         $method === 'GET' && $id === ''    => readBoard($pdo, $boardId),
         $method === 'PUT' && $id === ''    => renameBoard($pdo, $boardId, $body),
-        $method === 'POST' && $id === 'reset' => resetDemoBoard($pdo, $boardId, $user),
-        default => fail(405, 'Method not allowed'),
+        $method === 'POST' && $id === 'reset' => resetDemoBoard($pdo, $boardId, $user, $body),
+        $method === 'POST' && $id === 'language' => switchDemoLanguage($pdo, $boardId, $user, $body),
+        default => fail(405, 'http.method_not_allowed'),
     };
 }
 
@@ -53,7 +54,7 @@ function routeColumns(PDO $pdo, string $boardId, string $method, string $id, arr
         $method === 'POST' && $id === ''   => createColumn($pdo, $boardId, $body),
         $method === 'PUT' && $id !== ''    => updateColumn($pdo, $boardId, $id, $body),
         $method === 'DELETE' && $id !== '' => deleteColumn($pdo, $boardId, $id, $body),
-        default => fail(405, 'Method not allowed'),
+        default => fail(405, 'http.method_not_allowed'),
     };
 }
 
@@ -64,7 +65,7 @@ function routeCategories(PDO $pdo, string $boardId, string $method, string $id, 
         $method === 'POST' && $id === ''   => createCategory($pdo, $boardId, $body),
         $method === 'PUT' && $id !== ''    => updateCategory($pdo, $boardId, $id, $body),
         $method === 'DELETE' && $id !== '' => deleteCategory($pdo, $boardId, $id, $body),
-        default => fail(405, 'Method not allowed'),
+        default => fail(405, 'http.method_not_allowed'),
     };
 }
 
@@ -82,7 +83,7 @@ function routeTasks(
         $method === 'PUT' && $sub === 'move'         => moveTask($pdo, $boardId, $id, $body),
         $method === 'PUT' && $id !== '' && $sub === '' => updateTask($pdo, $boardId, $id, $body),
         $method === 'DELETE' && $id !== ''           => deleteTask($pdo, $boardId, $id),
-        default => fail(405, 'Method not allowed'),
+        default => fail(405, 'http.method_not_allowed'),
     };
 }
 
@@ -91,7 +92,7 @@ function routeSubtasks(PDO $pdo, string $boardId, string $method, string $id, ar
 {
     $method === 'PUT' && $id !== ''
         ? updateSubtask($pdo, $boardId, $id, $body)
-        : fail(405, 'Method not allowed');
+        : fail(405, 'http.method_not_allowed');
 }
 
 /** POST, PUT and DELETE on /api/contacts */
@@ -101,6 +102,6 @@ function routeContacts(PDO $pdo, string $boardId, string $method, string $id, ar
         $method === 'POST' && $id === ''   => createContact($pdo, $boardId, $body),
         $method === 'PUT' && $id !== ''    => updateContact($pdo, $boardId, $id, $body),
         $method === 'DELETE' && $id !== '' => deleteContact($pdo, $boardId, $id),
-        default => fail(405, 'Method not allowed'),
+        default => fail(405, 'http.method_not_allowed'),
     };
 }

@@ -11,6 +11,7 @@ import type {
   TaskInput,
 } from '../data/models';
 import { ApiService } from './api.service';
+import { LanguageService } from './language.service';
 
 /** A column together with the cards that sit in it, ready to render. */
 export interface ColumnWithTasks {
@@ -34,6 +35,7 @@ export interface ColumnDisposal {
 @Injectable({ providedIn: 'root' })
 export class BoardStore {
   private readonly api = inject(ApiService);
+  private readonly language = inject(LanguageService);
   private readonly data = signal<BoardData | null>(null);
   private readonly query = signal('');
 
@@ -73,6 +75,11 @@ export class BoardStore {
     }));
   });
 
+  /** A search is running and not a single card matches it. */
+  readonly noMatches = computed(
+    () => this.query() !== '' && this.board().every((entry) => entry.tasks.length === 0),
+  );
+
   /** Fetches the board; call it when a screen that needs it opens. */
   load(): void {
     this.loading.set(true);
@@ -109,7 +116,14 @@ export class BoardStore {
 
   /** Puts the demo board back to how a visitor first finds it. */
   resetDemo(): Observable<unknown> {
-    return this.api.post('/board/reset').pipe(tap(() => this.load()));
+    const body = { lang: this.language.lang() };
+    return this.api.post('/board/reset', body).pipe(tap(() => this.load()));
+  }
+
+  /** Puts the seeded demo cards into the language now on screen. */
+  switchLanguage(): Observable<unknown> {
+    const body = { lang: this.language.lang() };
+    return this.api.post('/board/language', body).pipe(tap(() => this.load()));
   }
 
   /** Adds a category to the board. */

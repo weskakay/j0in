@@ -3,8 +3,10 @@ import { Router } from '@angular/router';
 import { AuthService } from '../../core/auth.service';
 import { BoardStore } from '../../core/board.store';
 import { AccessService } from '../../core/access.service';
+import { LanguageService } from '../../core/language.service';
 import { ThemeService, type Theme } from '../../core/theme.service';
 import type { AccessRequest, Category } from '../../data/models';
+import type { Dictionary } from '../../data/i18n';
 import { ColorPicker } from '../../layout/color-picker/color-picker';
 import { AccessList } from './access-list/access-list';
 import {
@@ -24,11 +26,17 @@ function countByCategory(tasks: { categoryId: string | null }[]): Record<string,
   return counts;
 }
 
-/** One choice in the appearance switch. */
+/** One choice in the appearance switch, named by the dictionary. */
 interface ThemeChoice {
   value: Theme;
   label: string;
   note: string;
+}
+
+/** What the last action reported, kept as a key so it follows the language. */
+interface DoneMessage {
+  key: keyof Dictionary['settings'];
+  who?: string;
 }
 
 /** Appearance, the board's name, and what belongs to the account. */
@@ -44,6 +52,10 @@ export class Settings {
   private readonly auth = inject(AuthService);
   private readonly router = inject(Router);
   private readonly access = inject(AccessService);
+  private readonly language = inject(LanguageService);
+
+  /** Every piece of text, in the language currently on screen. */
+  protected readonly t = this.language.dict;
 
   /** The signed-in user. */
   protected readonly user = this.auth.user;
@@ -88,14 +100,20 @@ export class Settings {
   protected readonly busy = signal(false);
 
   /** What the last finished action reported, shown as a short confirmation. */
-  protected readonly done = signal('');
+  protected readonly done = signal<DoneMessage | null>(null);
+
+  /** That confirmation as a sentence, in the language currently on screen. */
+  protected readonly doneText = computed(() => sentenceFor(this.done(), this.t()));
 
   /** The three ways the appearance can be decided. */
-  protected readonly choices: ThemeChoice[] = [
-    { value: 'system', label: 'Wie das System', note: 'folgt der Einstellung deines Geräts' },
-    { value: 'light', label: 'Hell', note: 'immer heller Hintergrund' },
-    { value: 'dark', label: 'Dunkel', note: 'immer dunkler Hintergrund' },
-  ];
+  protected readonly choices = computed<ThemeChoice[]>(() => {
+    const s = this.t().settings;
+    return [
+      { value: 'system', label: s.system, note: s.systemNote },
+      { value: 'light', label: s.light, note: s.lightNote },
+      { value: 'dark', label: s.dark, note: s.darkNote },
+    ];
+  });
 
   constructor() {
     this.store.load();
@@ -108,7 +126,7 @@ export class Settings {
   protected approve(request: AccessRequest): void {
     this.deciding.set(request.id);
     this.access.approve(request.id).subscribe({
-      next: () => this.decided(`${request.email} freigegeben`),
+      next: () => this.decided({ key: 'approved', who: request.email }),
       error: () => this.deciding.set(''),
     });
   }
@@ -117,7 +135,7 @@ export class Settings {
   protected decline(request: AccessRequest): void {
     this.deciding.set(request.id);
     this.access.decline(request.id).subscribe({
-      next: () => this.decided(`${request.email} abgelehnt`),
+      next: () => this.decided({ key: 'declined', who: request.email }),
       error: () => this.deciding.set(''),
     });
   }
@@ -126,7 +144,7 @@ export class Settings {
    * Clears the running decision, says what happened, and reads the account
    * back so the badge in the navigation matches what is left.
    */
-  private decided(message: string): void {
+  private decided(message: DoneMessage): void {
     this.deciding.set('');
     this.done.set(message);
     this.auth.restore().subscribe();
@@ -135,14 +153,14 @@ export class Settings {
   /** Switches the accent colour. */
   protected pickAccent(color: string): void {
     this.themes.setAccent(color === this.accent() ? '' : color);
-    this.done.set('Akzentfarbe geändert');
+    this.done.set({ key: 'savedAccent' });
   }
 
   /** Adds a category to the board. */
   protected addCategory(draft: CategoryDraft): void {
     this.busy.set(true);
     this.store.createCategory(draft).subscribe({
-      next: () => this.finish('Kategorie angelegt'),
+      next: () => this.finish('addedCategory'),
       error: () => this.busy.set(false),
     });
   }
@@ -151,7 +169,7 @@ export class Settings {
   protected saveCategory(edit: CategoryEdit): void {
     this.busy.set(true);
     this.store.updateCategory(edit.id, { name: edit.name, color: edit.color }).subscribe({
-      next: () => this.finish('Kategorie gespeichert'),
+      next: () => this.finish('savedCategory'),
       error: () => this.busy.set(false),
     });
   }
@@ -160,7 +178,7 @@ export class Settings {
   protected removeCategory(category: Category): void {
     this.busy.set(true);
     this.store.deleteCategory(category.id).subscribe({
-      next: () => this.finish('Kategorie gelöscht'),
+      next: () => this.finish('removedCategory'),
       error: () => this.busy.set(false),
     });
   }
@@ -168,7 +186,7 @@ export class Settings {
   /** Switches the appearance. */
   protected pickTheme(theme: Theme): void {
     this.themes.set(theme);
-    this.done.set('Aussehen geändert');
+    this.done.set({ key: 'savedTheme' });
   }
 
   /** Saves a new name for the board. */
@@ -179,7 +197,7 @@ export class Settings {
     }
     this.busy.set(true);
     this.store.renameBoard(name).subscribe({
-      next: () => this.finish('Name gespeichert'),
+      next: () => this.finish('savedName'),
       error: () => this.busy.set(false),
     });
   }
@@ -188,7 +206,7 @@ export class Settings {
   protected resetDemo(): void {
     this.busy.set(true);
     this.store.resetDemo().subscribe({
-      next: () => this.finish('Demo zurückgesetzt'),
+      next: () => this.finish('savedDemo'),
       error: () => this.busy.set(false),
     });
   }
@@ -200,8 +218,17 @@ export class Settings {
   }
 
   /** Clears the busy state and says what happened. */
-  private finish(message: string): void {
+  private finish(key: DoneMessage['key']): void {
     this.busy.set(false);
-    this.done.set(message);
+    this.done.set({ key });
   }
+}
+
+/** Turns the stored key back into a sentence, with the address in front of it. */
+function sentenceFor(message: DoneMessage | null, t: Dictionary): string {
+  if (!message) {
+    return '';
+  }
+  const text = t.settings[message.key];
+  return message.who ? `${message.who} ${text}` : text;
 }

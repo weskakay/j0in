@@ -3,6 +3,7 @@ import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import type { Observable } from 'rxjs';
 import { AuthService } from '../../core/auth.service';
+import { LanguageService } from '../../core/language.service';
 import type { User } from '../../data/models';
 
 /** Sign-in screen with email, password and a one-click guest entrance. */
@@ -14,6 +15,10 @@ import type { User } from '../../data/models';
 })
 export class Login {
   private readonly auth = inject(AuthService);
+  private readonly language = inject(LanguageService);
+
+  /** Every piece of text, in the language currently on screen. */
+  protected readonly t = this.language.dict;
   private readonly router = inject(Router);
   private readonly fb = inject(FormBuilder);
 

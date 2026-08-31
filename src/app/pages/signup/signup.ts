@@ -2,6 +2,7 @@ import { Component, inject, signal } from '@angular/core';
 import { AbstractControl, FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { AuthService } from '../../core/auth.service';
+import { LanguageService } from '../../core/language.service';
 
 const MIN_PASSWORD = 8;
 
@@ -17,6 +18,10 @@ const MIN_PASSWORD = 8;
 })
 export class Signup {
   private readonly auth = inject(AuthService);
+  private readonly language = inject(LanguageService);
+
+  /** Every piece of text, in the language currently on screen. */
+  protected readonly t = this.language.dict;
   private readonly fb = inject(FormBuilder);
 
   protected readonly error = signal('');

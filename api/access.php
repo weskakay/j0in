@@ -12,7 +12,7 @@
 function requireOwner(array $user): void
 {
     if (($user['role'] ?? '') !== 'owner') {
-        fail(403, 'Only the owner decides about access');
+        fail(403, 'access.owner_only');
     }
 }
 
@@ -37,7 +37,7 @@ function approveRequest(PDO $pdo, array $user, string $userId): void
     $pending = findPending($pdo, $userId);
     setStatus($pdo, $userId, 'approved');
     if (!hasBoard($pdo, $userId)) {
-        createBoardFor($pdo, $userId, 'Mein Board', false);
+        createBoardFor($pdo, $userId, 'My board', false);
     }
     respond(200, ['ok' => true, 'email' => $pending['email']]);
 }
@@ -62,7 +62,7 @@ function findPending(PDO $pdo, string $userId): array
     $stmt->execute([$userId]);
     $row = $stmt->fetch();
     if (!$row) {
-        fail(404, 'No such request');
+        fail(404, 'access.request_not_found');
     }
     return $row;
 }

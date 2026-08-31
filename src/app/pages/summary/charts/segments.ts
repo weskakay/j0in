@@ -1,4 +1,5 @@
-import { Component, computed, input } from '@angular/core';
+import { Component, computed, inject, input } from '@angular/core';
+import { LanguageService } from '../../../core/language.service';
 import { type ChartRow, shareOf, sumOf } from './chart-row';
 
 /** One piece of the strip, with the share it takes up. */
@@ -15,6 +16,11 @@ interface Segment {
   styleUrl: './segments.scss',
 })
 export class Segments {
+  private readonly language = inject(LanguageService);
+
+  /** Every piece of text, in the language currently on screen. */
+  protected readonly t = this.language.dict;
+
   /** Heading above the strip. */
   readonly caption = input.required<string>();
 

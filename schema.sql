@@ -77,6 +77,7 @@ CREATE TABLE IF NOT EXISTS join_tasks (
   due_date    DATE         NULL,
   priority    VARCHAR(16)  NOT NULL DEFAULT 'medium',
   position    INT          NOT NULL,
+  demo_index  INT          NULL DEFAULT NULL,
   created_at  DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at  DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP
                            ON UPDATE CURRENT_TIMESTAMP,

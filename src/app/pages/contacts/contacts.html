@@ -1,29 +1,27 @@
 <header class="people__head">
-  <h1 class="people__title">Kontakte</h1>
+  <h1 class="people__title">{{ t().contacts.title }}</h1>
   <button class="people__new" type="button" (click)="openNew()">
     <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
       <path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
     </svg>
-    Neuer Kontakt
+    {{ t().contacts.newContact }}
   </button>
 </header>
 
 @if (error(); as message) {
   <p class="people__error" role="alert">
     {{ message }}
-    <button class="people__retry" type="button" (click)="retry()">Erneut laden</button>
+    <button class="people__retry" type="button" (click)="retry()">{{ t().common.retry }}</button>
   </p>
 }
 
 @if (loading() && !ready()) {
-  <app-loader label="Kontakte werden geladen" />
+  <app-loader [label]="t().contacts.loading" />
 }
 
 @if (ready()) {
   @if (total() === 0) {
-    <p class="people__empty">
-      Noch keine Kontakte. Lege welche an, dann kannst du Aufgaben an sie zuweisen.
-    </p>
+    <p class="people__empty">{{ t().contacts.empty }}</p>
   } @else {
     @for (group of groups(); track group.letter) {
       <section class="people__group">
@@ -59,57 +57,56 @@
         </span>
         <dl class="detail__facts">
           <div class="detail__fact">
-            <dt>E-Mail</dt>
+            <dt>{{ t().contacts.email }}</dt>
             <dd>
               @if (person.email) {
                 <a [href]="'mailto:' + person.email">{{ person.email }}</a>
               } @else {
-                nicht hinterlegt
+                {{ t().contacts.notGiven }}
               }
             </dd>
           </div>
           <div class="detail__fact">
-            <dt>Telefon</dt>
+            <dt>{{ t().contacts.phone }}</dt>
             <dd>
               @if (person.phone) {
                 <a [href]="'tel:' + person.phone">{{ person.phone }}</a>
               } @else {
-                nicht hinterlegt
+                {{ t().contacts.notGiven }}
               }
             </dd>
           </div>
           <div class="detail__fact">
-            <dt>Zugewiesen</dt>
-            <dd>{{ assignedCount() }} {{ assignedCount() === 1 ? 'Aufgabe' : 'Aufgaben' }}</dd>
+            <dt>{{ t().contacts.assigned }}</dt>
+            <dd>{{ assignedCount() }} {{ taskWord() }}</dd>
           </div>
         </dl>
       </div>
       <footer class="detail__actions">
         <button class="detail__btn detail__btn--danger" type="button" (click)="askDelete()">
-          Löschen
+          {{ t().common.delete }}
         </button>
         <button class="detail__btn detail__btn--primary" type="button" (click)="startEdit()">
-          Bearbeiten
+          {{ t().common.edit }}
         </button>
       </footer>
     } @else if (mode() === 'wipe' && current(); as person) {
       <p class="detail__confirm">
-        Soll „{{ person.name }}" wirklich gelöscht werden?
+        {{ t().contacts.confirmPrefix }}{{ person.name }}{{ t().contacts.confirmSuffix }}
         @if (assignedCount() > 0) {
-          Die Zuweisung verschwindet dann aus
-          {{ assignedCount() }} {{ assignedCount() === 1 ? 'Aufgabe' : 'Aufgaben' }},
-          die Aufgaben selbst bleiben bestehen.
+          {{ t().contacts.alsoDropsFrom }} {{ assignedCount() }} {{ taskWord() }},
+          {{ t().contacts.tasksStay }}
         }
       </p>
       <footer class="detail__actions">
-        <button class="detail__btn" type="button" (click)="open(person)">Abbrechen</button>
+        <button class="detail__btn" type="button" (click)="open(person)">{{ t().common.cancel }}</button>
         <button
           class="detail__btn detail__btn--wipe"
           type="button"
           [disabled]="busy()"
           (click)="onDelete()"
         >
-          {{ busy() ? 'Löscht …' : 'Kontakt löschen' }}
+          {{ busy() ? t().contacts.deletingNow : t().contacts.deleteContact }}
         </button>
       </footer>
     } @else {

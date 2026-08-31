@@ -1,4 +1,5 @@
-import { Component, input } from '@angular/core';
+import { Component, inject, input } from '@angular/core';
+import { LanguageService } from '../../core/language.service';
 
 /**
  * The waiting state of the brand: the zero starts as an open ring and turns
@@ -12,6 +13,8 @@ import { Component, input } from '@angular/core';
   styleUrl: './loader.scss',
 })
 export class Loader {
+  private readonly language = inject(LanguageService);
+
   /** What is being waited for, read out to screen readers. */
-  readonly label = input('Wird geladen');
+  readonly label = input(this.language.dict().common.loading);
 }

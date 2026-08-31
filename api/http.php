@@ -14,10 +14,19 @@ function respond(int $status, $body): void
     exit;
 }
 
-/** Sends an error response with a single message. */
-function fail(int $status, string $message): void
+/**
+ * Sends an error response. The body carries a stable code, never a sentence,
+ * so the client can word it in the language the reader has chosen.
+ *
+ * @param array<string, mixed> $detail values the wording needs, such as a count
+ */
+function fail(int $status, string $code, array $detail = []): void
 {
-    respond($status, ['error' => $message]);
+    $body = ['error' => $code];
+    if ($detail !== []) {
+        $body['detail'] = $detail;
+    }
+    respond($status, $body);
 }
 
 /**

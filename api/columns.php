@@ -5,7 +5,7 @@ function createColumn(PDO $pdo, string $boardId, array $body): void
 {
     $name = bodyString($body, 'name');
     if ($name === '') {
-        fail(422, 'A column needs a name');
+        fail(422, 'column.name_required');
     }
     $id = uuid();
     $stmt = $pdo->prepare(
@@ -24,7 +24,7 @@ function updateColumn(PDO $pdo, string $boardId, string $columnId, array $body):
     $values = [];
     collectColumnChanges($body, $fields, $values);
     if ($fields === []) {
-        fail(422, 'Nothing to change');
+        fail(422, 'column.nothing_to_change');
     }
     $values[] = $columnId;
     $pdo->prepare('UPDATE join_columns SET ' . implode(', ', $fields) . ' WHERE id = ?')
@@ -71,7 +71,7 @@ function applyTaskDisposal(PDO $pdo, string $boardId, string $columnId, array $b
         return;
     }
     if (($body['deleteTasks'] ?? false) !== true) {
-        fail(409, "This column still holds {$count} tasks; pass moveTo or deleteTasks");
+        fail(409, 'column.has_tasks', ['count' => $count]);
     }
 }
 
@@ -89,6 +89,6 @@ function requireOwnColumn(PDO $pdo, string $boardId, string $columnId): void
     $stmt = $pdo->prepare('SELECT 1 FROM join_columns WHERE id = ? AND board_id = ?');
     $stmt->execute([$columnId, $boardId]);
     if (!$stmt->fetch()) {
-        fail(404, 'Column not found');
+        fail(404, 'column.not_found');
     }
 }

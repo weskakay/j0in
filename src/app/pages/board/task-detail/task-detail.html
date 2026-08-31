@@ -8,18 +8,18 @@
 
 <dl class="detail__facts">
   <div class="detail__fact">
-    <dt>Fällig am</dt>
-    <dd>{{ due() || 'ohne Datum' }}</dd>
+    <dt>{{ t().task.due }}</dt>
+    <dd>{{ due() || t().task.noDue }}</dd>
   </div>
   <div class="detail__fact">
-    <dt>Priorität</dt>
+    <dt>{{ t().task.priority }}</dt>
     <dd class="detail__prio detail__prio--{{ task().priority }}">{{ priority() }}</dd>
   </div>
 </dl>
 
 @if (assignees().length > 0) {
   <section class="detail__block">
-    <h3 class="detail__label">Zugewiesen an</h3>
+    <h3 class="detail__label">{{ t().task.assignedTo }}</h3>
     <ul class="detail__people">
       @for (person of assignees(); track person.id) {
         <li class="detail__person">
@@ -35,7 +35,7 @@
 
 @if (task().subtasks.length > 0) {
   <section class="detail__block">
-    <h3 class="detail__label">Teilaufgaben</h3>
+    <h3 class="detail__label">{{ t().task.subtasks }}</h3>
     <ul class="detail__subtasks">
       @for (subtask of task().subtasks; track subtask.id) {
         <li>
@@ -55,9 +55,9 @@
 
 <footer class="detail__actions">
   <button class="detail__btn detail__btn--danger" type="button" (click)="remove.emit()">
-    Löschen
+    {{ t().common.delete }}
   </button>
   <button class="detail__btn detail__btn--primary" type="button" (click)="edit.emit()">
-    Bearbeiten
+    {{ t().common.edit }}
   </button>
 </footer>

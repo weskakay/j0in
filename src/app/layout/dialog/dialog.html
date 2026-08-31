@@ -1,5 +1,5 @@
 <div class="dialog">
-  <button class="dialog__backdrop" type="button" aria-label="Dialog schließen" (click)="close()">
+  <button class="dialog__backdrop" type="button" [attr.aria-label]="t().common.close" (click)="close()">
   </button>
 
   <div
@@ -13,7 +13,7 @@
   >
     <header class="dialog__head">
       <h2 class="dialog__title">{{ heading() }}</h2>
-      <button class="dialog__close" type="button" aria-label="Dialog schließen" (click)="close()">
+      <button class="dialog__close" type="button" [attr.aria-label]="t().common.close" (click)="close()">
         <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
           <path
             d="M6 6l12 12M18 6L6 18"

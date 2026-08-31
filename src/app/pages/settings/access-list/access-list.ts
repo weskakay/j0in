@@ -1,6 +1,8 @@
-import { Component, input, output } from '@angular/core';
+import { Component, inject, input, output } from '@angular/core';
+import { LanguageService } from '../../../core/language.service';
 import type { AccessRequest } from '../../../data/models';
-import { initialsOf } from '../../../data/format';
+import { dateIn, initialsOf } from '../../../data/format';
+import type { Lang } from '../../../data/i18n';
 
 /** The requests for access, each as a card with a yes and a no. */
 @Component({
@@ -10,6 +12,11 @@ import { initialsOf } from '../../../data/format';
   styleUrl: './access-list.scss',
 })
 export class AccessList {
+  private readonly language = inject(LanguageService);
+
+  /** Every piece of text, in the language currently on screen. */
+  protected readonly t = this.language.dict;
+
   /** Every request that is not approved, newest first. */
   readonly requests = input<AccessRequest[]>([]);
 
@@ -30,9 +37,9 @@ export class AccessList {
     return initialsOf(request.name);
   }
 
-  /** German wording for the date the request arrived. */
+  /** The date the request arrived, written the way the language does. */
   protected asked(request: AccessRequest): string {
-    return germanDateTime(request.created_at);
+    return dateTimeIn(request.created_at, this.language.lang());
   }
 
   /** Whether this request still needs a decision. */
@@ -41,10 +48,10 @@ export class AccessList {
   }
 }
 
-/** Turns "2026-08-29 14:12:03" into "29.08.2026 um 14:12". */
-function germanDateTime(value: string): string {
+/** Turns "2026-08-29 14:12:03" into "29.08.2026, 14:12" or "29/08/2026, 14:12". */
+function dateTimeIn(value: string, lang: Lang): string {
   const [date, time] = value.split(' ');
-  const [year, month, day] = (date ?? '').split('-');
   const clock = (time ?? '').slice(0, 5);
-  return day ? `${day}.${month}.${year} um ${clock}` : value;
+  const written = dateIn(date ?? '', lang);
+  return written ? `${written}, ${clock}` : value;
 }

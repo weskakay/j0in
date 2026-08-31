@@ -39,14 +39,14 @@ function createTask(PDO $pdo, string $boardId, array $body): void
 function requireValidTask(array $body): void
 {
     if (bodyString($body, 'title') === '') {
-        fail(422, 'A task needs a title');
+        fail(422, 'task.title_required');
     }
     if (bodyString($body, 'dueDate') === '') {
-        fail(422, 'A task needs a due date');
+        fail(422, 'task.due_required');
     }
     $priority = bodyString($body, 'priority');
     if ($priority !== '' && !in_array($priority, J0IN_PRIORITIES, true)) {
-        fail(422, 'Unknown priority');
+        fail(422, 'task.bad_priority');
     }
 }
 
@@ -131,7 +131,8 @@ function updateTask(PDO $pdo, string $boardId, string $taskId, array $body): voi
 function applyTaskFields(PDO $pdo, string $taskId, array $body): void
 {
     $stmt = $pdo->prepare(
-        'UPDATE join_tasks SET title = ?, description = ?, due_date = ?, priority = ? WHERE id = ?'
+        'UPDATE join_tasks SET title = ?, description = ?, due_date = ?, priority = ?,
+         demo_index = NULL WHERE id = ?'
     );
     $stmt->execute([
         bodyString($body, 'title'), blankToNull(bodyString($body, 'description')),
@@ -226,7 +227,7 @@ function updateSubtask(PDO $pdo, string $boardId, string $subtaskId, array $body
     );
     $stmt->execute([$subtaskId, $boardId]);
     if (!$stmt->fetch()) {
-        fail(404, 'Subtask not found');
+        fail(404, 'subtask.not_found');
     }
     applySubtaskFields($pdo, $subtaskId, $body);
     respond(200, ['ok' => true]);
@@ -254,6 +255,6 @@ function requireOwnTask(PDO $pdo, string $boardId, string $taskId): void
     );
     $stmt->execute([$taskId, $boardId]);
     if (!$stmt->fetch()) {
-        fail(404, 'Task not found');
+        fail(404, 'task.not_found');
     }
 }

@@ -45,6 +45,33 @@
   position: relative;
 }
 
+.shell__lang {
+  display: flex;
+  gap: var(--j0in-space-xs);
+}
+
+.shell__lang-btn {
+  min-width: var(--j0in-tap-target);
+  height: var(--j0in-tap-target);
+  border: 1px solid var(--j0in-border);
+  border-radius: var(--j0in-radius-sm);
+  background: transparent;
+  color: var(--j0in-text-muted);
+  font-size: var(--j0in-fs-sm);
+  font-weight: var(--j0in-fw-bold);
+  transition: background var(--j0in-transition);
+
+  &:hover {
+    color: var(--j0in-text);
+  }
+}
+
+.shell__lang-btn--on {
+  background: var(--j0in-accent);
+  border-color: var(--j0in-accent);
+  color: var(--j0in-text-on-color);
+}
+
 .shell__avatar {
   width: var(--j0in-tap-target);
   height: var(--j0in-tap-target);
@@ -107,9 +134,13 @@
   padding: var(--j0in-space-md);
 }
 
-/* Phone: navigation sits along the bottom, within thumb reach. */
+/* Phone: navigation stays along the bottom edge, within thumb reach. Sticky,
+   otherwise a long board pushes it out of reach. Below the menu and dialogs. */
 .shell__nav {
   grid-area: nav;
+  position: sticky;
+  bottom: 0;
+  z-index: 10;
   background: var(--j0in-surface);
   border-top: 1px solid var(--j0in-border);
 }
@@ -178,6 +209,7 @@
   }
 
   .shell__nav {
+    position: static;
     border-top: 0;
     border-right: 1px solid var(--j0in-border);
   }

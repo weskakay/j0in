@@ -29,7 +29,7 @@ function renameBoard(PDO $pdo, string $boardId, array $body): void
 {
     $name = bodyString($body, 'name');
     if ($name === '') {
-        fail(422, 'A board needs a name');
+        fail(422, 'board.name_required');
     }
     $pdo->prepare('UPDATE join_boards SET name = ? WHERE id = ?')->execute([$name, $boardId]);
     respond(200, ['ok' => true]);
@@ -39,15 +39,32 @@ function renameBoard(PDO $pdo, string $boardId, array $body): void
  * Empties the demo board and fills it again. Only the shared guest may do
  * this: on a real board it would be a way to lose everything by mis-click.
  */
-function resetDemoBoard(PDO $pdo, string $boardId, array $user): void
+function resetDemoBoard(PDO $pdo, string $boardId, array $user, array $body = []): void
 {
     if (($user['role'] ?? '') !== 'guest') {
-        fail(403, 'Only the demo board can be reset');
+        fail(403, 'board.demo_only');
     }
+    $lang = bodyString($body, 'lang');
     clearBoard($pdo, $boardId);
     $pdo->prepare('UPDATE join_boards SET name = ? WHERE id = ?')
-        ->execute(['Demo-Board', $boardId]);
-    fillDemoBoard($pdo, $boardId);
+        ->execute([boardNameIn($lang), $boardId]);
+    fillDemoBoard($pdo, $boardId, $lang);
+    respond(200, ['ok' => true]);
+}
+
+/**
+ * Puts the seeded cards and the board's own name into another language. Only
+ * the shared guest has anything to switch: a real board holds no demo text.
+ */
+function switchDemoLanguage(PDO $pdo, string $boardId, array $user, array $body = []): void
+{
+    if (($user['role'] ?? '') !== 'guest') {
+        fail(403, 'board.demo_only');
+    }
+    $lang = bodyString($body, 'lang');
+    $pdo->prepare('UPDATE join_boards SET name = ? WHERE id = ?')
+        ->execute([boardNameIn($lang), $boardId]);
+    rewriteDemoText($pdo, $boardId, $lang);
     respond(200, ['ok' => true]);
 }
 

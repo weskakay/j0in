@@ -1,6 +1,7 @@
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { Observable, catchError, throwError } from 'rxjs';
+import type { ErrorCode } from '../data/i18n';
 
 const BASE = '/api';
 
@@ -50,22 +51,21 @@ export class ApiService {
 }
 
 /**
- * Turns an HTTP failure into a plain message the screens can show.
- * The API always answers with `{ error: "..." }`, so that text is preferred.
+ * Turns an HTTP failure into the code the screens store. The API answers with
+ * `{ error: "<code>" }`; the wording happens where the language is known.
  */
 function toMessage(response: HttpErrorResponse): Observable<never> {
   const body = response.error as ApiError | null;
-  const message = body?.error ?? fallbackFor(response.status);
-  return throwError(() => new Error(message));
+  return throwError(() => new Error(body?.error ?? fallbackFor(response.status)));
 }
 
-/** A readable message for the cases where the API said nothing useful. */
-function fallbackFor(status: number): string {
+/** A code for the cases where the API itself said nothing. */
+function fallbackFor(status: number): ErrorCode {
   if (status === 0) {
-    return 'Keine Verbindung zum Server';
+    return 'network.offline';
   }
   if (status === 429) {
-    return 'Zu viele Versuche, bitte kurz warten';
+    return 'rate.too_many';
   }
-  return 'Da ist etwas schiefgelaufen';
+  return 'network.unknown';
 }

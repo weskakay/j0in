@@ -1,4 +1,5 @@
-import { Component, ElementRef, effect, input, output, viewChild } from '@angular/core';
+import { Component, ElementRef, effect, inject, input, output, viewChild } from '@angular/core';
+import { LanguageService } from '../../core/language.service';
 
 const FOCUSABLE =
   'a[href], button:not([disabled]), input:not([disabled]), select, textarea, [tabindex]:not([tabindex="-1"])';
@@ -14,6 +15,11 @@ const FOCUSABLE =
   styleUrl: './dialog.scss',
 })
 export class Dialog {
+  private readonly language = inject(LanguageService);
+
+  /** Every piece of text, in the language currently on screen. */
+  protected readonly t = this.language.dict;
+
   /** Heading of the dialog, read out as its accessible name. */
   readonly heading = input.required<string>();
 

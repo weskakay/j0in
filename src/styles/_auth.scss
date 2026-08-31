@@ -1,10 +1,13 @@
 // Shared look for the sign-in and sign-up screens.
 // Only tokens, never a hex value.
 
+// The card and the legal links stack, they must not sit side by side.
 .auth {
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
+  gap: var(--j0in-space-lg);
   min-height: 100dvh;
   padding: var(--j0in-space-lg);
 }

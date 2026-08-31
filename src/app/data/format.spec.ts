@@ -2,10 +2,8 @@ import {
   assigneesOf,
   doneCount,
   donePercent,
-  germanDate,
-  greeting,
+  dateIn,
   initialsOf,
-  priorityLabel,
 } from './format';
 import type { Contact, Task } from './models';
 
@@ -76,32 +74,17 @@ describe('Teilaufgaben', () => {
   });
 });
 
-describe('germanDate', () => {
+describe('dateIn', () => {
   it('dreht die Reihenfolge um', () => {
-    expect(germanDate('2026-09-12')).toBe('12.09.2026');
+    expect(dateIn('2026-09-12', 'de')).toBe('12.09.2026');
+  });
+
+  it('schreibt englisch mit Schrägstrichen', () => {
+    expect(dateIn('2026-09-12', 'en')).toBe('12/09/2026');
   });
 
   it('gibt bei fehlendem Datum nichts zurück', () => {
-    expect(germanDate(null)).toBe('');
-  });
-});
-
-describe('priorityLabel', () => {
-  it('übersetzt alle drei Stufen', () => {
-    expect(priorityLabel('urgent')).toBe('Dringend');
-    expect(priorityLabel('medium')).toBe('Mittel');
-    expect(priorityLabel('low')).toBe('Niedrig');
-  });
-});
-
-describe('greeting', () => {
-  it('wechselt am Vormittag, Nachmittag und Abend', () => {
-    expect(greeting(7)).toBe('Guten Morgen');
-    expect(greeting(10)).toBe('Guten Morgen');
-    expect(greeting(11)).toBe('Guten Tag');
-    expect(greeting(17)).toBe('Guten Tag');
-    expect(greeting(18)).toBe('Guten Abend');
-    expect(greeting(23)).toBe('Guten Abend');
+    expect(dateIn(null, 'de')).toBe('');
   });
 });
 

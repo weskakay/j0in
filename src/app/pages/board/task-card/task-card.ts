@@ -1,12 +1,7 @@
-import { Component, computed, input, output } from '@angular/core';
+import { Component, computed, inject, input, output } from '@angular/core';
 import type { Category, Contact, Task } from '../../../data/models';
-import {
-  assigneesOf,
-  doneCount,
-  donePercent,
-  initialsOf,
-  priorityLabel,
-} from '../../../data/format';
+import { assigneesOf, doneCount, donePercent, initialsOf } from '../../../data/format';
+import { LanguageService } from '../../../core/language.service';
 
 /** A single card on the board. Opening it is handled by the board screen. */
 @Component({
@@ -16,6 +11,11 @@ import {
   styleUrl: './task-card.scss',
 })
 export class TaskCard {
+  private readonly language = inject(LanguageService);
+
+  /** Every piece of text, in the language currently on screen. */
+  protected readonly t = this.language.dict;
+
   /** The task this card shows. */
   readonly task = input.required<Task>();
 
@@ -47,8 +47,8 @@ export class TaskCard {
   /** Share of finished subtasks, drives the width of the bar. */
   protected readonly percent = computed(() => donePercent(this.task()));
 
-  /** German wording of the priority. */
-  protected readonly priority = computed(() => priorityLabel(this.task().priority));
+  /** The priority in the language currently on screen. */
+  protected readonly priority = computed(() => this.t().task[this.task().priority]);
 
   /** Letters for one assignee's avatar. */
   protected initials(contact: Contact): string {

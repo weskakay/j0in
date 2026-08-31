@@ -1,6 +1,7 @@
-import { Component, computed, input, output } from '@angular/core';
+import { Component, computed, inject, input, output } from '@angular/core';
 import type { Category, Contact, Subtask, Task } from '../../../data/models';
-import { assigneesOf, germanDate, initialsOf, priorityLabel } from '../../../data/format';
+import { assigneesOf, dateIn, initialsOf } from '../../../data/format';
+import { LanguageService } from '../../../core/language.service';
 
 /** What one subtask tick reports back to the board. */
 export interface SubtaskToggle {
@@ -16,6 +17,11 @@ export interface SubtaskToggle {
   styleUrl: './task-detail.scss',
 })
 export class TaskDetail {
+  private readonly language = inject(LanguageService);
+
+  /** Every piece of text, in the language currently on screen. */
+  protected readonly t = this.language.dict;
+
   /** The task being read. */
   readonly task = input.required<Task>();
 
@@ -37,11 +43,11 @@ export class TaskDetail {
   /** The people this task is assigned to. */
   protected readonly assignees = computed(() => assigneesOf(this.task(), this.contacts()));
 
-  /** German wording of the priority. */
-  protected readonly priority = computed(() => priorityLabel(this.task().priority));
+  /** The priority in the language currently on screen. */
+  protected readonly priority = computed(() => this.t().task[this.task().priority]);
 
   /** The due date in German notation. */
-  protected readonly due = computed(() => germanDate(this.task().dueDate));
+  protected readonly due = computed(() => dateIn(this.task().dueDate, this.language.lang()));
 
   /** Letters for one assignee's avatar. */
   protected initials(contact: Contact): string {

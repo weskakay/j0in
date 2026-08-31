@@ -2,12 +2,14 @@ import { Component, computed, inject, signal } from '@angular/core';
 import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { AuthService } from '../../core/auth.service';
 import { BoardStore } from '../../core/board.store';
+import { LanguageService } from '../../core/language.service';
 import { initialsOf } from '../../data/format';
+import type { Dictionary, Lang } from '../../data/i18n';
 
-/** One entry in the main navigation. */
+/** One entry in the main navigation; the wording comes from the dictionary. */
 interface NavItem {
   path: string;
-  label: string;
+  key: keyof Dictionary['nav'];
 }
 
 /**
@@ -24,6 +26,13 @@ export class Shell {
   private readonly auth = inject(AuthService);
   private readonly board = inject(BoardStore);
   private readonly router = inject(Router);
+  private readonly language = inject(LanguageService);
+
+  /** Every piece of text, in the language currently on screen. */
+  protected readonly t = this.language.dict;
+
+  /** The language currently on screen, for the switch in the header. */
+  protected readonly lang = this.language.lang;
 
   /** The signed-in user, shown in the account menu. */
   protected readonly user = this.auth.user;
@@ -33,10 +42,10 @@ export class Shell {
 
   /** The screens reachable from the navigation. */
   protected readonly items: NavItem[] = [
-    { path: '/summary', label: 'Übersicht' },
-    { path: '/board', label: 'Board' },
-    { path: '/contacts', label: 'Kontakte' },
-    { path: '/settings', label: 'Einstellungen' },
+    { path: '/summary', key: 'summary' },
+    { path: '/board', key: 'board' },
+    { path: '/contacts', key: 'contacts' },
+    { path: '/settings', key: 'settings' },
   ];
 
   /** How many access requests are waiting, shown as a badge. */
@@ -45,6 +54,21 @@ export class Shell {
   /** Letters on the avatar button. */
   protected initials(): string {
     return initialsOf(this.user()?.name ?? '');
+  }
+
+  /**
+   * Switches the interface language. On the guest board the seeded cards are
+   * rewritten as well, since their wording sits on the server and cannot
+   * follow the interface on its own. Cards a visitor wrote stay untouched.
+   */
+  protected setLang(lang: Lang): void {
+    if (lang === this.lang()) {
+      return;
+    }
+    this.language.set(lang);
+    if (this.auth.isGuest()) {
+      this.board.switchLanguage().subscribe({ error: () => undefined });
+    }
   }
 
   /** Opens or closes the account menu. */

@@ -35,10 +35,10 @@ function handleAuth(PDO $pdo, string $method, string $action): void
     match (true) {
         $method === 'POST' && $action === 'signup' => signUp($pdo, $body),
         $method === 'POST' && $action === 'login'  => signIn($pdo, $body),
-        $method === 'POST' && $action === 'guest'  => signInAsGuest($pdo),
+        $method === 'POST' && $action === 'guest'  => signInAsGuest($pdo, $body),
         $method === 'POST' && $action === 'logout' => logoutAndRespond($pdo),
         $method === 'GET'  && $action === 'me'     => respondWithUser($pdo),
-        default => fail(405, 'Method not allowed'),
+        default => fail(405, 'http.method_not_allowed'),
     };
 }
 
@@ -82,7 +82,7 @@ function handleAccess(PDO $pdo, string $method, array $seg): void
         $method === 'GET' && $id === ''             => readRequests($pdo, $user),
         $method === 'POST' && $action === 'approve' => approveRequest($pdo, $user, $id),
         $method === 'POST' && $action === 'reject'  => rejectRequest($pdo, $user, $id),
-        default => fail(405, 'Method not allowed'),
+        default => fail(405, 'http.method_not_allowed'),
     };
 }
 
@@ -98,7 +98,7 @@ function handle(string $method, array $seg): void
         $area === 'auth'   => handleAuth(db(), $method, $seg[1] ?? ''),
         $area === 'access' => handleAccess(db(), $method, $seg),
         in_array($area, J0IN_BOARD_AREAS, true) => handleBoardArea(db(), $method, $seg),
-        default => fail(404, 'Not found'),
+        default => fail(404, 'http.not_found'),
     };
 }
 
@@ -106,5 +106,5 @@ try {
     handle($_SERVER['REQUEST_METHOD'] ?? 'GET', segments());
 } catch (Throwable $e) {
     error_log('j0in: ' . $e->getMessage());
-    fail(500, 'Server error');
+    fail(500, 'server.error');
 }

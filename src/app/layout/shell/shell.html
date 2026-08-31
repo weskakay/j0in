@@ -4,13 +4,34 @@
   </a>
 
   <header class="shell__header">
+    <div class="shell__lang" role="group" [attr.aria-label]="t().common.language">
+      <button
+        class="shell__lang-btn"
+        type="button"
+        [class.shell__lang-btn--on]="lang() === 'de'"
+        [attr.aria-pressed]="lang() === 'de'"
+        (click)="setLang('de')"
+      >
+        DE
+      </button>
+      <button
+        class="shell__lang-btn"
+        type="button"
+        [class.shell__lang-btn--on]="lang() === 'en'"
+        [attr.aria-pressed]="lang() === 'en'"
+        (click)="setLang('en')"
+      >
+        EN
+      </button>
+    </div>
+
     <div class="shell__account">
       <button
         class="shell__avatar"
         type="button"
         [attr.aria-expanded]="menuOpen()"
         aria-haspopup="menu"
-        aria-label="Konto und Abmelden"
+        [attr.aria-label]="t().nav.account"
         (click)="toggleMenu()"
       >
         {{ initials() }}
@@ -21,14 +42,14 @@
           <p class="shell__menu-name">{{ user()?.name }}</p>
           <p class="shell__menu-mail">{{ user()?.email }}</p>
           <button class="shell__menu-item" type="button" role="menuitem" (click)="signOut()">
-            Abmelden
+            {{ t().nav.logout }}
           </button>
         </div>
       }
     </div>
   </header>
 
-  <nav class="shell__nav" aria-label="Hauptnavigation">
+  <nav class="shell__nav" [attr.aria-label]="t().nav.label">
     <ul class="shell__nav-list">
       @for (item of items; track item.path) {
         <li>
@@ -38,9 +59,9 @@
             routerLinkActive="shell__nav-link--active"
             (click)="closeMenu()"
           >
-            {{ item.label }}
+            {{ t().nav[item.key] }}
             @if (item.path === '/settings' && pending() > 0) {
-              <span class="shell__badge" [attr.aria-label]="pending() + ' offene Anfragen'">
+              <span class="shell__badge" [attr.aria-label]="pending() + ' ' + t().nav.pending">
                 {{ pending() }}
               </span>
             }

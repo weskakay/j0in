@@ -2,7 +2,7 @@
   <h3 class="strip__caption">{{ caption() }}</h3>
 
   @if (total() === 0) {
-    <p class="strip__empty">Nichts zu zeigen.</p>
+    <p class="strip__empty">{{ t().summary.nothing }}</p>
   } @else {
     <div class="strip__bar" aria-hidden="true">
       @for (piece of pieces(); track piece.row.label) {

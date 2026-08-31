@@ -1,19 +1,14 @@
 <main class="auth">
   <section class="auth__card">
-    <h1 class="auth__brand">Zugang anfragen</h1>
+    <h1 class="auth__brand">{{ t().auth.requestAccess }}</h1>
 
     @if (filed()) {
-      <p class="auth__lead">
-        Deine Anfrage ist eingegangen. Sobald sie freigegeben ist, kannst du dich mit deiner
-        Mailadresse anmelden. Bis dahin passiert nichts weiter.
-      </p>
+      <p class="auth__lead">{{ t().auth.requestSent }}</p>
       <p class="auth__switch">
-        <a routerLink="/login">Zur Anmeldung</a>
+        <a routerLink="/login">{{ t().auth.toSignIn }}</a>
       </p>
     } @else {
-      <p class="auth__lead">
-        Zugänge werden von Hand freigegeben. Du legst hier eine Anfrage an, kein fertiges Konto.
-      </p>
+      <p class="auth__lead">{{ t().auth.requestNote }}</p>
 
       @if (error()) {
         <p class="auth__error" role="alert">{{ error() }}</p>
@@ -21,7 +16,7 @@
 
     <form class="auth__form" [formGroup]="form" (ngSubmit)="submit()" novalidate>
       <label class="auth__field">
-        <span class="auth__label">Name</span>
+        <span class="auth__label">{{ t().auth.name }}</span>
         <input
           class="auth__input"
           type="text"
@@ -30,12 +25,12 @@
           [class.auth__input--error]="invalid('name')"
         />
         @if (invalid('name')) {
-          <span class="auth__hint">Bitte einen Namen eingeben</span>
+          <span class="auth__hint">{{ t().auth.nameMissing }}</span>
         }
       </label>
 
       <label class="auth__field">
-        <span class="auth__label">E-Mail</span>
+        <span class="auth__label">{{ t().auth.email }}</span>
         <input
           class="auth__input"
           type="email"
@@ -44,12 +39,12 @@
           [class.auth__input--error]="invalid('email')"
         />
         @if (invalid('email')) {
-          <span class="auth__hint">Bitte eine gültige E-Mail-Adresse eingeben</span>
+          <span class="auth__hint">{{ t().auth.emailInvalid }}</span>
         }
       </label>
 
       <label class="auth__field">
-        <span class="auth__label">Passwort</span>
+        <span class="auth__label">{{ t().auth.password }}</span>
         <input
           class="auth__input"
           type="password"
@@ -58,12 +53,12 @@
           [class.auth__input--error]="invalid('password')"
         />
         @if (invalid('password')) {
-          <span class="auth__hint">Mindestens 8 Zeichen</span>
+          <span class="auth__hint">{{ t().auth.passwordShort }}</span>
         }
       </label>
 
       <label class="auth__field">
-        <span class="auth__label">Passwort wiederholen</span>
+        <span class="auth__label">{{ t().auth.passwordRepeat }}</span>
         <input
           class="auth__input"
           type="password"
@@ -72,34 +67,43 @@
           [class.auth__input--error]="mismatch"
         />
         @if (mismatch) {
-          <span class="auth__hint">Die beiden Passwörter sind nicht gleich</span>
+          <span class="auth__hint">{{ t().auth.passwordMismatch }}</span>
         }
       </label>
 
       <label class="auth__check">
         <input type="checkbox" formControlName="privacy" />
-        <span>Ich akzeptiere die <a routerLink="/privacy">Datenschutzerklärung</a></span>
+        <span>
+          {{ t().auth.acceptPrefix }}
+          <a href="https://weskakay.de/datenschutz" target="_blank" rel="noopener">
+            {{ t().auth.privacyPolicy }}
+          </a>
+        </span>
       </label>
       @if (invalid('privacy')) {
-        <span class="auth__hint">Ohne Zustimmung geht es leider nicht</span>
+        <span class="auth__hint">{{ t().auth.acceptMissing }}</span>
       }
 
       <div class="auth__actions">
-        <button class="auth__btn auth__btn--primary" type="submit" [disabled]="busy()">
-          Konto anlegen
+        <button
+          class="auth__btn auth__btn--primary"
+          type="submit"
+          [disabled]="busy() || form.invalid"
+        >
+          {{ t().auth.createAccount }}
         </button>
       </div>
     </form>
 
     <p class="auth__foot">
-      Schon ein Konto?
-      <a routerLink="/login">Anmelden</a>
+      {{ t().auth.haveAccount }}
+      <a routerLink="/login">{{ t().auth.signIn }}</a>
     </p>
     }
   </section>
 
   <p class="legal-links">
-    <a href="https://weskakay.de/impressum" target="_blank" rel="noopener">Impressum</a>
-    <a href="https://weskakay.de/datenschutz" target="_blank" rel="noopener">Datenschutz</a>
+    <a href="https://weskakay.de/impressum" target="_blank" rel="noopener">{{ t().auth.imprint }}</a>
+    <a href="https://weskakay.de/datenschutz" target="_blank" rel="noopener">{{ t().auth.privacy }}</a>
   </p>
 </main>

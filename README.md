@@ -9,7 +9,8 @@
 A task and project board: put work on a kanban board, break it into subtasks, assign people and
 drag cards through columns you define yourself.
 
-> Work in progress. The scaffold stands, the features are being built stage by stage.
+> Live at [j0in.weskakay.de](https://j0in.weskakay.de). Sign in as a guest to try the board without
+> an account.
 
 ## 💡 What is this?
 
@@ -127,4 +128,4 @@ groundwork for the configurable colours and fonts planned later.
 
 ## 📄 License
 
-Private project, published for reference.
+[MIT](LICENSE). Use it, read it, take pieces of it.

@@ -2,6 +2,7 @@ import { Injectable, computed, inject, signal } from '@angular/core';
 import { Observable, tap } from 'rxjs';
 import { ApiService } from './api.service';
 import type { User } from '../data/models';
+import { LanguageService } from './language.service';
 
 /** What the sign-up form sends. */
 interface SignUpInput {
@@ -24,6 +25,7 @@ interface SignInInput {
 @Injectable({ providedIn: 'root' })
 export class AuthService {
   private readonly api = inject(ApiService);
+  private readonly language = inject(LanguageService);
   private readonly currentUser = signal<User | null>(null);
   private readonly checked = signal(false);
 
@@ -59,9 +61,10 @@ export class AuthService {
     return this.api.post<User>('/auth/login', input).pipe(tap((u) => this.currentUser.set(u)));
   }
 
-  /** Signs in as the shared guest, no input needed. */
+  /** Signs in as the shared guest, seeding the demo board in the chosen language. */
   signInAsGuest(): Observable<User> {
-    return this.api.post<User>('/auth/guest').pipe(tap((u) => this.currentUser.set(u)));
+    const body = { lang: this.language.lang() };
+    return this.api.post<User>('/auth/guest', body).pipe(tap((u) => this.currentUser.set(u)));
   }
 
   /** Ends the session on the server and forgets the user here. */

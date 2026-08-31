@@ -1,19 +1,16 @@
 @if (count() === 0) {
-  <p class="wipe__text">
-    Die Spalte „{{ column().name }}" ist leer und kann ohne Weiteres verschwinden.
-  </p>
+  <p class="wipe__text">„{{ column().name }}" {{ t().board.columnEmpty }}</p>
 } @else {
   <p class="wipe__text">
-    In „{{ column().name }}" liegen noch
-    <strong>{{ count() }} {{ count() === 1 ? 'Aufgabe' : 'Aufgaben' }}</strong>.
-    Was soll damit passieren?
+    „{{ column().name }}": <strong>{{ count() }} {{ t().summary.tasksUnit }}</strong>.
+    {{ t().board.stillHolds }}
   </p>
 
   @if (targets().length > 0) {
     <label class="wipe__field">
-      <span class="wipe__label">Aufgaben verschieben nach</span>
+      <span class="wipe__label">{{ t().board.moveTo }}</span>
       <select class="wipe__select" (change)="pick($event)">
-        <option value="">nirgendwohin, mitlöschen</option>
+        <option value="">{{ t().board.deleteWithColumn }}</option>
         @for (target of targets(); track target.id) {
           <option [value]="target.id">{{ target.name }}</option>
         }
@@ -23,19 +20,19 @@
 
   @if (moveTo() === '') {
     <p class="wipe__warning" role="alert">
-      Die Aufgaben werden mit der Spalte gelöscht. Das lässt sich nicht rückgängig machen.
+      {{ t().board.warnDeletes }}
     </p>
   }
 }
 
 <footer class="wipe__actions">
-  <button class="wipe__btn" type="button" (click)="cancelled.emit()">Abbrechen</button>
+  <button class="wipe__btn" type="button" (click)="cancelled.emit()">{{ t().common.cancel }}</button>
   <button
     class="wipe__btn wipe__btn--danger"
     type="button"
     [disabled]="busy()"
     (click)="confirm()"
   >
-    {{ busy() ? 'Löscht …' : 'Spalte löschen' }}
+    {{ busy() ? t().board.deleting : t().board.deleteColumn }}
   </button>
 </footer>

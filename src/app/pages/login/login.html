@@ -1,7 +1,7 @@
 <main class="auth">
   <section class="auth__card">
     <h1 class="auth__brand">J0IN</h1>
-    <p class="auth__lead">Aufgaben und Projekte an einem Ort.</p>
+    <p class="auth__lead">{{ t().auth.lead }}</p>
 
     @if (error()) {
       <p class="auth__error" role="alert">{{ error() }}</p>
@@ -9,7 +9,7 @@
 
     <form class="auth__form" [formGroup]="form" (ngSubmit)="submit()" novalidate>
       <label class="auth__field">
-        <span class="auth__label">E-Mail</span>
+        <span class="auth__label">{{ t().auth.email }}</span>
         <input
           class="auth__input"
           type="email"
@@ -18,12 +18,12 @@
           [class.auth__input--error]="invalid('email')"
         />
         @if (invalid('email')) {
-          <span class="auth__hint">Bitte eine gültige E-Mail-Adresse eingeben</span>
+          <span class="auth__hint">{{ t().auth.emailInvalid }}</span>
         }
       </label>
 
       <label class="auth__field">
-        <span class="auth__label">Passwort</span>
+        <span class="auth__label">{{ t().auth.password }}</span>
         <input
           class="auth__input"
           type="password"
@@ -32,33 +32,37 @@
           [class.auth__input--error]="invalid('password')"
         />
         @if (invalid('password')) {
-          <span class="auth__hint">Bitte das Passwort eingeben</span>
+          <span class="auth__hint">{{ t().auth.passwordMissing }}</span>
         }
       </label>
 
       <label class="auth__check">
         <input type="checkbox" formControlName="remember" />
-        <span>Angemeldet bleiben</span>
+        <span>{{ t().auth.stayed }}</span>
       </label>
 
       <div class="auth__actions">
-        <button class="auth__btn auth__btn--primary" type="submit" [disabled]="busy()">
-          Anmelden
+        <button
+          class="auth__btn auth__btn--primary"
+          type="submit"
+          [disabled]="busy() || form.invalid"
+        >
+          {{ t().auth.signIn }}
         </button>
         <button class="auth__btn" type="button" [disabled]="busy()" (click)="enterAsGuest()">
-          Als Gast ansehen
+          {{ t().auth.asGuest }}
         </button>
       </div>
     </form>
 
     <p class="auth__foot">
-      Noch kein Konto?
-      <a routerLink="/signup">Registrieren</a>
+      {{ t().auth.noAccount }}
+      <a routerLink="/signup">{{ t().auth.signUp }}</a>
     </p>
   </section>
 
   <p class="legal-links">
-    <a href="https://weskakay.de/impressum" target="_blank" rel="noopener">Impressum</a>
-    <a href="https://weskakay.de/datenschutz" target="_blank" rel="noopener">Datenschutz</a>
+    <a href="https://weskakay.de/impressum" target="_blank" rel="noopener">{{ t().auth.imprint }}</a>
+    <a href="https://weskakay.de/datenschutz" target="_blank" rel="noopener">{{ t().auth.privacy }}</a>
   </p>
 </main>

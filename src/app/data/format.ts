@@ -1,15 +1,5 @@
-import type { Contact, Priority, Task } from './models';
-
-const PRIORITY_LABELS: Record<Priority, string> = {
-  urgent: 'Dringend',
-  medium: 'Mittel',
-  low: 'Niedrig',
-};
-
-/** German wording for a priority, since the API stores the English key. */
-export function priorityLabel(priority: Priority): string {
-  return PRIORITY_LABELS[priority];
-}
+import type { Lang } from './i18n';
+import type { Contact, Task } from './models';
 
 /** First letters of the first and last word, used on the small avatars. */
 export function initialsOf(name: string): string {
@@ -35,13 +25,13 @@ export function donePercent(task: Task): number {
   return Math.round((doneCount(task) / task.subtasks.length) * 100);
 }
 
-/** Turns a date like 2026-09-15 into 15.09.2026. */
-export function germanDate(value: string | null): string {
+/** Turns a date like 2026-09-15 into 15.09.2026, or 15/09/2026 in English. */
+export function dateIn(value: string | null, lang: Lang): string {
   if (!value) {
     return '';
   }
   const [year, month, day] = value.split('-');
-  return `${day}.${month}.${year}`;
+  return lang === 'en' ? `${day}/${month}/${year}` : `${day}.${month}.${year}`;
 }
 
 /** Today as the API writes dates, so due dates can be compared as strings. */
@@ -50,17 +40,6 @@ export function today(): string {
   const month = `${now.getMonth() + 1}`.padStart(2, '0');
   const day = `${now.getDate()}`.padStart(2, '0');
   return `${now.getFullYear()}-${month}-${day}`;
-}
-
-/** Morning, afternoon or evening, for the greeting on the summary. */
-export function greeting(hour: number): string {
-  if (hour < 11) {
-    return 'Guten Morgen';
-  }
-  if (hour < 18) {
-    return 'Guten Tag';
-  }
-  return 'Guten Abend';
 }
 
 /** Picks the contacts a task is assigned to, in board order. */

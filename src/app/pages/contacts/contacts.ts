@@ -1,6 +1,8 @@
 import { Component, computed, inject, signal } from '@angular/core';
 import { BoardStore } from '../../core/board.store';
+import { LanguageService } from '../../core/language.service';
 import type { Contact, ContactInput } from '../../data/models';
+import type { Dictionary } from '../../data/i18n';
 import { initialsOf } from '../../data/format';
 import { Dialog } from '../../layout/dialog/dialog';
 import { Loader } from '../../layout/loader/loader';
@@ -24,6 +26,10 @@ type DialogMode = 'none' | 'detail' | 'edit' | 'create' | 'wipe';
 })
 export class Contacts {
   private readonly store = inject(BoardStore);
+  private readonly language = inject(LanguageService);
+
+  /** Every piece of text, in the language currently on screen. */
+  protected readonly t = this.language.dict;
 
   /** True while a load is running. */
   protected readonly loading = this.store.loading;
@@ -50,13 +56,18 @@ export class Contacts {
   protected readonly busy = signal(false);
 
   /** Heading of the open dialog. */
-  protected readonly heading = computed(() => headingFor(this.mode(), this.current()));
+  protected readonly heading = computed(() => headingFor(this.mode(), this.current(), this.t()));
 
   /** How many cards this contact is assigned to. */
   protected readonly assignedCount = computed(() => {
     const id = this.current()?.id;
     return id ? this.store.tasks().filter((task) => task.contactIds.includes(id)).length : 0;
   });
+
+  /** Singular or plural of "task", for the counts in the dialog. */
+  protected readonly taskWord = computed(() =>
+    this.assignedCount() === 1 ? this.t().contacts.taskOne : this.t().contacts.taskMany,
+  );
 
   constructor() {
     this.store.load();
@@ -130,15 +141,14 @@ export class Contacts {
   }
 }
 
-const HEADINGS: Partial<Record<DialogMode, string>> = {
-  create: 'Neuer Kontakt',
-  edit: 'Kontakt bearbeiten',
-  wipe: 'Kontakt löschen',
-};
-
 /** The heading the dialog carries in each of its uses. */
-function headingFor(mode: DialogMode, contact: Contact | null): string {
-  return HEADINGS[mode] ?? contact?.name ?? '';
+function headingFor(mode: DialogMode, contact: Contact | null, t: Dictionary): string {
+  const headings: Partial<Record<DialogMode, string>> = {
+    create: t.contacts.newContact,
+    edit: t.contacts.editContact,
+    wipe: t.contacts.deleteContact,
+  };
+  return headings[mode] ?? contact?.name ?? '';
 }
 
 /** Sorts the contacts by name and files them under their first letter. */

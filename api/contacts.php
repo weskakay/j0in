@@ -7,7 +7,7 @@ function createContact(PDO $pdo, string $boardId, array $body): void
 {
     $name = bodyString($body, 'name');
     if ($name === '') {
-        fail(422, 'A contact needs a name');
+        fail(422, 'contact.name_required');
     }
     $id = uuid();
     $stmt = $pdo->prepare(
@@ -31,7 +31,7 @@ function updateContact(PDO $pdo, string $boardId, string $contactId, array $body
     requireOwnContact($pdo, $boardId, $contactId);
     $name = bodyString($body, 'name');
     if ($name === '') {
-        fail(422, 'A contact needs a name');
+        fail(422, 'contact.name_required');
     }
     $stmt = $pdo->prepare('UPDATE join_contacts SET name = ?, email = ?, phone = ? WHERE id = ?');
     $stmt->execute([$name, blankToNull(bodyString($body, 'email')),
@@ -56,7 +56,7 @@ function requireOwnContact(PDO $pdo, string $boardId, string $contactId): void
     $stmt = $pdo->prepare('SELECT 1 FROM join_contacts WHERE id = ? AND board_id = ?');
     $stmt->execute([$contactId, $boardId]);
     if (!$stmt->fetch()) {
-        fail(404, 'Contact not found');
+        fail(404, 'contact.not_found');
     }
 }
 
@@ -65,7 +65,7 @@ function createCategory(PDO $pdo, string $boardId, array $body): void
 {
     $name = bodyString($body, 'name');
     if ($name === '') {
-        fail(422, 'A category needs a name');
+        fail(422, 'category.name_required');
     }
     $id = uuid();
     $stmt = $pdo->prepare(
@@ -82,7 +82,7 @@ function updateCategory(PDO $pdo, string $boardId, string $categoryId, array $bo
     requireOwnCategory($pdo, $boardId, $categoryId);
     $name = bodyString($body, 'name');
     if ($name === '') {
-        fail(422, 'A category needs a name');
+        fail(422, 'category.name_required');
     }
     $stmt = $pdo->prepare('UPDATE join_categories SET name = ?, color = ? WHERE id = ?');
     $stmt->execute([$name, bodyString($body, 'color') ?: '#1FD7C1', $categoryId]);
@@ -106,6 +106,6 @@ function requireOwnCategory(PDO $pdo, string $boardId, string $categoryId): void
     $stmt = $pdo->prepare('SELECT 1 FROM join_categories WHERE id = ? AND board_id = ?');
     $stmt->execute([$categoryId, $boardId]);
     if (!$stmt->fetch()) {
-        fail(404, 'Category not found');
+        fail(404, 'category.not_found');
     }
 }
