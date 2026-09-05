@@ -209,9 +209,10 @@ function renumber(PDO $pdo, string $columnId): void
 }
 
 /** Deletes a task; its subtasks and assignments fall with it. */
-function deleteTask(PDO $pdo, string $boardId, string $taskId): void
+function deleteTask(PDO $pdo, string $boardId, array $user, string $taskId): void
 {
     requireOwnTask($pdo, $boardId, $taskId);
+    dropEventsOf($pdo, $user, [$taskId]);
     $pdo->prepare('DELETE FROM join_tasks WHERE id = ?')->execute([$taskId]);
     respond(200, ['ok' => true]);
 }

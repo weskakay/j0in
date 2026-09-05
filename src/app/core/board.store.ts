@@ -20,7 +20,7 @@ export interface ColumnWithTasks {
 }
 
 /** How long the loading state stays on screen once it has been shown. */
-const MIN_WAIT = 400;
+const MIN_WAIT = 1400;
 
 /** What happens to the cards of a column that is being removed. */
 export interface ColumnDisposal {

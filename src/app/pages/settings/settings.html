@@ -91,6 +91,48 @@
   </section>
 }
 
+<section class="conf__block" [class.conf__block--off]="!canUseCalendar()">
+  <h2 class="conf__heading">{{ t().settings.calendar }}</h2>
+
+  @if (!canUseCalendar()) {
+    <p class="conf__note">
+      {{ isGuest() ? t().settings.calendarGuest : t().settings.calendarLocked }}
+    </p>
+    <button class="conf__btn" type="button" disabled>{{ t().settings.calendarConnect }}</button>
+  } @else {
+    <p class="conf__note">{{ t().settings.calendarNote }}</p>
+
+    @if (calendarProblem()) {
+      <p class="conf__warning" role="alert">{{ t().settings.calendarFailed }}</p>
+    }
+
+    @if (!calendarStatus().available) {
+      <p class="conf__note">{{ t().settings.calendarOff }}</p>
+    } @else if (calendarStatus().connected) {
+      <p class="conf__note">
+        {{ t().settings.calendarConnected }} <strong>{{ calendarStatus().email }}</strong>
+      </p>
+      <button
+        class="conf__btn"
+        type="button"
+        [disabled]="calendarBusy()"
+        (click)="disconnectCalendar()"
+      >
+        {{ t().settings.calendarDisconnect }}
+      </button>
+    } @else {
+      <button
+        class="conf__btn"
+        type="button"
+        [disabled]="calendarBusy()"
+        (click)="connectCalendar()"
+      >
+        {{ t().settings.calendarConnect }}
+      </button>
+    }
+  }
+</section>
+
 <section class="conf__block">
   <h2 class="conf__heading">{{ t().settings.legal }}</h2>
   <p class="legal-links">

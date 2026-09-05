@@ -1,0 +1,31 @@
+/* The guest entrance is the offer here, so it carries the whole row. */
+.auth__btn--guest {
+  flex: 1 0 100%;
+  order: 1;
+  border-color: var(--j0in-accent);
+  background: var(--j0in-accent);
+  color: var(--j0in-text-inverse);
+  animation: guest-glow 2.4s ease-in-out infinite;
+}
+
+.auth__btn--guest:hover:not([disabled]) {
+  background: var(--j0in-accent-hover);
+}
+
+@keyframes guest-glow {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 color-mix(in srgb, var(--j0in-accent) 45%, transparent);
+  }
+
+  50% {
+    box-shadow: 0 0 22px 4px color-mix(in srgb, var(--j0in-accent) 45%, transparent);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .auth__btn--guest {
+    animation: none;
+    box-shadow: 0 0 18px 2px color-mix(in srgb, var(--j0in-accent) 40%, transparent);
+  }
+}

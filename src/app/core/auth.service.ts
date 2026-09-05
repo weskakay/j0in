@@ -41,6 +41,13 @@ export class AuthService {
   /** True when the current session belongs to the shared guest account. */
   readonly isGuest = computed(() => this.currentUser()?.role === 'guest');
 
+  /**
+   * True when this account may reach the calendar. The server decides it per
+   * account and refuses the routes for everybody else, so this only keeps the
+   * screen from offering something that would come back as a refusal.
+   */
+  readonly canUseCalendar = computed(() => this.currentUser()?.calendarEnabled === true);
+
   /** Asks the server who is signed in; called once when the app starts. */
   restore(): Observable<User | Record<string, never>> {
     return this.api

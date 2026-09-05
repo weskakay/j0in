@@ -45,7 +45,7 @@ function currentUser(PDO $pdo): ?array
         return null;
     }
     $stmt = $pdo->prepare(
-        'SELECT u.id, u.name, u.email, u.role FROM join_sessions s
+        'SELECT u.id, u.name, u.email, u.role, u.calendar_enabled FROM join_sessions s
          JOIN join_users u ON u.id = s.user_id
          WHERE s.token_hash = ? AND s.expires_at > NOW()'
     );

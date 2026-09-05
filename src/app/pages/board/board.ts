@@ -7,11 +7,16 @@ import { TaskCard } from './task-card/task-card';
 import { Dialog } from '../../layout/dialog/dialog';
 import { TaskDetail, type SubtaskToggle } from './task-detail/task-detail';
 import { TaskForm } from './task-form/task-form';
-import { BoardDrag, type Drop } from './drag/board-drag.service';
+import { BoardDrag, type Landing } from './drag/board-drag.service';
 import { DragCard } from './drag/drag-card';
 import { Loader } from '../../layout/loader/loader';
 import { ColumnHead } from './column-head/column-head';
 import { ColumnDelete } from './column-delete/column-delete';
+import { ColumnGrip } from './resize/column-grip';
+import { Planner } from './planner/planner';
+import { LayoutService } from '../../core/layout.service';
+import { CalendarService } from '../../core/calendar.service';
+import { ScheduleService } from '../../core/schedule.service';
 
 /** Which dialog is on screen, if any. */
 type DialogMode = 'none' | 'detail' | 'edit' | 'create' | 'wipeColumn' | 'wipeTask';
@@ -19,33 +24,47 @@ type DialogMode = 'none' | 'detail' | 'edit' | 'create' | 'wipeColumn' | 'wipeTa
 /** The board: every column with its cards, plus the task dialog. */
 @Component({
   selector: 'app-board',
-  imports: [TaskCard, Dialog, TaskDetail, TaskForm, DragCard, Loader, ColumnHead, ColumnDelete],
+  imports: [
+    TaskCard,
+    Dialog,
+    TaskDetail,
+    TaskForm,
+    DragCard,
+    Loader,
+    ColumnHead,
+    ColumnDelete,
+    ColumnGrip,
+    Planner,
+  ],
   providers: [BoardDrag],
   templateUrl: './board.html',
   styleUrl: './board.scss',
 })
 export class Board {
   private readonly store = inject(BoardStore);
-  private readonly drag = inject(BoardDrag);
+  /** The running drag, read straight by the template for the preview. */
+  protected readonly drag = inject(BoardDrag);
   private readonly language = inject(LanguageService);
+  private readonly layout = inject(LayoutService);
+  private readonly calendar = inject(CalendarService);
+  private readonly planned = inject(ScheduleService);
 
   /** Every piece of text, in the language currently on screen. */
   protected readonly t = this.language.dict;
 
-  /** The card being dragged, or null. Drives the preview under the pointer. */
-  protected readonly dragged = this.drag.task;
+  /** How wide one column is, dragged by the edge between two of them. */
+  protected readonly columnWidth = this.layout.columnWidth;
 
-  /** Column currently under the pointer, highlighted while dragging. */
-  protected readonly overColumn = this.drag.overColumn;
+  /** Whether the day can be planned at all, see the schedule service. */
+  protected readonly canPlan = this.planned.possible;
 
-  /** Where the pointer is, so the preview can follow it. */
-  protected readonly dragPoint = this.drag.point;
+  /** True while the day stands beside the board. */
+  protected readonly plannerOpen = computed(() => this.canPlan() && this.layout.plannerOpen());
 
-  /** Where the card was grabbed, so it stays put under the hand. */
-  protected readonly dragGrab = this.drag.grab;
-
-  /** The gap the card would drop into. */
-  protected readonly dropIndex = this.drag.overIndex;
+  /** Shows the day beside the board, or puts it away. */
+  protected togglePlanner(): void {
+    this.layout.togglePlanner();
+  }
 
   /** The name of the board, shown as the heading of the screen. */
   protected readonly boardName = this.store.name;
@@ -211,15 +230,20 @@ export class Board {
 
   /** Whether the insertion marker belongs in front of the given card. */
   protected showSlot(columnId: string, index: number): boolean {
-    return !!this.dragged() && this.overColumn() === columnId && this.dropIndex() === index;
+    const drag = this.drag;
+    return !!drag.task() && drag.overColumn() === columnId && drag.overIndex() === index;
   }
 
   /**
    * Moves a dropped card to where it was let go. The board is redrawn from
    * the server afterwards, so the order matches what was really stored.
    */
-  protected onDrop(drop: Drop): void {
-    this.store.moveTask(drop.task.id, drop.columnId, drop.position).subscribe({
+  protected onDrop(landing: Landing): void {
+    if (landing.kind === 'slot') {
+      this.planned.schedule(landing.task.id, landing.minutes, this.calendar.day());
+      return;
+    }
+    this.store.moveTask(landing.task.id, landing.columnId, landing.position).subscribe({
       next: () => this.store.load(),
     });
   }

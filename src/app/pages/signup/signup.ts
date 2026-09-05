@@ -24,12 +24,16 @@ export class Signup {
   protected readonly t = this.language.dict;
   private readonly fb = inject(FormBuilder);
 
+  /** Why the last attempt was turned down, worded for the screen. */
   protected readonly error = signal('');
+
+  /** True while a request runs; the buttons stay disabled meanwhile. */
   protected readonly busy = signal(false);
 
   /** True once the request has been filed, which ends the form's job. */
   protected readonly filed = signal(false);
 
+  /** The sign-up form; it is checked when a field is left, not while typing. */
   protected readonly form = this.fb.nonNullable.group(
     {
       name: ['', [Validators.required]],

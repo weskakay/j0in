@@ -171,6 +171,16 @@
   flex: 1;
 }
 
+/* Phone: the mark sits above the word, so four entries fit side by side. */
+.shell__nav-link {
+  flex-direction: column;
+  gap: 2px;
+}
+
+.shell__fold {
+  display: none;
+}
+
 /* Sits next to the label, so an open request is visible from every screen. */
 .shell__badge {
   display: grid;
@@ -216,12 +226,19 @@
 
   .shell__nav-list {
     flex-direction: column;
+    justify-content: flex-start;
     padding: var(--j0in-space-md) var(--j0in-space-sm);
     gap: var(--j0in-space-xs);
   }
 
+  .shell__nav-list > li {
+    flex: 0 0 auto;
+  }
+
   .shell__nav-link {
+    flex-direction: row;
     justify-content: flex-start;
+    gap: var(--j0in-space-sm);
     padding: 0 var(--j0in-space-md);
     border-radius: var(--j0in-radius-sm);
     font-size: var(--j0in-fs-body);
@@ -230,6 +247,61 @@
     &:hover {
       background: var(--j0in-surface-raised);
     }
+  }
+
+  .shell__nav-icon {
+    flex: 0 0 auto;
+  }
+
+  /* Folded away, the marks alone carry the navigation. */
+  .shell--folded {
+    grid-template-columns: 72px 1fr;
+  }
+
+  /* The brand shares that column, so only its padding gives way. The wording
+     stays whole: a half-cut mark reads as a fault, not as a narrow menu. */
+  .shell--folded .shell__brand {
+    justify-content: center;
+    padding-right: var(--j0in-space-xs);
+    padding-left: var(--j0in-space-xs);
+  }
+
+  .shell__nav--folded {
+    .shell__nav-link {
+      justify-content: center;
+      padding: 0;
+    }
+
+    .shell__nav-text {
+      display: none;
+    }
+
+    .shell__badge {
+      position: absolute;
+      transform: translate(14px, -12px);
+    }
+  }
+
+  .shell__fold {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    width: 100%;
+    min-height: var(--j0in-tap-target);
+    padding: 0 var(--j0in-space-md);
+    border: 0;
+    border-bottom: 1px solid var(--j0in-border);
+    background: transparent;
+    color: var(--j0in-text-muted);
+
+    &:hover {
+      color: var(--j0in-text);
+    }
+  }
+
+  .shell__nav {
+    display: flex;
+    flex-direction: column;
   }
 
   .shell__nav-link--active {

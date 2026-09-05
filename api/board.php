@@ -36,19 +36,16 @@ function renameBoard(PDO $pdo, string $boardId, array $body): void
 }
 
 /**
- * Empties the demo board and fills it again. Only the shared guest may do
- * this: on a real board it would be a way to lose everything by mis-click.
+ * Puts the demo board back on request. Only the shared guest may do this: on
+ * a real board it would be a way to lose everything by mis-click.
  */
 function resetDemoBoard(PDO $pdo, string $boardId, array $user, array $body = []): void
 {
     if (($user['role'] ?? '') !== 'guest') {
         fail(403, 'board.demo_only');
     }
-    $lang = bodyString($body, 'lang');
-    clearBoard($pdo, $boardId);
-    $pdo->prepare('UPDATE join_boards SET name = ? WHERE id = ?')
-        ->execute([boardNameIn($lang), $boardId]);
-    fillDemoBoard($pdo, $boardId, $lang);
+    dropEventsOf($pdo, $user, allTaskIdsOf($pdo, $boardId));
+    rebuildDemoBoard($pdo, $boardId, bodyString($body, 'lang'));
     respond(200, ['ok' => true]);
 }
 

@@ -11,6 +11,21 @@
       />
     </label>
 
+    @if (canPlan()) {
+      <button class="board__planner-toggle" type="button" (click)="togglePlanner()">
+      <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
+        <path
+          d="M4 6h16v14H4zM4 10h16M8 3v3M16 3v3"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+        />
+      </svg>
+        {{ plannerOpen() ? t().planner.hide : t().planner.show }}
+      </button>
+    }
+
     @if (namingColumn()) {
       <input
         class="board__column-field"
@@ -48,14 +63,20 @@
 }
 
 @if (ready()) {
-  <div class="board__columns">
+  <div class="board__split" [class.board__split--planner]="plannerOpen()">
+  @if (plannerOpen()) {
+    <app-planner />
+  }
+  <div class="board__columns" [style.--j0in-column-width.px]="columnWidth()">
     @for (entry of board(); track entry.column.id) {
       <section
         class="column"
-        [class.column--over]="overColumn() === entry.column.id && dragged()"
+        [class.column--over]="drag.overColumn() === entry.column.id && drag.task()"
         [attr.data-column-id]="entry.column.id"
         [attr.aria-label]="entry.column.name"
       >
+        <app-column-grip />
+
         <app-column-head
           [column]="entry.column"
           [count]="entry.tasks.length"
@@ -72,7 +93,7 @@
             <li
               [appDragCard]="task"
               [attr.data-task-id]="task.id"
-              [class.column__dragging]="dragged()?.id === task.id"
+              [class.column__dragging]="drag.task()?.id === task.id"
               (dropped)="onDrop($event)"
             >
               <app-task-card
@@ -94,14 +115,15 @@
     }
 
   </div>
+  </div>
 }
 
-@if (dragged(); as task) {
+@if (drag.task(); as task) {
   <div
     class="ghost"
-    [style.left.px]="dragPoint().x - dragGrab().dx"
-    [style.top.px]="dragPoint().y - dragGrab().dy"
-    [style.width.px]="dragGrab().width"
+    [style.left.px]="drag.point().x - drag.grab().dx"
+    [style.top.px]="drag.point().y - drag.grab().dy"
+    [style.width.px]="drag.grab().width"
     aria-hidden="true"
   >
     <app-task-card

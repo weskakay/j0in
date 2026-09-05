@@ -1,0 +1,17 @@
+<button
+  class="grip"
+  type="button"
+  role="separator"
+  aria-orientation="vertical"
+  [attr.aria-label]="t().board.columnWidth"
+  [attr.aria-valuenow]="width()"
+  [attr.aria-valuemin]="min"
+  [attr.aria-valuemax]="max"
+  (pointerdown)="onPointerDown($event)"
+  (pointermove)="onPointerMove($event)"
+  (pointerup)="onPointerUp()"
+  (pointercancel)="onPointerUp()"
+  (keydown)="onKeydown($event)"
+>
+  <span class="grip__line" aria-hidden="true"></span>
+</button>

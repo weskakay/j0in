@@ -11,6 +11,7 @@ CREATE TABLE IF NOT EXISTS join_users (
   email         VARCHAR(190) NOT NULL,
   password_hash VARCHAR(255) NOT NULL,
   role          VARCHAR(16)  NOT NULL DEFAULT 'user',
+  calendar_enabled TINYINT(1) NOT NULL DEFAULT 0,
   created_at    DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
   UNIQUE KEY join_users_email_uq (email)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -34,6 +35,7 @@ CREATE TABLE IF NOT EXISTS join_boards (
   owner_user_id CHAR(36)     NOT NULL,
   name          VARCHAR(120) NOT NULL,
   is_demo       TINYINT(1)   NOT NULL DEFAULT 0,
+  demo_reset_on DATE         NULL,
   created_at    DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
   CONSTRAINT join_fk_board_user FOREIGN KEY (owner_user_id)
     REFERENCES join_users(id) ON DELETE CASCADE,
@@ -134,4 +136,35 @@ CREATE TABLE IF NOT EXISTS join_task_contacts (
   CONSTRAINT join_fk_tc_contact FOREIGN KEY (contact_id)
     REFERENCES join_contacts(id) ON DELETE CASCADE,
   KEY join_task_contacts_contact_idx (contact_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- One connected Google account per user. The tokens are stored sealed, never
+-- in plain text: whoever reads the table still cannot use them.
+CREATE TABLE IF NOT EXISTS join_google_accounts (
+  user_id       CHAR(36)     NOT NULL PRIMARY KEY,
+  email         VARCHAR(190) NOT NULL,
+  calendar_id   VARCHAR(190) NOT NULL DEFAULT 'primary',
+  access_token  TEXT         NOT NULL,
+  refresh_token TEXT         NOT NULL,
+  expires_at    DATETIME     NOT NULL,
+  created_at    DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at    DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP
+                             ON UPDATE CURRENT_TIMESTAMP,
+  CONSTRAINT join_fk_google_user FOREIGN KEY (user_id)
+    REFERENCES join_users(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- A planned card holds a slot in the day. Deleting the card takes the row with
+-- it; the event in Google is removed by the code before that happens.
+CREATE TABLE IF NOT EXISTS join_task_events (
+  task_id     CHAR(36)     NOT NULL PRIMARY KEY,
+  event_id    VARCHAR(190) NOT NULL,
+  starts_at   DATETIME     NOT NULL,
+  ends_at     DATETIME     NOT NULL,
+  created_at  DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at  DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP
+                           ON UPDATE CURRENT_TIMESTAMP,
+  CONSTRAINT join_fk_event_task FOREIGN KEY (task_id)
+    REFERENCES join_tasks(id) ON DELETE CASCADE,
+  KEY join_task_events_start_idx (starts_at)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

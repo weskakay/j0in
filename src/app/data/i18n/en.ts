@@ -21,6 +21,8 @@ export const EN: Dictionary = {
     account: 'Account and sign out',
     logout: 'Sign out',
     pending: 'open requests',
+    fold: 'Fold the navigation away',
+    unfold: 'Bring the navigation back',
   },
   auth: {
     lead: 'Tasks and projects in one place.',
@@ -55,6 +57,7 @@ export const EN: Dictionary = {
     search: 'Search a task',
     addColumn: 'Add a column',
     columnName: 'Name of the column',
+    columnWidth: 'Drag the column width',
     empty: 'No tasks',
     newTask: 'Add a task',
     editColumn: 'edit',
@@ -125,6 +128,17 @@ export const EN: Dictionary = {
     later: 'Later',
     noDate: 'No date',
   },
+  planner: {
+    title: 'Day plan',
+    show: 'Show the day',
+    hide: 'Hide the day',
+    today: 'Today',
+    previous: 'One day back',
+    next: 'One day on',
+    empty: 'Nothing in the calendar for this day.',
+    release: 'Take out of the day',
+    newCard: 'What is on?',
+  },
   settings: {
     title: 'Settings',
     appearance: 'Appearance',
@@ -152,6 +166,18 @@ export const EN: Dictionary = {
     access: 'Access',
     accessNote:
       'Anyone who signs up lands here first. Only after approval can that address sign in and get a board of its own.',
+    calendar: 'Google Calendar',
+    calendarNote:
+      'Connect your calendar to lay cards into the day as time blocks. The connection is yours alone and can be undone at any time.',
+    calendarConnect: 'Connect calendar',
+    calendarConnected: 'Connected to',
+    calendarDisconnect: 'Disconnect',
+    calendarOff: 'The calendar is not set up on this server.',
+    calendarFailed: 'The connection did not go through. Please try again.',
+    calendarGuest:
+      'With your own account a Google calendar can be connected here, and cards then sit in the day as time blocks. The guest login cannot, because every visitor shares it.',
+    calendarLocked:
+      'The calendar is not unlocked for this account yet. The owner opens it up account by account.',
     legal: 'Legal',
     account: 'Account',
     signedInAs: 'Signed in as',
@@ -218,6 +244,9 @@ export const EN: Dictionary = {
     'auth.signup_closed': 'New accounts are closed at the moment',
     'auth.signup_invalid':
       'Please provide a name, a valid email and a password of at least 8 characters',
+    'calendar.not_connected': 'No calendar is connected',
+    'calendar.not_configured': 'The calendar is not set up on this server',
+    'calendar.google_refused': 'Google refused the connection',
     'board.demo_only': 'Only the demo board can be reset',
     'board.name_required': 'A board needs a name',
     'category.name_required': 'A category needs a name',

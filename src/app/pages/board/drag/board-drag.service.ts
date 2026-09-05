@@ -20,6 +20,15 @@ export interface Drop {
   position: number;
 }
 
+/** A card let go over the day, with the minute of day it landed on. */
+export interface Slot {
+  task: Task;
+  minutes: number;
+}
+
+/** Either outcome of a drag, told apart by its kind. */
+export type Landing = ({ kind: 'column' } & Drop) | ({ kind: 'slot' } & Slot);
+
 /**
  * Where inside the card the pointer took hold, and how wide the card was.
  * Without this the card would jump under the pointer the moment it lifts.
@@ -44,6 +53,9 @@ export class BoardDrag {
 
   /** Where in that column the card would land, counted from zero. */
   readonly overIndex = signal(0);
+
+  /** Minute of day the pointer rests on inside the day, or null. */
+  readonly overSlot = signal<number | null>(null);
 
   /** Current pointer position in the viewport. */
   readonly point = signal<Point>({ x: 0, y: 0 });
@@ -84,9 +96,14 @@ export class BoardDrag {
     this.aimAt(at);
   }
 
-  /** Works out which column and which gap the pointer is over. */
+  /**
+   * Works out what the pointer rests on. The day wins over the columns: it
+   * sits beside them, and a card let go there means a time, not an order.
+   */
   private aimAt(at: Point): void {
-    const column = columnUnder(at);
+    const slot = slotUnder(at);
+    this.overSlot.set(slot);
+    const column = slot === null ? columnUnder(at) : null;
     this.overColumn.set(column);
     this.overIndex.set(column === null ? 0 : gapUnder(column, at, this.task()?.id ?? ''));
   }
@@ -96,15 +113,19 @@ export class BoardDrag {
    * let go outside any column. A drop into its own column is allowed, that
    * is how a card is reordered.
    */
-  end(): Drop | null {
+  end(): Landing | null {
     const task = this.task();
     const columnId = this.overColumn();
     const position = this.overIndex() + 1;
+    const minutes = this.overSlot();
     this.cancel();
-    if (!task || !columnId) {
+    if (!task) {
       return null;
     }
-    return { task, columnId, position };
+    if (minutes !== null) {
+      return { kind: 'slot', task, minutes };
+    }
+    return columnId ? { kind: 'column', task, columnId, position } : null;
   }
 
   /** Drops the drag without moving anything. */
@@ -115,7 +136,30 @@ export class BoardDrag {
     }
     this.task.set(null);
     this.overColumn.set(null);
+    this.overSlot.set(null);
   }
+}
+
+/**
+ * The minute of day the pointer rests on inside the day column, snapped to a
+ * quarter of an hour. Null when the pointer is anywhere else.
+ */
+function slotUnder(at: Point): number | null {
+  const element = document.elementFromPoint(at.x, at.y);
+  const grid = element?.closest<HTMLElement>('[data-day-grid]');
+  return grid ? minuteIn(grid, at) : null;
+}
+
+/** The minute of day a point marks in the grid, snapped to a quarter hour. */
+function minuteIn(grid: HTMLElement, at: Point): number | null {
+  const perHour = Number(grid.dataset['hourHeight'] ?? 0);
+  const first = Number(grid.dataset['firstHour'] ?? 0);
+  if (perHour <= 0) {
+    return null;
+  }
+  const top = grid.getBoundingClientRect().top;
+  const minutes = first * 60 + ((at.y - top + grid.scrollTop) / perHour) * 60;
+  return Math.max(0, Math.round(minutes / 15) * 15);
 }
 
 /**

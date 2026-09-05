@@ -1,0 +1,108 @@
+<section class="day" [attr.aria-label]="t().planner.title">
+  <header class="day__head">
+    <h2 class="day__title">{{ heading() }}</h2>
+    <div class="day__steps">
+      <button
+        class="day__step"
+        type="button"
+        [attr.aria-label]="t().planner.previous"
+        (click)="step(-1)"
+      >
+        &#8249;
+      </button>
+      <button class="day__today" type="button" (click)="goToday()">{{ t().planner.today }}</button>
+      <button
+        class="day__step"
+        type="button"
+        [attr.aria-label]="t().planner.next"
+        (click)="step(1)"
+      >
+        &#8250;
+      </button>
+    </div>
+  </header>
+
+  @if (problem(); as message) {
+    <p class="day__problem" role="alert">{{ message }}</p>
+  }
+
+  @if (loading()) {
+    <p class="day__hint" role="status">{{ t().common.loading }}</p>
+  }
+
+  @if (allDay().length > 0) {
+    <ul class="day__allday">
+      @for (event of allDay(); track event.id) {
+        <li class="day__allday-item">{{ event.title }}</li>
+      }
+    </ul>
+  }
+
+  <div
+    class="day__grid"
+    data-day-grid
+    [attr.data-hour-height]="hourHeight"
+    [attr.data-first-hour]="firstHour"
+  >
+    @for (hour of hours; track hour) {
+      <button
+        class="day__hour"
+        type="button"
+        [style.height.px]="hourHeight"
+        [attr.aria-label]="t().planner.newCard + ' ' + hour + ':00'"
+        (click)="compose($event, hour)"
+      >
+        <span class="day__clock">{{ hour }}:00</span>
+      </button>
+    }
+
+    @if (aim(); as top) {
+      <div class="day__aim" [style.top.px]="top" aria-hidden="true"></div>
+    }
+
+    @if (composing() !== null) {
+      <div class="day__compose" [style.top.px]="composingTop()">
+        <span class="day__compose-time">{{ composingLabel() }}</span>
+        <input
+          class="day__compose-field"
+          type="text"
+          [placeholder]="t().planner.newCard"
+          [attr.aria-label]="t().planner.newCard"
+          (keydown.enter)="keep(field.value)"
+          (keydown.escape)="drop()"
+          (blur)="keep(field.value)"
+          #field
+        />
+      </div>
+    }
+
+    <div class="day__events">
+      @for (slot of placed(); track slot.event.id) {
+        <article
+          class="day__event"
+          [class.day__event--card]="slot.event.taskId"
+          [class.day__event--pending]="pending() === slot.event.taskId"
+          [style.top.px]="slot.top"
+          [style.height.px]="slot.height"
+        >
+          <span class="day__event-time">{{ slot.label }}</span>
+          <span class="day__event-title">{{ slot.event.title }}</span>
+          @if (slot.event.taskId; as taskId) {
+            <button
+              class="day__release"
+              type="button"
+              [attr.aria-label]="t().planner.release"
+              (click)="release(taskId)"
+            >
+              &times;
+            </button>
+          }
+        </article>
+      }
+    </div>
+  </div>
+
+  @if (!loading() && !problem() && placed().length === 0 && allDay().length === 0) {
+    <p class="day__hint" role="status">{{ t().planner.empty }}</p>
+  }
+</section>

@@ -194,11 +194,51 @@
     padding-bottom: var(--j0in-space-md);
   }
 
-  /* Columns share the free width, and only start scrolling once there are
-     so many that each would fall below its minimum. */
+  /* A column keeps the width it was dragged to. Once they no longer fit
+     side by side the board scrolls instead of squeezing them. */
   .column {
-    flex: 1 1 var(--j0in-column-width);
-    min-width: var(--j0in-column-min);
-    max-width: var(--j0in-column-width);
+    position: relative;
+    flex: 0 0 var(--j0in-column-width);
+  }
+}
+
+/* Same shape as the button for a new column, so the tools read as one row. */
+.board__planner-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--j0in-space-sm);
+  flex: 0 0 auto;
+  align-self: flex-start;
+  white-space: nowrap;
+  min-height: var(--j0in-tap-target);
+  padding: 0 var(--j0in-space-md);
+  border: 1px solid var(--j0in-border);
+  border-radius: var(--j0in-radius-md);
+  background: transparent;
+  color: var(--j0in-text-muted);
+
+  &:hover {
+    color: var(--j0in-text);
+  }
+}
+
+/* Phone: the day sits above the board. Wide screens put it alongside. */
+.board__split {
+  display: flex;
+  flex-direction: column;
+  gap: var(--j0in-space-md);
+  min-width: 0;
+}
+
+@media (min-width: 900px) {
+  .board__split--planner {
+    flex-direction: row;
+    align-items: flex-start;
+  }
+
+  .board__split--planner .board__columns {
+    min-width: 0;
+    flex: 1 1 auto;
   }
 }

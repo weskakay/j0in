@@ -18,6 +18,7 @@ export class LanguageService {
 
   constructor() {
     apply(this.lang());
+    save(LANG_KEY, this.lang());
   }
 
   /** Switches the language, remembers it and tells the document about it. */
@@ -45,9 +46,27 @@ function apply(lang: Lang): void {
   document.documentElement.lang = lang;
 }
 
-/** The stored choice, falling back to German. */
+/**
+ * The language to start in. A `lang` in the address wins, so a visitor who
+ * arrives from the portfolio keeps reading in the language they were in.
+ * Otherwise the stored choice, and German as the fallback.
+ */
 function readLang(): Lang {
-  return read(LANG_KEY) === 'en' ? 'en' : 'de';
+  return asLang(fromAddress()) ?? asLang(read(LANG_KEY)) ?? 'de';
+}
+
+/** The `lang` parameter of the current address, empty if there is none. */
+function fromAddress(): string {
+  try {
+    return new URLSearchParams(location.search).get('lang') ?? '';
+  } catch {
+    return '';
+  }
+}
+
+/** Turns a value into a language, or nothing if it names none. */
+function asLang(value: string): Lang | null {
+  return value === 'de' || value === 'en' ? value : null;
 }
 
 /** Reads one value, treating a browser that refuses as an empty one. */

@@ -1,6 +1,6 @@
 import { Directive, ElementRef, HostListener, inject, input, output } from '@angular/core';
 import type { Task } from '../../../data/models';
-import { BoardDrag, type Drop } from './board-drag.service';
+import { BoardDrag, type Landing } from './board-drag.service';
 
 /** How far a mouse must travel before a press turns into a drag. */
 const MOUSE_THRESHOLD = 5;
@@ -21,7 +21,7 @@ export class DragCard {
   readonly appDragCard = input.required<Task>();
 
   /** Fires when the card was let go over another column. */
-  readonly dropped = output<Drop>();
+  readonly dropped = output<Landing>();
 
   private readonly drag = inject(BoardDrag);
   private readonly host = inject(ElementRef<HTMLElement>);

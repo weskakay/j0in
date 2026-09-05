@@ -21,6 +21,8 @@ export const DE: Dictionary = {
     account: 'Konto und Abmelden',
     logout: 'Abmelden',
     pending: 'offene Anfragen',
+    fold: 'Navigation einklappen',
+    unfold: 'Navigation ausklappen',
   },
   auth: {
     lead: 'Aufgaben und Projekte an einem Ort.',
@@ -56,6 +58,7 @@ export const DE: Dictionary = {
     search: 'Aufgabe suchen',
     addColumn: 'Spalte hinzufügen',
     columnName: 'Name der Spalte',
+    columnWidth: 'Spaltenbreite ziehen',
     empty: 'Keine Aufgaben',
     newTask: 'Aufgabe anlegen',
     editColumn: 'bearbeiten',
@@ -126,6 +129,17 @@ export const DE: Dictionary = {
     later: 'Später',
     noDate: 'Ohne Datum',
   },
+  planner: {
+    title: 'Tagesplan',
+    show: 'Tag anzeigen',
+    hide: 'Tag ausblenden',
+    today: 'Heute',
+    previous: 'Ein Tag zurück',
+    next: 'Ein Tag weiter',
+    empty: 'Für diesen Tag steht nichts im Kalender.',
+    release: 'Aus dem Tag nehmen',
+    newCard: 'Was steht an?',
+  },
   settings: {
     title: 'Einstellungen',
     appearance: 'Aussehen',
@@ -153,6 +167,18 @@ export const DE: Dictionary = {
     access: 'Zugänge',
     accessNote:
       'Wer sich registriert, landet zuerst hier. Erst nach der Freigabe kann sich die Adresse anmelden und bekommt ein eigenes Board.',
+    calendar: 'Google-Kalender',
+    calendarNote:
+      'Verbinde deinen Kalender, um Karten als Zeitblöcke in den Tag zu legen. Die Verbindung gilt nur für dich und lässt sich jederzeit trennen.',
+    calendarConnect: 'Kalender verbinden',
+    calendarConnected: 'Verbunden mit',
+    calendarDisconnect: 'Verbindung trennen',
+    calendarOff: 'Auf diesem Server ist der Kalender nicht eingerichtet.',
+    calendarFailed: 'Die Verbindung kam nicht zustande. Versuch es noch einmal.',
+    calendarGuest:
+      'Mit einem eigenen Konto lässt sich hier ein Google-Kalender verbinden. Karten liegen dann als Zeitblöcke im Tag. Im Gastzugang geht das nicht, weil ihn alle Besucher teilen.',
+    calendarLocked:
+      'Der Kalender ist für dieses Konto noch nicht freigeschaltet. Der Betreiber schaltet ihn pro Konto frei.',
     legal: 'Rechtliches',
     account: 'Konto',
     signedInAs: 'Angemeldet als',
@@ -219,6 +245,9 @@ export const DE: Dictionary = {
     'auth.signup_closed': 'Neue Zugänge sind gerade geschlossen',
     'auth.signup_invalid':
       'Bitte einen Namen, eine gültige E-Mail und ein Passwort mit mindestens 8 Zeichen angeben',
+    'calendar.not_connected': 'Es ist kein Kalender verbunden',
+    'calendar.not_configured': 'Der Kalender ist auf diesem Server nicht eingerichtet',
+    'calendar.google_refused': 'Google hat die Verbindung abgelehnt',
     'board.demo_only': 'Nur das Demo-Board lässt sich zurücksetzen',
     'board.name_required': 'Das Board braucht einen Namen',
     'category.name_required': 'Die Kategorie braucht einen Namen',

@@ -16,6 +16,9 @@ export type ErrorCode =
   | 'auth.signup_closed'
   | 'auth.signup_invalid'
   | 'board.demo_only'
+  | 'calendar.not_configured'
+  | 'calendar.not_connected'
+  | 'calendar.google_refused'
   | 'board.name_required'
   | 'category.name_required'
   | 'category.not_found'
@@ -60,6 +63,8 @@ export interface Dictionary {
     account: string;
     logout: string;
     pending: string;
+    fold: string;
+    unfold: string;
   };
   auth: {
     lead: string;
@@ -93,6 +98,7 @@ export interface Dictionary {
     search: string;
     addColumn: string;
     columnName: string;
+    columnWidth: string;
     empty: string;
     newTask: string;
     editColumn: string;
@@ -163,6 +169,17 @@ export interface Dictionary {
     later: string;
     noDate: string;
   };
+  planner: {
+    title: string;
+    show: string;
+    hide: string;
+    today: string;
+    previous: string;
+    next: string;
+    empty: string;
+    release: string;
+    newCard: string;
+  };
   settings: {
     title: string;
     appearance: string;
@@ -186,6 +203,15 @@ export interface Dictionary {
     demoResetting: string;
     access: string;
     accessNote: string;
+    calendar: string;
+    calendarNote: string;
+    calendarConnect: string;
+    calendarConnected: string;
+    calendarDisconnect: string;
+    calendarOff: string;
+    calendarFailed: string;
+    calendarGuest: string;
+    calendarLocked: string;
     legal: string;
     account: string;
     signedInAs: string;

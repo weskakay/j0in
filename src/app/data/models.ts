@@ -20,6 +20,8 @@ export interface User {
   name: string;
   email: string;
   role: UserRole;
+  /** Whether this account may reach the calendar; the server decides. */
+  calendarEnabled?: boolean;
   /** Open access requests, counted only for the owner. */
   pending?: number;
 }

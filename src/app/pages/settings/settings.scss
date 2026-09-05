@@ -41,6 +41,12 @@
   font-size: var(--j0in-fs-sm);
 }
 
+.conf__warning {
+  margin-bottom: var(--j0in-space-md);
+  color: var(--j0in-danger);
+  font-size: var(--j0in-fs-sm);
+}
+
 .conf__choices {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
@@ -135,4 +141,10 @@
     opacity: 0.6;
     cursor: default;
   }
+}
+
+/* A section a guest can read but not use: visible, so the feature is known,
+   dimmed, so it is clear it belongs to an account of your own. */
+.conf__block--off {
+  opacity: 0.6;
 }

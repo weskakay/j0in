@@ -1,5 +1,5 @@
-<div class="shell">
-  <a class="shell__brand" routerLink="/summary">
+<div class="shell" [class.shell--folded]="navFolded()">
+  <a class="shell__brand" routerLink="/board">
     <span class="shell__brand-mark">J<span class="shell__brand-zero">0</span>IN</span>
   </a>
 
@@ -49,7 +49,24 @@
     </div>
   </header>
 
-  <nav class="shell__nav" [attr.aria-label]="t().nav.label">
+  <nav
+    class="shell__nav"
+    [class.shell__nav--folded]="navFolded()"
+    [attr.aria-label]="t().nav.label"
+  >
+    <button
+      class="shell__fold"
+      type="button"
+      [attr.aria-label]="navFolded() ? t().nav.unfold : t().nav.fold"
+      [attr.aria-pressed]="navFolded()"
+      (click)="toggleNav()"
+    >
+      <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
+        <path [attr.d]="navFolded() ? 'M9 6l6 6-6 6' : 'M15 6l-6 6 6 6'" stroke="currentColor"
+          stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" />
+      </svg>
+    </button>
+
     <ul class="shell__nav-list">
       @for (item of items; track item.path) {
         <li>
@@ -57,9 +74,16 @@
             class="shell__nav-link"
             [routerLink]="item.path"
             routerLinkActive="shell__nav-link--active"
+            [attr.aria-label]="navFolded() ? t().nav[item.key] : null"
+            [attr.title]="navFolded() ? t().nav[item.key] : null"
             (click)="closeMenu()"
           >
-            {{ t().nav[item.key] }}
+            <svg class="shell__nav-icon" viewBox="0 0 24 24" width="20" height="20"
+              aria-hidden="true">
+              <path [attr.d]="item.icon" stroke="currentColor" stroke-width="2" fill="none"
+                stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+            <span class="shell__nav-text">{{ t().nav[item.key] }}</span>
             @if (item.path === '/settings' && pending() > 0) {
               <span class="shell__badge" [attr.aria-label]="pending() + ' ' + t().nav.pending">
                 {{ pending() }}
@@ -69,6 +93,7 @@
         </li>
       }
     </ul>
+
   </nav>
 
   <main class="shell__main">

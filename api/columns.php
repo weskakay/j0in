@@ -49,15 +49,31 @@ function collectColumnChanges(array $body, array &$fields, array &$values): void
  * Deletes a column. The caller must say what happens to its tasks, either
  * a target column or an explicit delete, so no task is ever left orphaned.
  */
-function deleteColumn(PDO $pdo, string $boardId, string $columnId, array $body): void
+function deleteColumn(PDO $pdo, string $boardId, array $user, string $columnId, array $body): void
 {
     requireOwnColumn($pdo, $boardId, $columnId);
     $count = countTasksIn($pdo, $columnId);
     if ($count > 0) {
+        $doomed = taskIdsIn($pdo, $columnId);
         applyTaskDisposal($pdo, $boardId, $columnId, $body, $count);
+        dropEventsOf($pdo, $user, stillIn($pdo, $columnId, $doomed));
     }
     $pdo->prepare('DELETE FROM join_columns WHERE id = ?')->execute([$columnId]);
     respond(200, ['ok' => true]);
+}
+
+/**
+ * Of the given cards, the ones still sitting in this column. Cards moved
+ * elsewhere keep their appointment; only those going down with the column
+ * lose it.
+ *
+ * @param list<string> $taskIds
+ * @return list<string>
+ */
+function stillIn(PDO $pdo, string $columnId, array $taskIds): array
+{
+    $left = taskIdsIn($pdo, $columnId);
+    return array_values(array_intersect($taskIds, $left));
 }
 
 /** Moves the tasks away, or refuses when the caller did not decide. */

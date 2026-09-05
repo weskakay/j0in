@@ -23,11 +23,13 @@ export class Login {
   private readonly fb = inject(FormBuilder);
 
   /** Server-side error, shown above the form. */
+  /** Why the last attempt was turned down, worded for the screen. */
   protected readonly error = signal('');
 
   /** True while a request runs; the buttons stay disabled meanwhile. */
   protected readonly busy = signal(false);
 
+  /** The sign-in form, with the address, the password and the stay-in tick. */
   protected readonly form = this.fb.nonNullable.group({
     email: ['', [Validators.required, Validators.email]],
     password: ['', [Validators.required]],

@@ -6,7 +6,7 @@ import { BoardStore } from './board.store';
 import type { BoardData } from '../data/models';
 
 /** Mirrors the store's own minimum waiting time. */
-const MIN_WAIT = 400;
+const MIN_WAIT = 1400;
 
 const BOARD: BoardData = {
   name: 'Mein Board',

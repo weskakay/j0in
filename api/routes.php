@@ -20,9 +20,9 @@ function dispatchArea(
     $id = $seg[1] ?? '';
     match ($seg[0]) {
         'board'      => routeBoard($pdo, $boardId, $method, $id, $body, $user),
-        'columns'    => routeColumns($pdo, $boardId, $method, $id, $body),
+        'columns'    => routeColumns($pdo, $boardId, $method, $id, $body, $user),
         'categories' => routeCategories($pdo, $boardId, $method, $id, $body),
-        'tasks'      => routeTasks($pdo, $boardId, $method, $id, $seg[2] ?? '', $body),
+        'tasks'      => routeTasks($pdo, $boardId, $method, $id, $seg[2] ?? '', $body, $user),
         'subtasks'   => routeSubtasks($pdo, $boardId, $method, $id, $body),
         'contacts'   => routeContacts($pdo, $boardId, $method, $id, $body),
         default      => fail(404, 'http.not_found'),
@@ -48,12 +48,18 @@ function routeBoard(
 }
 
 /** POST, PUT and DELETE on /api/columns */
-function routeColumns(PDO $pdo, string $boardId, string $method, string $id, array $body): void
-{
+function routeColumns(
+    PDO $pdo,
+    string $boardId,
+    string $method,
+    string $id,
+    array $body,
+    array $user
+): void {
     match (true) {
         $method === 'POST' && $id === ''   => createColumn($pdo, $boardId, $body),
         $method === 'PUT' && $id !== ''    => updateColumn($pdo, $boardId, $id, $body),
-        $method === 'DELETE' && $id !== '' => deleteColumn($pdo, $boardId, $id, $body),
+        $method === 'DELETE' && $id !== '' => deleteColumn($pdo, $boardId, $user, $id, $body),
         default => fail(405, 'http.method_not_allowed'),
     };
 }
@@ -76,13 +82,16 @@ function routeTasks(
     string $method,
     string $id,
     string $sub,
-    array $body
+    array $body,
+    array $user
 ): void {
     match (true) {
         $method === 'POST' && $id === ''             => createTask($pdo, $boardId, $body),
+        $method === 'POST' && $sub === 'schedule'    => scheduleTask($pdo, $boardId, $user, $id, $body),
+        $method === 'DELETE' && $sub === 'schedule'  => unscheduleTask($pdo, $boardId, $user, $id),
         $method === 'PUT' && $sub === 'move'         => moveTask($pdo, $boardId, $id, $body),
         $method === 'PUT' && $id !== '' && $sub === '' => updateTask($pdo, $boardId, $id, $body),
-        $method === 'DELETE' && $id !== ''           => deleteTask($pdo, $boardId, $id),
+        $method === 'DELETE' && $id !== ''           => deleteTask($pdo, $boardId, $user, $id),
         default => fail(405, 'http.method_not_allowed'),
     };
 }

@@ -150,7 +150,8 @@ function requireApproved(array $user): void
 function findUserByEmail(PDO $pdo, string $email): ?array
 {
     $stmt = $pdo->prepare(
-        'SELECT id, name, email, role, status, password_hash FROM join_users WHERE email = ?'
+        'SELECT id, name, email, role, status, calendar_enabled, password_hash
+         FROM join_users WHERE email = ?'
     );
     $stmt->execute([$email]);
     return $stmt->fetch() ?: null;
@@ -167,7 +168,7 @@ function signInAsGuest(PDO $pdo, array $body = []): void
     if ($user === null) {
         $user = createGuestAccount($pdo, $lang);
     }
-    refillDemoIfEmpty($pdo, $user['id'], $lang);
+    freshenDemoBoard($pdo, $user['id'], $lang);
     startSession($pdo, $user['id'], J0IN_DAYS_GUEST);
     respond(200, publicUser($user));
 }
@@ -182,29 +183,51 @@ function createGuestAccount(PDO $pdo, string $lang = 'de'): array
     $password = bin2hex(random_bytes(16));
     $id = insertUser($pdo, 'Gast', J0IN_GUEST_EMAIL, $password, 'guest');
     createBoardFor($pdo, $id, boardNameIn($lang), true);
-    return ['id' => $id, 'name' => 'Gast', 'email' => J0IN_GUEST_EMAIL, 'role' => 'guest'];
+    return [
+        'id' => $id,
+        'name' => 'Gast',
+        'email' => J0IN_GUEST_EMAIL,
+        'role' => 'guest',
+        'calendar_enabled' => 0,
+    ];
 }
 
 /**
- * Puts the demo cards back whenever the guest board stands empty. That covers
- * the very first visitor as well as the one who arrives after someone before
- * them deleted everything.
+ * Brings the guest board back to how it is meant to be found: once on the
+ * first visit of a new day, and whenever somebody left it empty. Between
+ * those moments a visitor may change anything on it.
  */
-function refillDemoIfEmpty(PDO $pdo, string $userId, string $lang = 'de'): void
+function freshenDemoBoard(PDO $pdo, string $userId, string $lang = 'de'): void
+{
+    $row = demoBoardState($pdo, $userId);
+    if ($row === null) {
+        return;
+    }
+    $fresh = (int) $row['cards'] > 0 && (string) $row['demo_reset_on'] === date('Y-m-d');
+    if (!$fresh) {
+        rebuildDemoBoard($pdo, (string) $row['id'], $lang);
+    }
+}
+
+/**
+ * The guest board with the number of cards standing on it, or null when the
+ * account has no board yet.
+ *
+ * @return array<string, mixed>|null
+ */
+function demoBoardState(PDO $pdo, string $userId): ?array
 {
     $stmt = $pdo->prepare(
-        'SELECT b.id, COUNT(t.id) AS cards
+        'SELECT b.id, b.demo_reset_on, COUNT(t.id) AS cards
          FROM join_boards b
          LEFT JOIN join_columns c ON c.board_id = b.id
          LEFT JOIN join_tasks t ON t.column_id = c.id
          WHERE b.owner_user_id = ?
-         GROUP BY b.id LIMIT 1'
+         GROUP BY b.id, b.demo_reset_on LIMIT 1'
     );
     $stmt->execute([$userId]);
     $row = $stmt->fetch();
-    if ($row && (int) $row['cards'] === 0) {
-        fillDemoBoard($pdo, (string) $row['id'], $lang);
-    }
+    return $row === false ? null : $row;
 }
 
 /**
@@ -219,6 +242,7 @@ function publicUser(array $user): array
         'name'    => $user['name'],
         'email'   => $user['email'],
         'role'    => $user['role'],
+        'calendarEnabled' => (int) ($user['calendar_enabled'] ?? 0) === 1,
         'pending' => ($user['role'] ?? '') === 'owner' ? countPending(db()) : 0,
     ];
 }

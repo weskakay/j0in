@@ -1,0 +1,45 @@
+:host {
+  display: none;
+}
+
+/* Only where the columns stand side by side is there an edge to drag. */
+@media (min-width: 900px) {
+  :host {
+    display: block;
+    position: absolute;
+    top: 0;
+    right: calc(var(--j0in-space-md) * -0.5);
+    bottom: 0;
+    width: var(--j0in-space-md);
+  }
+
+  .grip {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    cursor: col-resize;
+    touch-action: none;
+  }
+
+  .grip__line {
+    width: 2px;
+    height: 100%;
+    border-radius: var(--j0in-radius-pill);
+    background: transparent;
+    transition: background var(--j0in-transition);
+  }
+
+  .grip:hover .grip__line,
+  .grip:focus-visible .grip__line {
+    background: var(--j0in-accent);
+  }
+}
+
+:host(.grip--held) .grip__line {
+  background: var(--j0in-accent);
+}

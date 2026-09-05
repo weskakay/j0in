@@ -145,6 +145,23 @@ function fillDemoBoard(PDO $pdo, string $boardId, string $lang = 'de'): void
     }
 }
 
+/**
+ * Puts the whole guest board back: columns, categories, cards, contacts and
+ * the board's own name. The date it happened on is stamped alongside, so the
+ * next visitor of the same day keeps whatever was changed in the meantime.
+ */
+function rebuildDemoBoard(PDO $pdo, string $boardId, string $lang = 'de'): void
+{
+    clearBoard($pdo, $boardId);
+    $pdo->prepare('DELETE FROM join_columns WHERE board_id = ?')->execute([$boardId]);
+    $pdo->prepare('DELETE FROM join_categories WHERE board_id = ?')->execute([$boardId]);
+    insertStartColumns($pdo, $boardId);
+    insertStartCategories($pdo, $boardId);
+    $pdo->prepare('UPDATE join_boards SET name = ?, demo_reset_on = CURDATE() WHERE id = ?')
+        ->execute([boardNameIn($lang), $boardId]);
+    fillDemoBoard($pdo, $boardId, $lang);
+}
+
 /** What the guest board is called, in each language it is offered in. */
 const J0IN_DEMO_BOARD_NAME = ['de' => 'Demo-Board', 'en' => 'Demo board'];
 

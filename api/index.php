@@ -8,6 +8,7 @@ ini_set('log_errors', '1');
 require __DIR__ . '/settings.php';
 require __DIR__ . '/http.php';
 require __DIR__ . '/db.php';
+require __DIR__ . '/crypto.php';
 require __DIR__ . '/session.php';
 require __DIR__ . '/ratelimit.php';
 require __DIR__ . '/auth.php';
@@ -16,6 +17,9 @@ require __DIR__ . '/columns.php';
 require __DIR__ . '/tasks.php';
 require __DIR__ . '/contacts.php';
 require __DIR__ . '/access.php';
+require __DIR__ . '/calendar.php';
+require __DIR__ . '/events.php';
+require __DIR__ . '/planning.php';
 require __DIR__ . '/demo.php';
 require __DIR__ . '/routes.php';
 
@@ -62,14 +66,43 @@ function logoutAndRespond(PDO $pdo): void
  */
 function handleHealth(): void
 {
-    $db = 'unchecked';
+    respond(200, [
+        'ok' => true,
+        'php' => PHP_VERSION,
+        'database' => databaseState(),
+        'curl' => extension_loaded('curl') ? 'ok' : 'missing',
+        'outbound' => reachesGoogle() ? 'ok' : 'blocked',
+        'sealing' => sealingReady() ? 'ok' : 'missing',
+        'calendar' => calendarReady() ? 'ready' : 'off',
+    ]);
+}
+
+/** Whether the database answers at all. */
+function databaseState(): string
+{
     try {
         db()->query('SELECT 1');
-        $db = 'ok';
+        return 'ok';
     } catch (Throwable $e) {
-        $db = 'unreachable';
+        return 'unreachable';
     }
-    respond(200, ['ok' => true, 'php' => PHP_VERSION, 'database' => $db]);
+}
+
+/**
+ * Whether this server may open a connection of its own to the outside. Some
+ * shared hosts do not allow it, and the calendar link stands or falls with it.
+ */
+function reachesGoogle(): bool
+{
+    if (!extension_loaded('curl')) {
+        return false;
+    }
+    $curl = curl_init('https://oauth2.googleapis.com/');
+    curl_setopt_array($curl, [CURLOPT_NOBODY => true, CURLOPT_TIMEOUT => 5, CURLOPT_RETURNTRANSFER => true]);
+    curl_exec($curl);
+    $failed = curl_errno($curl) !== 0;
+    curl_close($curl);
+    return !$failed;
 }
 
 /** Routes everything under /api/access, which only the owner may reach. */
@@ -86,6 +119,22 @@ function handleAccess(PDO $pdo, string $method, array $seg): void
     };
 }
 
+/** Routes everything under /api/calendar for the signed-in user. */
+function handleCalendar(PDO $pdo, string $method, array $seg): void
+{
+    $user = requireUser($pdo);
+    requireCalendarUser($user);
+    $action = $seg[1] ?? '';
+    match (true) {
+        $method === 'GET' && $action === ''           => calendarStatus($pdo, $user),
+        $method === 'GET' && $action === 'events'     => readDay($pdo, $user),
+        $method === 'GET' && $action === 'connect'    => startCalendarConnect($user),
+        $method === 'GET' && $action === 'callback'   => finishCalendarConnect($pdo, $user),
+        $method === 'DELETE' && $action === ''        => disconnectCalendar($pdo, $user),
+        default => fail(405, 'http.method_not_allowed'),
+    };
+}
+
 /** The areas that need a signed-in user and their board. */
 const J0IN_BOARD_AREAS = ['board', 'columns', 'categories', 'tasks', 'subtasks', 'contacts'];
 
@@ -97,6 +146,7 @@ function handle(string $method, array $seg): void
         $area === 'health' => handleHealth(),
         $area === 'auth'   => handleAuth(db(), $method, $seg[1] ?? ''),
         $area === 'access' => handleAccess(db(), $method, $seg),
+        $area === 'calendar' => handleCalendar(db(), $method, $seg),
         in_array($area, J0IN_BOARD_AREAS, true) => handleBoardArea(db(), $method, $seg),
         default => fail(404, 'http.not_found'),
     };

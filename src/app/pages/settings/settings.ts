@@ -3,6 +3,7 @@ import { Router } from '@angular/router';
 import { AuthService } from '../../core/auth.service';
 import { BoardStore } from '../../core/board.store';
 import { AccessService } from '../../core/access.service';
+import { CalendarService } from '../../core/calendar.service';
 import { LanguageService } from '../../core/language.service';
 import { ThemeService, type Theme } from '../../core/theme.service';
 import type { AccessRequest, Category } from '../../data/models';
@@ -52,6 +53,7 @@ export class Settings {
   private readonly auth = inject(AuthService);
   private readonly router = inject(Router);
   private readonly access = inject(AccessService);
+  private readonly calendar = inject(CalendarService);
   private readonly language = inject(LanguageService);
 
   /** Every piece of text, in the language currently on screen. */
@@ -62,6 +64,9 @@ export class Settings {
 
   /** Whether this is the shared guest account. */
   protected readonly isGuest = computed(() => this.user()?.role === 'guest');
+
+  /** Whether the calendar block is more than a locked note for this account. */
+  protected readonly canUseCalendar = this.auth.canUseCalendar;
 
   /** Whether this account decides who may use the app. */
   protected readonly isOwner = computed(() => this.user()?.role === 'owner');
@@ -115,11 +120,35 @@ export class Settings {
     ];
   });
 
+  /** What the server says about the connection to Google. */
+  protected readonly calendarStatus = this.calendar.status;
+
+  /** True while the calendar connection is being asked about or changed. */
+  protected readonly calendarBusy = this.calendar.busy;
+
+  /** Set when the visitor came back from Google without a connection. */
+  protected readonly calendarProblem = signal(false);
+
   constructor() {
     this.store.load();
     if (this.isOwner()) {
       this.access.load();
     }
+    if (this.canUseCalendar()) {
+      this.calendar.load();
+      this.calendarProblem.set(returnedWithProblem());
+    }
+  }
+
+  /** Leaves for Google's consent screen. */
+  protected connectCalendar(): void {
+    this.calendarProblem.set(false);
+    this.calendar.connect();
+  }
+
+  /** Drops the connection to Google. */
+  protected disconnectCalendar(): void {
+    this.calendar.disconnect();
   }
 
   /** Lets one address in. */
@@ -231,4 +260,17 @@ function sentenceFor(message: DoneMessage | null, t: Dictionary): string {
   }
   const text = t.settings[message.key];
   return message.who ? `${message.who} ${text}` : text;
+}
+
+/**
+ * Whether Google sent the visitor back without a connection. The answer is
+ * carried in the address, since the round trip leaves the app entirely.
+ */
+function returnedWithProblem(): boolean {
+  try {
+    const answer = new URLSearchParams(location.search).get('calendar');
+    return answer !== null && answer !== 'connected';
+  } catch {
+    return false;
+  }
 }
