@@ -157,10 +157,15 @@
   gap: var(--j0in-space-sm);
 }
 
+/* Narrow screens give the text its own row, or it ends up in a tiny column. */
 .switch__btn {
-  display: flex;
-  align-items: flex-start;
-  gap: var(--j0in-space-md);
+  display: grid;
+  grid-template-columns: auto 1fr;
+  grid-template-areas:
+    'track state'
+    'text text';
+  align-items: start;
+  gap: var(--j0in-space-sm) var(--j0in-space-md);
   width: 100%;
   padding: var(--j0in-space-md);
   border: 1px solid var(--j0in-border);
@@ -179,7 +184,7 @@
 /* Track height and inset drive the knob, so the two cannot drift apart. */
 .switch__track {
   position: relative;
-  flex: 0 0 auto;
+  grid-area: track;
   width: var(--switch-width);
   height: var(--switch-height);
   margin-top: 2px;
@@ -215,6 +220,7 @@
   display: flex;
   flex-direction: column;
   gap: 2px;
+  grid-area: text;
   min-width: 0;
 }
 
@@ -228,10 +234,18 @@
 }
 
 .switch__state {
-  margin-left: auto;
-  flex: 0 0 auto;
+  grid-area: state;
+  justify-self: end;
   color: var(--j0in-text-muted);
   font-size: var(--j0in-fs-body);
+}
+
+/* Wide enough for the three in a row, the way they were drawn. */
+@media (min-width: 30rem) {
+  .switch__btn {
+    grid-template-columns: auto 1fr auto;
+    grid-template-areas: 'track text state';
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {

@@ -1,0 +1,98 @@
+<section class="time">
+  <header class="time__head">
+    <h3 class="time__label">{{ t().time.title }}</h3>
+    <span class="time__total" [class.time__total--running]="running()">{{ total() }}</span>
+  </header>
+
+  @if (sums().length > 0) {
+    <ul class="time__sums">
+      @for (sum of sums(); track sum.id) {
+        <li class="time__sum">
+          <span>{{ sum.name }}</span>
+          <span class="time__num">{{ sum.text }}</span>
+        </li>
+      }
+    </ul>
+  }
+
+  <div class="time__control">
+    <label class="time__field">
+      <span class="time__field-label">{{ t().time.phase }}</span>
+      <select class="time__select" [disabled]="running()" (change)="onPhase($event)">
+        <option value="" [selected]="nextPhase() === null">{{ t().time.noPhase }}</option>
+        @for (phase of phases(); track phase.id) {
+          <option [value]="phase.id" [selected]="phase.id === nextPhase()">{{ phase.name }}</option>
+        }
+      </select>
+    </label>
+    <button
+      class="time__toggle"
+      type="button"
+      [class.time__toggle--running]="running()"
+      [disabled]="toggling()"
+      (click)="toggle()"
+    >
+      {{ running() ? t().time.stop : t().time.start }}
+    </button>
+  </div>
+
+  <ul class="time__entries">
+    @for (row of rows(); track row.entry.id) {
+      <li class="time__entry">
+        @if (editing() === row.entry.id) {
+          <app-time-entry-form
+            [phases]="phases()"
+            [entry]="row.entry"
+            [saving]="saving()"
+            (submitted)="save($event)"
+            (cancelled)="close()"
+          />
+        } @else {
+          <span class="time__entry-text">
+            <span class="time__entry-phase">{{ row.phase }}</span>
+            @if (row.entry.note) {
+              <span class="time__entry-note">{{ row.entry.note }}</span>
+            }
+          </span>
+          <span class="time__num" [class.time__total--running]="row.entry.running">{{ row.duration }}</span>
+          <button
+            class="time__icon"
+            type="button"
+            [attr.aria-label]="t().time.editOne + ': ' + row.phase"
+            (click)="open(row.entry.id)"
+          >
+            <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+              <path d="M4 20h4l10-10-4-4L4 16v4zM14 6l4 4" stroke="currentColor"
+                stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+          </button>
+          <button
+            class="time__icon time__icon--danger"
+            type="button"
+            [attr.aria-label]="t().time.deleteOne + ': ' + row.phase"
+            [disabled]="saving()"
+            (click)="remove(row.entry)"
+          >
+            <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+              <path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+            </svg>
+          </button>
+        }
+      </li>
+    } @empty {
+      <li class="time__empty">{{ t().time.empty }}</li>
+    }
+  </ul>
+
+  @if (editing() === 'new') {
+    <app-time-entry-form
+      [phases]="phases()"
+      [phaseId]="nextPhase()"
+      [saving]="saving()"
+      (submitted)="save($event)"
+      (cancelled)="close()"
+    />
+  } @else {
+    <button class="time__add" type="button" (click)="open('new')">{{ t().time.add }}</button>
+  }
+</section>

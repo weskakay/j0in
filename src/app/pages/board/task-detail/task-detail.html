@@ -53,6 +53,10 @@
   </section>
 }
 
+@if (tracking()) {
+  <app-time-log [task]="task()" />
+}
+
 <footer class="detail__actions">
   <button class="detail__btn detail__btn--danger" type="button" (click)="remove.emit()">
     {{ t().common.delete }}

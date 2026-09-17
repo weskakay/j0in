@@ -48,6 +48,7 @@ const J0IN_DEMO_TASKS = [
         'priority' => 'urgent',
         'people' => [0],
         'subtasks' => ['de' => [['Am Rechner ziehen', true], ['Am Handy ziehen', false]], 'en' => [['Drag on a desktop', true], ['Drag on a phone', false]]],
+        'time' => [[1, 35]],
     ],
     [
         'column' => 'In Progress',
@@ -108,6 +109,7 @@ const J0IN_DEMO_TASKS = [
         'priority' => 'low',
         'people' => [0, 2],
         'subtasks' => ['de' => [['Lesen', true], ['Anzeigen', true]], 'en' => [['Read', true], ['Render', true]]],
+        'time' => [[0, 20], [1, 55], [2, 15]],
     ],
     [
         'column' => 'Done',
@@ -149,6 +151,19 @@ const J0IN_DEMO_TASKS = [
         'people' => [2],
         'subtasks' => ['de' => [], 'en' => []],
     ],
+    // Appended rather than placed on top: demo_index points into this list,
+    // and cards already seeded on the live board must keep their index.
+    [
+        'column' => 'ToDo',
+        'category' => 'User Story',
+        'title' => ['de' => 'Zeit auf der Karte messen', 'en' => 'Track time on a card'],
+        'text' => ['de' => 'Der Knopf mit dem Dreieck startet den Timer. In der Karte lässt sich Zeit für Planen, Umsetzen, Testen und Recherche nachtragen.', 'en' => 'The button with the triangle starts the timer. Inside the card, time for planning, building, testing and research can be added by hand.'],
+        'due' => '+4 days',
+        'priority' => 'medium',
+        'people' => [1],
+        'subtasks' => ['de' => [['Timer starten', false], ['Zeit nachtragen', false]], 'en' => [['Start the timer', false], ['Add time by hand', false]]],
+        'time' => [[0, 10], [3, 25]],
+    ],
 ];
 
 /**
@@ -160,8 +175,20 @@ function fillDemoBoard(PDO $pdo, string $boardId, string $lang = 'de'): void
     $contacts = insertDemoContacts($pdo, $boardId);
     $columns = idsByName($pdo, 'join_columns', $boardId);
     $categories = idsByName($pdo, 'join_categories', $boardId);
+    $phases = phaseIdsInOrder($pdo, $boardId);
     foreach (J0IN_DEMO_TASKS as $index => $task) {
-        insertDemoTask($pdo, inLanguage($task, $lang), $columns, $categories, $contacts, $index);
+        $id = insertDemoTask($pdo, inLanguage($task, $lang), $columns, $categories, $contacts, $index);
+        if ($id !== null) {
+            insertDemoTime($pdo, $id, $phases, $task['time'] ?? []);
+        }
+    }
+}
+
+/** Books the demo minutes of a card, each on the phase at the given position. */
+function insertDemoTime(PDO $pdo, string $taskId, array $phases, array $time): void
+{
+    foreach ($time as [$phase, $minutes]) {
+        insertTimeRow($pdo, $taskId, $phases[$phase] ?? null, $minutes, null);
     }
 }
 
@@ -175,8 +202,10 @@ function rebuildDemoBoard(PDO $pdo, string $boardId, string $lang = 'de'): void
     clearBoard($pdo, $boardId);
     $pdo->prepare('DELETE FROM join_columns WHERE board_id = ?')->execute([$boardId]);
     $pdo->prepare('DELETE FROM join_categories WHERE board_id = ?')->execute([$boardId]);
+    $pdo->prepare('DELETE FROM join_time_phases WHERE board_id = ?')->execute([$boardId]);
     insertStartColumns($pdo, $boardId);
     insertStartCategories($pdo, $boardId);
+    insertStartPhases($pdo, $boardId, $lang);
     $pdo->prepare('UPDATE join_boards SET name = ?, demo_reset_on = CURDATE() WHERE id = ?')
         ->execute([boardNameIn($lang), $boardId]);
     fillDemoBoard($pdo, $boardId, $lang);
@@ -237,7 +266,10 @@ function idsByName(PDO $pdo, string $table, string $boardId): array
     return array_column($stmt->fetchAll(), 'id', 'name');
 }
 
-/** Writes one demo card with its subtasks and assignees. */
+/**
+ * Writes one demo card with its subtasks and assignees and returns its id,
+ * or null when the board has no column of that name any more.
+ */
 function insertDemoTask(
     PDO $pdo,
     array $task,
@@ -245,21 +277,32 @@ function insertDemoTask(
     array $categories,
     array $contacts,
     int $index
-): void {
+): ?string {
     $columnId = $columns[$task['column']] ?? null;
     if ($columnId === null) {
-        return;
+        return null;
     }
-    $id = insertTaskRow($pdo, $columnId, [
+    $id = insertTaskRow($pdo, $columnId, demoTaskFields($task, $categories));
+    $pdo->prepare('UPDATE join_tasks SET demo_index = ? WHERE id = ?')->execute([$index, $id]);
+    replaceSubtasks($pdo, $id, subtaskRows($task['subtasks']));
+    replaceAssignees($pdo, columnBoard($pdo, $columnId), $id, pickContacts($contacts, $task['people']));
+    return $id;
+}
+
+/**
+ * The fields of a demo card in the shape insertTaskRow expects.
+ *
+ * @return array<string, string>
+ */
+function demoTaskFields(array $task, array $categories): array
+{
+    return [
         'categoryId' => $categories[$task['category']] ?? '',
         'title' => $task['title'],
         'description' => $task['text'],
         'dueDate' => date('Y-m-d', strtotime($task['due'])),
         'priority' => $task['priority'],
-    ]);
-    $pdo->prepare('UPDATE join_tasks SET demo_index = ? WHERE id = ?')->execute([$index, $id]);
-    replaceSubtasks($pdo, $id, subtaskRows($task['subtasks']));
-    replaceAssignees($pdo, columnBoard($pdo, $columnId), $id, pickContacts($contacts, $task['people']));
+    ];
 }
 
 /**

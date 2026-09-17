@@ -1,0 +1,50 @@
+<form class="entry" [formGroup]="form" (ngSubmit)="save()" novalidate>
+  <label class="entry__field">
+    <span class="entry__label">{{ t().time.phase }}</span>
+    <select class="entry__input" formControlName="phaseId">
+      <option value="">{{ t().time.noPhase }}</option>
+      @for (phase of phases(); track phase.id) {
+        <option [value]="phase.id">{{ phase.name }}</option>
+      }
+    </select>
+  </label>
+
+  @if (running()) {
+    <p class="entry__note">{{ t().time.runningNote }}</p>
+  } @else {
+    <div class="entry__row" (focusin)="onDurationEntered()" (focusout)="onDurationLeft($event)">
+      <label class="entry__field">
+        <span class="entry__label">{{ t().time.hours }}</span>
+        <input class="entry__input" type="number" inputmode="numeric" min="0" max="24" formControlName="hours" />
+      </label>
+      <label class="entry__field">
+        <span class="entry__label">{{ t().time.minutes }}</span>
+        <input class="entry__input" type="number" inputmode="numeric" min="0" max="59" formControlName="minutes" />
+      </label>
+    </div>
+    <span class="entry__hint" role="alert">
+      @if (showDurationHint()) {
+        {{ t().time.durationMissing }}
+      }
+    </span>
+  }
+
+  <label class="entry__field">
+    <span class="entry__label">{{ t().time.note }}</span>
+    <input
+      class="entry__input"
+      type="text"
+      autocomplete="off"
+      maxlength="200"
+      [placeholder]="t().time.notePlaceholder"
+      formControlName="note"
+    />
+  </label>
+
+  <footer class="entry__actions">
+    <button class="entry__btn" type="button" (click)="cancelled.emit()">{{ t().common.cancel }}</button>
+    <button class="entry__btn entry__btn--primary" type="submit" [disabled]="form.invalid || saving()">
+      {{ saving() ? t().task.saving : saveLabel() }}
+    </button>
+  </footer>
+</form>

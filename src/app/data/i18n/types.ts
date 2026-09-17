@@ -39,6 +39,11 @@ export type ErrorCode =
   | 'task.due_required'
   | 'task.not_found'
   | 'task.title_required'
+  | 'phase.name_required'
+  | 'phase.not_found'
+  | 'time.minutes_invalid'
+  | 'time.not_found'
+  | 'time.note_too_long'
   | 'network.offline'
   | 'network.unknown';
 
@@ -192,6 +197,8 @@ export interface Dictionary {
     off: string;
     cardStack: string;
     cardStackNote: string;
+    timeTracking: string;
+    timeTrackingNote: string;
   };
   settings: {
     title: string;
@@ -237,6 +244,11 @@ export interface Dictionary {
     savedCategory: string;
     addedCategory: string;
     removedCategory: string;
+    phases: string;
+    phasesNote: string;
+    savedPhase: string;
+    addedPhase: string;
+    removedPhase: string;
     approved: string;
     declined: string;
   };
@@ -277,6 +289,37 @@ export interface Dictionary {
     empty: string;
     add: string;
     create: string;
+    editOne: string;
+    deleteOne: string;
+  };
+  phase: {
+    name: string;
+    placeholder: string;
+    empty: string;
+    add: string;
+    create: string;
+    editOne: string;
+    deleteOne: string;
+  };
+  time: {
+    title: string;
+    start: string;
+    stop: string;
+    startOn: string;
+    stopOn: string;
+    running: string;
+    phase: string;
+    noPhase: string;
+    add: string;
+    book: string;
+    hours: string;
+    minutes: string;
+    durationMissing: string;
+    note: string;
+    notePlaceholder: string;
+    noteTooLong: string;
+    runningNote: string;
+    empty: string;
     editOne: string;
     deleteOne: string;
   };

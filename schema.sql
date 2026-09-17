@@ -35,6 +35,7 @@ CREATE TABLE IF NOT EXISTS join_boards (
   owner_user_id CHAR(36)     NOT NULL,
   name          VARCHAR(120) NOT NULL,
   is_demo       TINYINT(1)   NOT NULL DEFAULT 0,
+  time_tracking TINYINT(1)   NOT NULL DEFAULT 1,
   demo_reset_on DATE         NULL,
   created_at    DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
   CONSTRAINT join_fk_board_user FOREIGN KEY (owner_user_id)
@@ -101,6 +102,36 @@ CREATE TABLE IF NOT EXISTS join_subtasks (
   CONSTRAINT join_fk_subtask_task FOREIGN KEY (task_id)
     REFERENCES join_tasks(id) ON DELETE CASCADE,
   KEY join_subtasks_task_idx (task_id, position)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- The kinds of work time is booked on, editable like the columns.
+CREATE TABLE IF NOT EXISTS join_time_phases (
+  id         CHAR(36)    NOT NULL PRIMARY KEY,
+  board_id   CHAR(36)    NOT NULL,
+  name       VARCHAR(60) NOT NULL,
+  position   INT         NOT NULL,
+  created_at DATETIME    NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT join_fk_phase_board FOREIGN KEY (board_id)
+    REFERENCES join_boards(id) ON DELETE CASCADE,
+  KEY join_time_phases_board_idx (board_id, position)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Time spent on a card. ended_at stays NULL while the timer runs, and the
+-- seconds are written when it stops. Deleting a phase keeps the time.
+CREATE TABLE IF NOT EXISTS join_time_entries (
+  id         CHAR(36)     NOT NULL PRIMARY KEY,
+  task_id    CHAR(36)     NOT NULL,
+  phase_id   CHAR(36)     NULL,
+  started_at DATETIME     NOT NULL,
+  ended_at   DATETIME     NULL,
+  seconds    INT          NOT NULL DEFAULT 0,
+  note       VARCHAR(200) NULL,
+  CONSTRAINT join_fk_time_task FOREIGN KEY (task_id)
+    REFERENCES join_tasks(id) ON DELETE CASCADE,
+  CONSTRAINT join_fk_time_phase FOREIGN KEY (phase_id)
+    REFERENCES join_time_phases(id) ON DELETE SET NULL,
+  KEY join_time_entries_task_idx (task_id, started_at),
+  KEY join_time_entries_running_idx (ended_at)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Contacts belong to a board, so guest and owner never see each other's.

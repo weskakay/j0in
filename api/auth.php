@@ -87,6 +87,7 @@ function createBoardFor(PDO $pdo, string $userId, string $name, bool $isDemo): s
     $stmt->execute([$boardId, $userId, $name, $isDemo ? 1 : 0]);
     insertStartColumns($pdo, $boardId);
     insertStartCategories($pdo, $boardId);
+    insertStartPhases($pdo, $boardId);
     return $boardId;
 }
 

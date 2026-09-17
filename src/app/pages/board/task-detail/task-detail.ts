@@ -2,6 +2,8 @@ import { Component, computed, inject, input, output } from '@angular/core';
 import type { Category, Contact, Subtask, Task } from '../../../data/models';
 import { assigneesOf, dateIn, initialsOf } from '../../../data/format';
 import { LanguageService } from '../../../core/language.service';
+import { TimeTracker } from '../../../core/time-tracker.service';
+import { TimeLog } from '../time-log/time-log';
 
 /** What one subtask tick reports back to the board. */
 export interface SubtaskToggle {
@@ -12,15 +14,19 @@ export interface SubtaskToggle {
 /** Reads a task out in full and lets its subtasks be ticked off. */
 @Component({
   selector: 'app-task-detail',
-  imports: [],
+  imports: [TimeLog],
   templateUrl: './task-detail.html',
   styleUrl: './task-detail.scss',
 })
 export class TaskDetail {
   private readonly language = inject(LanguageService);
+  private readonly tracker = inject(TimeTracker);
 
   /** Every piece of text, in the language currently on screen. */
   protected readonly t = this.language.dict;
+
+  /** Whether this board measures time at all. */
+  protected readonly tracking = this.tracker.enabled;
 
   /** The task being read. */
   readonly task = input.required<Task>();

@@ -8,11 +8,13 @@
 function readBoard(PDO $pdo, string $boardId): void
 {
     respond(200, [
-        'name'       => boardName($pdo, $boardId),
-        'columns'    => readColumns($pdo, $boardId),
-        'categories' => readCategories($pdo, $boardId),
-        'tasks'      => readTasks($pdo, $boardId),
-        'contacts'   => readContacts($pdo, $boardId),
+        'name'         => boardName($pdo, $boardId),
+        'timeTracking' => tracksTime($pdo, $boardId),
+        'columns'      => readColumns($pdo, $boardId),
+        'categories'   => readCategories($pdo, $boardId),
+        'phases'       => readPhases($pdo, $boardId),
+        'tasks'        => readTasks($pdo, $boardId),
+        'contacts'     => readContacts($pdo, $boardId),
     ]);
 }
 
@@ -22,6 +24,41 @@ function boardName(PDO $pdo, string $boardId): string
     $stmt = $pdo->prepare('SELECT name FROM join_boards WHERE id = ?');
     $stmt->execute([$boardId]);
     return (string) $stmt->fetchColumn();
+}
+
+/** Whether this board offers the timer and the time log on its cards. */
+function tracksTime(PDO $pdo, string $boardId): bool
+{
+    $stmt = $pdo->prepare('SELECT time_tracking FROM join_boards WHERE id = ?');
+    $stmt->execute([$boardId]);
+    return (bool) $stmt->fetchColumn();
+}
+
+/**
+ * Turns time tracking on or off for the whole board. Switching it off stops
+ * the timer that may be running first, because afterwards nobody could see
+ * it, let alone stop it. Booked time and the phases stay untouched.
+ */
+function setTimeTracking(PDO $pdo, string $boardId, array $body): void
+{
+    $on = $body['on'] ?? null;
+    if (!is_bool($on)) {
+        fail(422, 'board.time_tracking_invalid');
+    }
+    if (!$on) {
+        inTransaction($pdo, fn() => stopRunningOn($pdo, $boardId));
+    }
+    $pdo->prepare('UPDATE join_boards SET time_tracking = ? WHERE id = ?')
+        ->execute([$on ? 1 : 0, $boardId]);
+    respond(200, ['ok' => true]);
+}
+
+/** Ends the request with 409 when the board has time tracking switched off. */
+function requireTimeTracking(PDO $pdo, string $boardId): void
+{
+    if (!tracksTime($pdo, $boardId)) {
+        fail(409, 'time.tracking_off');
+    }
 }
 
 /** Gives the board another name. */
@@ -62,6 +99,7 @@ function switchDemoLanguage(PDO $pdo, string $boardId, array $user, array $body 
     $pdo->prepare('UPDATE join_boards SET name = ? WHERE id = ?')
         ->execute([boardNameIn($lang), $boardId]);
     rewriteDemoText($pdo, $boardId, $lang);
+    translateStartPhases($pdo, $boardId, $lang);
     respond(200, ['ok' => true]);
 }
 
@@ -126,16 +164,17 @@ function readTasks(PDO $pdo, string $boardId): array
     $stmt->execute([$boardId]);
     $rows = $stmt->fetchAll();
     $ids = array_column($rows, 'id');
-    return attachDetails($pdo, $rows, subtasksByTask($pdo, $ids), contactsByTask($pdo, $ids));
+    $details = [subtasksByTask($pdo, $ids), contactsByTask($pdo, $ids), timeByTask($pdo, $ids)];
+    return attachDetails($rows, ...$details);
 }
 
 /**
- * Merges subtasks and assignees into the task rows and renames the columns
- * to the camelCase the frontend expects.
+ * Merges subtasks, assignees and booked time into the task rows and renames
+ * the columns to the camelCase the frontend expects.
  *
  * @return list<array<string, mixed>>
  */
-function attachDetails(PDO $pdo, array $rows, array $subtasks, array $contacts): array
+function attachDetails(array $rows, array $subtasks, array $contacts, array $time): array
 {
     return array_map(fn($r) => [
         'id'          => $r['id'],
@@ -148,6 +187,7 @@ function attachDetails(PDO $pdo, array $rows, array $subtasks, array $contacts):
         'position'    => (int) $r['position'],
         'subtasks'    => $subtasks[$r['id']] ?? [],
         'contactIds'  => $contacts[$r['id']] ?? [],
+        'timeEntries' => $time[$r['id']] ?? [],
     ], $rows);
 }
 

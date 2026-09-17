@@ -7,7 +7,7 @@ import { CalendarService } from '../../core/calendar.service';
 import { LanguageService } from '../../core/language.service';
 import { FeaturesService } from '../../core/features.service';
 import { ThemeService, type Theme } from '../../core/theme.service';
-import type { AccessRequest, Category } from '../../data/models';
+import type { AccessRequest, Category, TimePhase } from '../../data/models';
 import type { Dictionary } from '../../data/i18n';
 import { ColorPicker } from '../../layout/color-picker/color-picker';
 import { AccessList } from './access-list/access-list';
@@ -16,6 +16,7 @@ import {
   type CategoryDraft,
   type CategoryEdit,
 } from './category-manager/category-manager';
+import { PhaseManager, type PhaseEdit } from './phase-manager/phase-manager';
 
 /** How many cards carry each category, keyed by its id. */
 function countByCategory(tasks: { categoryId: string | null }[]): Record<string, number> {
@@ -44,7 +45,7 @@ interface DoneMessage {
 /** Appearance, the board's name, and what belongs to the account. */
 @Component({
   selector: 'app-settings',
-  imports: [ColorPicker, CategoryManager, AccessList],
+  imports: [ColorPicker, CategoryManager, PhaseManager, AccessList],
   templateUrl: './settings.html',
   styleUrl: './settings.scss',
 })
@@ -95,6 +96,12 @@ export class Settings {
 
   /** How many cards carry each category, keyed by its id. */
   protected readonly categoryUsage = computed(() => countByCategory(this.store.tasks()));
+
+  /** The phases time is booked on. */
+  protected readonly phases = this.store.phases;
+
+  /** Whether this board measures time on its cards. */
+  protected readonly timeTracking = this.store.timeTracking;
 
   /** The name of the board. */
   protected readonly boardName = this.store.name;
@@ -212,6 +219,45 @@ export class Settings {
     this.busy.set(true);
     this.store.deleteCategory(category.id).subscribe({
       next: () => this.finish('removedCategory'),
+      error: () => this.busy.set(false),
+    });
+  }
+
+  /**
+   * Turns time tracking on or off for everyone on this board. The switch shows
+   * what came back from the server, so a call that fails leaves it where it was.
+   */
+  protected toggleTimeTracking(): void {
+    this.busy.set(true);
+    this.store.setTimeTracking(!this.timeTracking()).subscribe({
+      next: () => this.busy.set(false),
+      error: () => this.busy.set(false),
+    });
+  }
+
+  /** Adds a phase time can be booked on. */
+  protected addPhase(name: string): void {
+    this.busy.set(true);
+    this.store.createPhase(name).subscribe({
+      next: () => this.finish('addedPhase'),
+      error: () => this.busy.set(false),
+    });
+  }
+
+  /** Saves the new name of a phase. */
+  protected savePhase(edit: PhaseEdit): void {
+    this.busy.set(true);
+    this.store.renamePhase(edit.id, edit.name).subscribe({
+      next: () => this.finish('savedPhase'),
+      error: () => this.busy.set(false),
+    });
+  }
+
+  /** Removes a phase; the time booked on it stays, without a phase. */
+  protected removePhase(phase: TimePhase): void {
+    this.busy.set(true);
+    this.store.deletePhase(phase.id).subscribe({
+      next: () => this.finish('removedPhase'),
       error: () => this.busy.set(false),
     });
   }

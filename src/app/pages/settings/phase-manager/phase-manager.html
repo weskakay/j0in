@@ -1,0 +1,70 @@
+<ul class="phases__list">
+  @for (phase of phases(); track phase.id) {
+    <li class="phases__row">
+      @if (editing() === phase.id) {
+        <ng-container [ngTemplateOutlet]="form" />
+      } @else {
+        <span class="phases__name">{{ phase.name }}</span>
+        <button
+          class="phases__icon"
+          type="button"
+          [attr.aria-label]="phase.name + ' ' + t().phase.editOne"
+          (click)="start(phase)"
+        >
+          <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+            <path d="M4 20h4l10-10-4-4L4 16v4zM14 6l4 4" stroke="currentColor"
+              stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+        </button>
+        <button
+          class="phases__icon phases__icon--danger"
+          type="button"
+          [attr.aria-label]="phase.name + ' ' + t().phase.deleteOne"
+          [disabled]="busy()"
+          (click)="removed.emit(phase)"
+        >
+          <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+            <path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+          </svg>
+        </button>
+      }
+    </li>
+  } @empty {
+    <li class="phases__empty">{{ t().phase.empty }}</li>
+  }
+</ul>
+
+@if (editing() === 'new') {
+  <ng-container [ngTemplateOutlet]="form" />
+} @else {
+  <button class="phases__add" type="button" (click)="start(null)">{{ t().phase.add }}</button>
+}
+
+<ng-template #form>
+  <div class="phases__form">
+    <label class="phases__field">
+      <span class="phases__label">{{ t().phase.name }}</span>
+      <input
+        class="phases__input"
+        type="text"
+        maxlength="60"
+        autocomplete="off"
+        [placeholder]="t().phase.placeholder"
+        [value]="draftName()"
+        (input)="onName($event)"
+        (keydown.enter)="save()"
+      />
+    </label>
+    <span class="phases__actions">
+      <button class="phases__btn" type="button" (click)="cancel()">{{ t().common.cancel }}</button>
+      <button
+        class="phases__btn phases__btn--primary"
+        type="button"
+        [disabled]="busy() || draftName().trim() === ''"
+        (click)="save()"
+      >
+        {{ editing() === 'new' ? t().phase.create : t().common.save }}
+      </button>
+    </span>
+  </div>
+</ng-template>

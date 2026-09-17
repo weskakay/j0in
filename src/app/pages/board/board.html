@@ -220,7 +220,7 @@
           {{ busy() ? t().board.deleting : t().board.deleteTask }}
         </button>
       </footer>
-    } @else if (mode() === 'detail' && current(); as task) {
+    } @else if (mode() === 'detail' && shownTask(); as task) {
       <app-task-detail
         [task]="task"
         [category]="categoryOf(task)"

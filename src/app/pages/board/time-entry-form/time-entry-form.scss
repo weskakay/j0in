@@ -1,0 +1,79 @@
+.entry {
+  display: flex;
+  flex-direction: column;
+  gap: var(--j0in-space-sm);
+  padding: var(--j0in-space-md);
+  border: 1px solid var(--j0in-border);
+  border-radius: var(--j0in-radius-md);
+}
+
+.entry__row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--j0in-space-sm);
+}
+
+.entry__row > .entry__field {
+  flex: 1 1 100px;
+}
+
+.entry__field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--j0in-space-xs);
+  min-width: 0;
+}
+
+.entry__label,
+.entry__note {
+  color: var(--j0in-text-muted);
+  font-size: var(--j0in-fs-body);
+}
+
+.entry__input {
+  width: 100%;
+  min-height: var(--j0in-tap-target);
+  padding: 0 var(--j0in-space-sm);
+  border: 1px solid var(--j0in-border);
+  border-radius: var(--j0in-radius-sm);
+  background: var(--j0in-bg);
+}
+
+/* Holds its line even when empty, so the hint appearing never pushes the
+   fields below it down. */
+.entry__hint {
+  min-height: 1.5em;
+  color: var(--j0in-danger);
+  font-size: var(--j0in-fs-body);
+}
+
+.entry__actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: var(--j0in-space-sm);
+}
+
+.entry__btn {
+  min-height: var(--j0in-tap-target);
+  padding: 0 var(--j0in-space-lg);
+  border: 1px solid var(--j0in-border);
+  border-radius: var(--j0in-radius-pill);
+  background: transparent;
+}
+
+.entry__btn--primary {
+  border-color: var(--j0in-accent);
+  background: var(--j0in-accent);
+  color: var(--j0in-text-on-color);
+
+  &:hover {
+    border-color: var(--j0in-accent-hover);
+    background: var(--j0in-accent-hover);
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}

@@ -58,6 +58,32 @@ export interface Subtask {
   position: number;
 }
 
+/** A kind of work time is booked on, such as planning or testing. */
+export interface TimePhase {
+  id: string;
+  name: string;
+  position: number;
+}
+
+/** Time spent on a task, either finished or with the timer still running. */
+export interface TimeEntry {
+  id: string;
+  /** Null when no phase was chosen or the phase has since been deleted. */
+  phaseId: string | null;
+  note: string | null;
+  startedAt: string;
+  running: boolean;
+  /** Seconds booked; for a running entry, the seconds up to the moment the board was read. */
+  seconds: number;
+}
+
+/** What the time form collects, for booking by hand as well as for editing. */
+export interface TimeEntryInput {
+  phaseId: string | null;
+  minutes: number;
+  note: string | null;
+}
+
 /** A person a task can be assigned to. */
 export interface Contact {
   id: string;
@@ -86,6 +112,7 @@ export interface Task {
   position: number;
   subtasks: Subtask[];
   contactIds: string[];
+  timeEntries: TimeEntry[];
 }
 
 /** A subtask on its way to the server, before it has an id. */
@@ -109,8 +136,11 @@ export interface TaskInput {
 /** Everything the board screen needs, delivered in one call. */
 export interface BoardData {
   name: string;
+  /** Whether this board offers the timer and the time log on its cards. */
+  timeTracking: boolean;
   columns: Column[];
   categories: Category[];
+  phases: TimePhase[];
   tasks: Task[];
   contacts: Contact[];
 }

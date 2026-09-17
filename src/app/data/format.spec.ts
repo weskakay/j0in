@@ -1,11 +1,17 @@
 import {
   assigneesOf,
+  clockText,
   doneCount,
   donePercent,
   dateIn,
+  durationText,
   initialsOf,
+  lastPhaseId,
+  pickPhase,
+  secondsByPhase,
+  taskSeconds,
 } from './format';
-import type { Contact, Task } from './models';
+import type { Contact, Task, TimeEntry, TimePhase } from './models';
 
 /** A task with just enough filled in for the function under test. */
 function task(parts: Partial<Task> = {}): Task {
@@ -20,6 +26,7 @@ function task(parts: Partial<Task> = {}): Task {
     position: 1,
     subtasks: [],
     contactIds: [],
+    timeEntries: [],
     ...parts,
   };
 }
@@ -101,5 +108,86 @@ describe('assigneesOf', () => {
 
   it('ignoriert Kennungen, die es nicht mehr gibt', () => {
     expect(assigneesOf(task({ contactIds: ['weg'] }), people)).toEqual([]);
+  });
+});
+
+/** A booked entry with just enough filled in. */
+function entry(parts: Partial<TimeEntry> = {}): TimeEntry {
+  return {
+    id: 'e1',
+    phaseId: 'ph1',
+    note: null,
+    startedAt: '2026-09-17 09:00:00',
+    running: false,
+    seconds: 600,
+    ...parts,
+  };
+}
+
+describe('Zeiterfassung', () => {
+  it('zählt alle Einträge einer Karte zusammen', () => {
+    const one = task({ timeEntries: [entry(), entry({ id: 'e2', seconds: 1200 })] });
+    expect(taskSeconds(one, 0)).toBe(1800);
+  });
+
+  it('rechnet beim laufenden Timer die Zeit seit dem Laden dazu', () => {
+    const one = task({ timeEntries: [entry(), entry({ id: 'e2', running: true, seconds: 60 })] });
+    expect(taskSeconds(one, 30)).toBe(690);
+  });
+
+  it('sammelt nach Phase und legt Einträge ohne Phase unter den leeren Schlüssel', () => {
+    const one = task({
+      timeEntries: [entry(), entry({ id: 'e2', seconds: 300 }), entry({ id: 'e3', phaseId: null, seconds: 60 })],
+    });
+    expect(secondsByPhase(one, 0)).toEqual({ ph1: 900, '': 60 });
+  });
+});
+
+describe('durationText', () => {
+  it('schreibt unter einer Stunde nur Minuten', () => {
+    expect(durationText(45 * 60 + 59)).toBe('45 min');
+  });
+
+  it('lässt volle Stunden ohne Minuten', () => {
+    expect(durationText(2 * 3600)).toBe('2 h');
+  });
+
+  it('kombiniert Stunden und Minuten', () => {
+    expect(durationText(2 * 3600 + 15 * 60)).toBe('2 h 15 min');
+  });
+});
+
+describe('clockText', () => {
+  it('zeigt Minuten und Sekunden', () => {
+    expect(clockText(245)).toBe('4:05');
+  });
+
+  it('nimmt ab einer Stunde die Stunden dazu', () => {
+    expect(clockText(3845)).toBe('1:04:05');
+  });
+});
+
+describe('Phase für den nächsten Start', () => {
+  const phases: TimePhase[] = [
+    { id: 'ph1', name: 'Planen', position: 1 },
+    { id: 'ph2', name: 'Testen', position: 2 },
+  ];
+
+  it('findet die zuletzt gestartete Phase auf dem ganzen Board', () => {
+    const early = task({ timeEntries: [entry({ phaseId: 'ph1', startedAt: '2026-09-17 08:00:00' })] });
+    const late = task({ id: 't2', timeEntries: [entry({ phaseId: 'ph2', startedAt: '2026-09-17 10:00:00' })] });
+    expect(lastPhaseId([early, late])).toBe('ph2');
+  });
+
+  it('nimmt den ersten Wunsch, den es noch gibt', () => {
+    expect(pickPhase(phases, 'weg', 'ph2')).toBe('ph2');
+  });
+
+  it('fällt auf die erste Phase zurück', () => {
+    expect(pickPhase(phases, null, null)).toBe('ph1');
+  });
+
+  it('antwortet ohne Phasen mit null', () => {
+    expect(pickPhase([], 'ph1')).toBeNull();
   });
 });

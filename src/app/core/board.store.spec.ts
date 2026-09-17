@@ -10,22 +10,24 @@ const MIN_WAIT = 1400;
 
 const BOARD: BoardData = {
   name: 'Mein Board',
+  timeTracking: true,
   columns: [
     { id: 'c1', name: 'ToDo', position: 1 },
     { id: 'c2', name: 'Fertig', position: 2 },
   ],
   categories: [{ id: 'k1', name: 'Technisch', color: '#29abe2', position: 1 }],
+  phases: [],
   contacts: [],
   tasks: [
     {
       id: 't1', columnId: 'c1', categoryId: 'k1', title: 'Dach decken',
       description: 'Ziegel bestellen', dueDate: '2026-09-01', priority: 'urgent',
-      position: 1, subtasks: [], contactIds: [],
+      position: 1, subtasks: [], contactIds: [], timeEntries: [],
     },
     {
       id: 't2', columnId: 'c2', categoryId: null, title: 'Keller räumen',
       description: null, dueDate: null, priority: 'low',
-      position: 1, subtasks: [], contactIds: [],
+      position: 1, subtasks: [], contactIds: [], timeEntries: [],
     },
   ],
 };
@@ -150,6 +152,35 @@ describe('BoardStore', () => {
     store.toggleSubtask('t1', 's1', true);
     expect(store.tasks()[0].subtasks[0].isDone).toBe(true);
     http.expectOne('/api/subtasks/s1').flush({ ok: true });
+  });
+
+  it('meldet die Zeiterfassung erst als an, wenn das Board da ist', () => {
+    expect(store.timeTracking()).toBe(false);
+    deliverBoard();
+    expect(store.timeTracking()).toBe(true);
+  });
+
+  it('übernimmt eine abgeschaltete Zeiterfassung aus der Antwort', () => {
+    const off = structuredClone(BOARD);
+    off.timeTracking = false;
+    deliverBoard(off);
+    expect(store.timeTracking()).toBe(false);
+  });
+
+  it('schaltet die Zeiterfassung am Board um und liest danach neu', () => {
+    deliverBoard();
+
+    store.setTimeTracking(false).subscribe();
+    const call = http.expectOne('/api/board/time-tracking');
+    expect(call.request.method).toBe('PUT');
+    expect(call.request.body).toEqual({ on: false });
+    call.flush({ ok: true });
+
+    const off = structuredClone(BOARD);
+    off.timeTracking = false;
+    http.expectOne('/api/board').flush(off);
+    vi.advanceTimersByTime(MIN_WAIT);
+    expect(store.timeTracking()).toBe(false);
   });
 
   it('nimmt einen missglückten Haken zurück', () => {

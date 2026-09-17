@@ -9,6 +9,7 @@ import type {
   ContactInput,
   Task,
   TaskInput,
+  TimePhase,
 } from '../data/models';
 import { ApiService } from './api.service';
 import { LanguageService } from './language.service';
@@ -38,6 +39,10 @@ export class BoardStore {
   private readonly language = inject(LanguageService);
   private readonly data = signal<BoardData | null>(null);
   private readonly query = signal('');
+  private readonly read = signal(0);
+
+  /** When the board on screen arrived, so a running timer can count on from there. */
+  readonly readAt = this.read.asReadonly();
 
   /** True while the board is being fetched. */
   readonly loading = signal(false);
@@ -59,6 +64,15 @@ export class BoardStore {
 
   /** All contacts of the board. */
   readonly contacts = computed<Contact[]>(() => this.data()?.contacts ?? []);
+
+  /**
+   * Whether this board offers the timer and the time log on its cards. False
+   * until the board has arrived, so nothing flashes up that is switched off.
+   */
+  readonly timeTracking = computed(() => this.data()?.timeTracking ?? false);
+
+  /** The phases time is booked on, in their stored order. */
+  readonly phases = computed<TimePhase[]>(() => this.data()?.phases ?? []);
 
   /** All tasks, unfiltered. */
   readonly tasks = computed<Task[]>(() => this.data()?.tasks ?? []);
@@ -88,6 +102,18 @@ export class BoardStore {
     this.api.get<BoardData>('/board').subscribe({
       next: (board) => this.after(started, () => this.accept(board)),
       error: (failure: Error) => this.after(started, () => this.reject(failure)),
+    });
+  }
+
+  /**
+   * Reads the board again without the loading state and without holding the
+   * answer back. Meant for small changes such as a started timer, where the
+   * card should react at once.
+   */
+  refresh(): void {
+    this.api.get<BoardData>('/board').subscribe({
+      next: (board) => this.accept(board),
+      error: (failure: Error) => this.error.set(failure.message),
     });
   }
 
@@ -139,6 +165,26 @@ export class BoardStore {
   /** Removes a category; the cards keep existing and simply lose it. */
   deleteCategory(categoryId: string): Observable<unknown> {
     return this.api.delete(`/categories/${categoryId}`).pipe(tap(() => this.load()));
+  }
+
+  /** Turns time tracking on or off for the whole board. */
+  setTimeTracking(on: boolean): Observable<unknown> {
+    return this.api.put('/board/time-tracking', { on }).pipe(tap(() => this.load()));
+  }
+
+  /** Adds a phase time can be booked on. */
+  createPhase(name: string): Observable<unknown> {
+    return this.api.post('/phases', { name }).pipe(tap(() => this.load()));
+  }
+
+  /** Gives a phase another name. */
+  renamePhase(phaseId: string, name: string): Observable<unknown> {
+    return this.api.put(`/phases/${phaseId}`, { name }).pipe(tap(() => this.load()));
+  }
+
+  /** Removes a phase; the time booked on it stays, without a phase. */
+  deletePhase(phaseId: string): Observable<unknown> {
+    return this.api.delete(`/phases/${phaseId}`).pipe(tap(() => this.load()));
   }
 
   /** Adds a contact to the board. */
@@ -230,6 +276,7 @@ export class BoardStore {
 
   /** Stores a freshly loaded board. */
   private accept(board: BoardData): void {
+    this.read.set(Date.now());
     this.data.set(board);
     this.loading.set(false);
   }

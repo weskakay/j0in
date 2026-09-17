@@ -15,6 +15,7 @@ require __DIR__ . '/auth.php';
 require __DIR__ . '/board.php';
 require __DIR__ . '/columns.php';
 require __DIR__ . '/tasks.php';
+require __DIR__ . '/time.php';
 require __DIR__ . '/contacts.php';
 require __DIR__ . '/access.php';
 require __DIR__ . '/calendar.php';
@@ -136,7 +137,7 @@ function handleCalendar(PDO $pdo, string $method, array $seg): void
 }
 
 /** The areas that need a signed-in user and their board. */
-const J0IN_BOARD_AREAS = ['board', 'columns', 'categories', 'tasks', 'subtasks', 'contacts'];
+const J0IN_BOARD_AREAS = ['board', 'columns', 'categories', 'tasks', 'subtasks', 'time', 'phases', 'contacts'];
 
 /** Entry point: picks the area from the first path segment. */
 function handle(string $method, array $seg): void

@@ -101,6 +101,15 @@ export class Board {
   /** The task the dialog is about, or null while creating. */
   protected readonly current = signal<Task | null>(null);
 
+  /**
+   * The open task as the store holds it right now. The detail view reads this
+   * one, so a started timer or booked time shows without reopening the card.
+   */
+  protected readonly shownTask = computed(() => {
+    const opened = this.current();
+    return this.store.tasks().find((task) => task.id === opened?.id) ?? opened;
+  });
+
   /** The column a newly created task lands in. */
   protected readonly targetColumn = signal('');
 

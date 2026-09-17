@@ -25,6 +25,63 @@
   }
 }
 
+/* Sits beside the grip and outside the card button, because a button inside a
+   button is neither valid nor reachable by keyboard. */
+.card__timer {
+  position: absolute;
+  top: var(--j0in-space-xs);
+  right: calc(var(--j0in-space-xs) + var(--j0in-tap-target));
+  z-index: 2;
+  display: grid;
+  place-items: center;
+  width: var(--j0in-tap-target);
+  height: var(--j0in-tap-target);
+  border: 0;
+  border-radius: var(--j0in-radius-pill);
+  background: transparent;
+  color: var(--j0in-text-muted);
+  transition:
+    background var(--j0in-transition),
+    color var(--j0in-transition);
+
+  &:hover,
+  &:focus-visible {
+    color: var(--j0in-accent);
+  }
+
+  svg {
+    position: relative;
+  }
+
+  &:disabled {
+    cursor: progress;
+  }
+}
+
+/* The circle sits inside the 44px tap area, so it reads smaller than it taps. */
+.card__timer--running {
+  color: var(--j0in-text-on-color);
+
+  &::before {
+    content: '';
+    position: absolute;
+    inset: var(--j0in-space-xs);
+    border-radius: 50%;
+    background: var(--j0in-accent);
+    transition: background var(--j0in-transition);
+  }
+
+  &:hover,
+  &:focus-visible {
+    color: var(--j0in-text-on-color);
+  }
+
+  &:hover::before,
+  &:focus-visible::before {
+    background: var(--j0in-accent-hover);
+  }
+}
+
 .card {
   display: flex;
   flex-direction: column;
@@ -48,6 +105,7 @@
 
 .card__category {
   align-self: flex-start;
+  max-width: calc(100% - var(--j0in-tap-target) * 2);
   padding: var(--j0in-space-xs) var(--j0in-space-sm);
   border-radius: var(--j0in-radius-sm);
   color: var(--j0in-text-on-color);
@@ -56,7 +114,7 @@
 }
 
 .card__title {
-  padding-right: var(--j0in-space-lg);
+  padding-right: calc(var(--j0in-tap-target) * 2 - var(--j0in-space-md));
   font-size: var(--j0in-fs-body);
   font-weight: var(--j0in-fw-bold);
 }
@@ -95,6 +153,24 @@
   color: var(--j0in-text-muted);
   font-size: var(--j0in-fs-sm);
   white-space: nowrap;
+}
+
+.card__time {
+  display: flex;
+  align-items: center;
+  gap: var(--j0in-space-xs);
+  color: var(--j0in-text-muted);
+  font-size: var(--j0in-fs-body);
+  font-variant-numeric: tabular-nums;
+}
+
+.card__time--running {
+  color: var(--j0in-accent);
+  font-weight: var(--j0in-fw-bold);
+}
+
+.card__time-state {
+  font-weight: var(--j0in-fw-regular);
 }
 
 .card__foot {
