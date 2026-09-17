@@ -129,6 +129,26 @@ const J0IN_DEMO_TASKS = [
         'people' => [0, 1, 2],
         'subtasks' => ['de' => [], 'en' => []],
     ],
+    [
+        'column' => 'ToDo',
+        'category' => 'Technical Task',
+        'title' => ['de' => 'Stapel durchblättern', 'en' => 'Flick through the stack'],
+        'text' => ['de' => 'Ab vier Karten liegt die Spalte als Stapel. Die Pfeile über der Spalte blättern, das Mausrad auch.', 'en' => 'A column with more than three cards is shown as a stack. Use the arrows above it, or the mouse wheel.'],
+        'due' => '+12 days',
+        'priority' => 'medium',
+        'people' => [1],
+        'subtasks' => ['de' => [['Vorblättern', false], ['Alle Karten zeigen', false]], 'en' => [['Flick forward', false], ['Show every card', false]]],
+    ],
+    [
+        'column' => 'ToDo',
+        'category' => 'User Story',
+        'title' => ['de' => 'Stapel abschalten', 'en' => 'Switch the stack off'],
+        'text' => ['de' => 'In den Einstellungen unter Funktionen. Dann steht wieder die volle Liste da.', 'en' => 'In the settings, under features. The full list comes back.'],
+        'due' => '+14 days',
+        'priority' => 'low',
+        'people' => [2],
+        'subtasks' => ['de' => [], 'en' => []],
+    ],
 ];
 
 /**

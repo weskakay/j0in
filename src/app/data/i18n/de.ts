@@ -73,6 +73,11 @@ export const DE: Dictionary = {
     confirmTask: 'wirklich gelöscht werden? Die Teilaufgaben verschwinden mit. Das lässt sich nicht rückgängig machen.',
     deleteTask: 'Aufgabe löschen',
     deleting: 'Löscht …',
+    stackPrev: 'Eine Karte zurück',
+    stackNext: 'Eine Karte weiter',
+    stackOf: 'von',
+    stackExpand: 'Alle Karten zeigen',
+    stackCollapse: 'Als Stapel zeigen',
   },
   task: {
     newTask: 'Neue Aufgabe',
@@ -139,6 +144,15 @@ export const DE: Dictionary = {
     empty: 'Für diesen Tag steht nichts im Kalender.',
     release: 'Aus dem Tag nehmen',
     newCard: 'Was steht an?',
+  },
+  features: {
+    title: 'Funktionen',
+    note: 'Jede einzeln an- und abschaltbar. Gilt nur auf diesem Gerät.',
+    on: 'An',
+    off: 'Aus',
+    cardStack: 'Karten als Stapel',
+    cardStackNote:
+      'Spalten mit mehr als drei Karten zeigen eine Karte groß, die Nachbarn schauen darunter und darüber hervor. Abgeschaltet steht wieder die volle Liste da.',
   },
   settings: {
     title: 'Einstellungen',

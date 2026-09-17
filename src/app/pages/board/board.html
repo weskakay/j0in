@@ -85,7 +85,61 @@
           (added)="openNew(entry.column.id)"
         />
 
-        <ul class="column__list">
+        @let many = stack.many(entry);
+        @let stacked = stack.stacked(entry);
+
+        @if (many) {
+          <div class="stack__bar">
+            @if (stacked) {
+              <button
+                class="stack__btn"
+                type="button"
+                [disabled]="stack.atStart(entry)"
+                [attr.aria-label]="t().board.stackPrev"
+                (click)="stack.step(entry, -1)"
+              >
+                <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+                  <path d="m6 15 6-6 6 6" fill="none" stroke="currentColor"
+                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                </svg>
+              </button>
+              <span class="stack__count" aria-live="polite">
+                {{ stack.focusOf(entry) + 1 }} {{ t().board.stackOf }} {{ entry.tasks.length }}
+              </span>
+              <button
+                class="stack__btn"
+                type="button"
+                [disabled]="stack.atEnd(entry)"
+                [attr.aria-label]="t().board.stackNext"
+                (click)="stack.step(entry, 1)"
+              >
+                <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+                  <path d="m6 9 6 6 6-6" fill="none" stroke="currentColor"
+                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                </svg>
+              </button>
+            }
+            <button
+              class="stack__toggle"
+              type="button"
+              [attr.aria-label]="
+                (stack.isOpen(entry) ? t().board.stackCollapse : t().board.stackExpand) +
+                ': ' +
+                entry.column.name
+              "
+              (click)="stack.toggle(entry)"
+            >
+              {{ stack.isOpen(entry) ? t().board.stackCollapse : t().board.stackExpand }}
+            </button>
+          </div>
+        }
+
+        <ul
+          #list
+          class="column__list"
+          [class.column__list--stack]="stacked"
+          (wheel)="onStackWheel($event, entry, list)"
+        >
           @for (task of entry.tasks; track task.id; let i = $index) {
             @if (showSlot(entry.column.id, i)) {
               <li class="column__slot" aria-hidden="true"></li>
@@ -94,14 +148,19 @@
               [appDragCard]="task"
               [attr.data-task-id]="task.id"
               [class.column__dragging]="drag.task()?.id === task.id"
+              [class.column__card--stacked]="stacked"
+              [class.column__card--away]="stacked && stack.hidden(entry, i)"
+              [attr.data-depth]="stacked ? stack.depth(entry, i) : null"
+              [attr.data-side]="stacked ? stack.side(entry, i) : null"
               (dropped)="onDrop($event)"
             >
               <app-task-card
                 [task]="task"
                 [category]="categoryOf(task)"
                 [contacts]="contacts()"
-                (open)="openTask($event)"
-                (keyed)="onCardKeydown($event, task)"
+                (open)="onCardOpen(entry, i, $event)"
+                (keyed)="onCardKeydown($event, task, entry)"
+                (focusin)="onCardFocus(entry, i)"
               />
             </li>
           } @empty {

@@ -113,6 +113,11 @@ export interface Dictionary {
     confirmTask: string;
     deleteTask: string;
     deleting: string;
+    stackPrev: string;
+    stackNext: string;
+    stackOf: string;
+    stackExpand: string;
+    stackCollapse: string;
   };
   task: {
     newTask: string;
@@ -179,6 +184,14 @@ export interface Dictionary {
     empty: string;
     release: string;
     newCard: string;
+  };
+  features: {
+    title: string;
+    note: string;
+    on: string;
+    off: string;
+    cardStack: string;
+    cardStackNote: string;
   };
   settings: {
     title: string;

@@ -5,6 +5,7 @@ import { BoardStore } from '../../core/board.store';
 import { AccessService } from '../../core/access.service';
 import { CalendarService } from '../../core/calendar.service';
 import { LanguageService } from '../../core/language.service';
+import { FeaturesService } from '../../core/features.service';
 import { ThemeService, type Theme } from '../../core/theme.service';
 import type { AccessRequest, Category } from '../../data/models';
 import type { Dictionary } from '../../data/i18n';
@@ -55,6 +56,9 @@ export class Settings {
   private readonly access = inject(AccessService);
   private readonly calendar = inject(CalendarService);
   private readonly language = inject(LanguageService);
+
+  /** The switchable features, turned on and off right here. */
+  protected readonly features = inject(FeaturesService);
 
   /** Every piece of text, in the language currently on screen. */
   protected readonly t = this.language.dict;

@@ -72,6 +72,11 @@ export const EN: Dictionary = {
     confirmTask: 'really be deleted? Its subtasks go with it. This cannot be undone.',
     deleteTask: 'Delete task',
     deleting: 'Deleting …',
+    stackPrev: 'One card back',
+    stackNext: 'One card on',
+    stackOf: 'of',
+    stackExpand: 'Show every card',
+    stackCollapse: 'Show as a stack',
   },
   task: {
     newTask: 'New task',
@@ -138,6 +143,15 @@ export const EN: Dictionary = {
     empty: 'Nothing in the calendar for this day.',
     release: 'Take out of the day',
     newCard: 'What is on?',
+  },
+  features: {
+    title: 'Features',
+    note: 'Each one switched on and off on its own. Applies to this device only.',
+    on: 'On',
+    off: 'Off',
+    cardStack: 'Cards as a stack',
+    cardStackNote:
+      'Columns holding more than three cards show one card large, its neighbours peeking out above and below. Switched off the full list is back.',
   },
   settings: {
     title: 'Settings',

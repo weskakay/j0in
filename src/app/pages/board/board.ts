@@ -2,7 +2,7 @@ import { Component, ElementRef, computed, effect, inject, signal, viewChild } fr
 import { BoardStore, type ColumnDisposal, type ColumnWithTasks } from '../../core/board.store';
 import { LanguageService } from '../../core/language.service';
 import type { Category, Column, Task, TaskInput } from '../../data/models';
-import type { Dictionary } from '../../data/i18n';
+import { headingFor, withToggled, type DialogMode } from './board-dialog';
 import { TaskCard } from './task-card/task-card';
 import { Dialog } from '../../layout/dialog/dialog';
 import { TaskDetail, type SubtaskToggle } from './task-detail/task-detail';
@@ -14,12 +14,12 @@ import { ColumnHead } from './column-head/column-head';
 import { ColumnDelete } from './column-delete/column-delete';
 import { ColumnGrip } from './resize/column-grip';
 import { Planner } from './planner/planner';
+import { ColumnStack } from './stack/column-stack.service';
+import { focusCard, holdsFocus } from './stack/stack-focus';
+import { ARROWS, VERTICAL, nextPlace } from './keys/card-move';
 import { LayoutService } from '../../core/layout.service';
 import { CalendarService } from '../../core/calendar.service';
 import { ScheduleService } from '../../core/schedule.service';
-
-/** Which dialog is on screen, if any. */
-type DialogMode = 'none' | 'detail' | 'edit' | 'create' | 'wipeColumn' | 'wipeTask';
 
 /** The board: every column with its cards, plus the task dialog. */
 @Component({
@@ -36,7 +36,7 @@ type DialogMode = 'none' | 'detail' | 'edit' | 'create' | 'wipeColumn' | 'wipeTa
     ColumnGrip,
     Planner,
   ],
-  providers: [BoardDrag],
+  providers: [BoardDrag, ColumnStack],
   templateUrl: './board.html',
   styleUrl: './board.scss',
 })
@@ -48,6 +48,8 @@ export class Board {
   private readonly layout = inject(LayoutService);
   private readonly calendar = inject(CalendarService);
   private readonly planned = inject(ScheduleService);
+  /** Which card each column has in focus, read by the template as well. */
+  protected readonly stack = inject(ColumnStack);
 
   /** Every piece of text, in the language currently on screen. */
   protected readonly t = this.language.dict;
@@ -215,17 +217,77 @@ export class Board {
    * Moves a card with the keyboard. Alt and an arrow key shifts it, which
    * keeps the plain arrows free for scrolling and reading.
    */
-  protected onCardKeydown(event: KeyboardEvent, task: Task): void {
+  protected onCardKeydown(event: KeyboardEvent, task: Task, entry: ColumnWithTasks): void {
+    if (!event.altKey && this.stack.stacked(entry) && VERTICAL.includes(event.key)) {
+      event.preventDefault();
+      this.browse(entry, event.key === 'ArrowUp' ? -1 : 1);
+      return;
+    }
     if (!event.altKey || !ARROWS.includes(event.key)) {
       return;
     }
     event.preventDefault();
-    const target = nextPlace(this.board(), task, event.key);
-    if (target) {
-      this.store.moveTask(task.id, target.columnId, target.position).subscribe({
-        next: () => this.store.load(),
-      });
+    this.nudge(task, entry, event.key);
+  }
+
+  /** Moves a card one place and keeps the stack looking at it. */
+  private nudge(task: Task, entry: ColumnWithTasks, key: string): void {
+    const target = nextPlace(this.board(), task, key);
+    if (!target) {
+      return;
     }
+    if (this.stack.stacked(entry) && VERTICAL.includes(key)) {
+      this.stack.step(entry, key === 'ArrowUp' ? -1 : 1);
+    }
+    this.store.moveTask(task.id, target.columnId, target.position).subscribe({
+      next: () => this.store.load(),
+    });
+  }
+
+  /**
+   * Browses the stack and takes the keyboard along, otherwise it would be
+   * left sitting on a card that has just slid out of the way.
+   */
+  private browse(entry: ColumnWithTasks, delta: number): void {
+    this.stack.step(entry, delta);
+    this.carryFocus(entry);
+  }
+
+  /** The wheel browses too, and keeps the keyboard on the card in focus. */
+  protected onStackWheel(event: WheelEvent, entry: ColumnWithTasks, list: Element): void {
+    if (this.stack.onWheel(event, entry) && holdsFocus(list)) {
+      this.carryFocus(entry);
+    }
+  }
+
+  /** Puts the keyboard on whichever card the stack now has in focus. */
+  private carryFocus(entry: ColumnWithTasks): void {
+    const task = entry.tasks[this.stack.focusOf(entry)];
+    if (task) {
+      requestAnimationFrame(() => focusCard(task.id));
+    }
+  }
+
+  /**
+   * Tabbing onto a card that merely peeks out brings it forward, so the
+   * keyboard never sits on something faded out behind another card.
+   */
+  protected onCardFocus(entry: ColumnWithTasks, index: number): void {
+    if (this.stack.stacked(entry) && this.stack.offset(entry, index) !== 0) {
+      this.stack.to(entry, index);
+    }
+  }
+
+  /**
+   * A card that is merely peeking out is brought forward rather than
+   * opened, so one click never does two things at once.
+   */
+  protected onCardOpen(entry: ColumnWithTasks, index: number, task: Task): void {
+    if (this.stack.stacked(entry) && this.stack.offset(entry, index) !== 0) {
+      this.stack.to(entry, index);
+      return;
+    }
+    this.openTask(task);
   }
 
   /** Whether the insertion marker belongs in front of the given card. */
@@ -319,68 +381,4 @@ export class Board {
     this.busy.set(false);
     this.closeDialog();
   }
-}
-
-const ARROWS = ['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown'];
-
-/** Where a card goes when it is nudged, or null when it cannot move there. */
-function nextPlace(
-  board: ColumnWithTasks[],
-  task: Task,
-  key: string,
-): { columnId: string; position: number } | null {
-  const column = board.findIndex((entry) => entry.column.id === task.columnId);
-  if (column < 0) {
-    return null;
-  }
-  const row = board[column].tasks.findIndex((one) => one.id === task.id);
-  return key === 'ArrowUp' || key === 'ArrowDown'
-    ? withinColumn(board[column], row, key)
-    : acrossColumns(board, column, row, key);
-}
-
-/** One place up or down inside the same column. */
-function withinColumn(
-  entry: ColumnWithTasks,
-  row: number,
-  key: string,
-): { columnId: string; position: number } | null {
-  const target = key === 'ArrowUp' ? row - 1 : row + 1;
-  if (target < 0 || target >= entry.tasks.length) {
-    return null;
-  }
-  return { columnId: entry.column.id, position: target + 1 };
-}
-
-/** Into the neighbouring column, at the same height. */
-function acrossColumns(
-  board: ColumnWithTasks[],
-  column: number,
-  row: number,
-  key: string,
-): { columnId: string; position: number } | null {
-  const target = key === 'ArrowLeft' ? column - 1 : column + 1;
-  if (target < 0 || target >= board.length) {
-    return null;
-  }
-  return { columnId: board[target].column.id, position: Math.min(row + 1, board[target].tasks.length + 1) };
-}
-
-/** The heading the dialog carries in each of its uses. */
-function headingFor(mode: DialogMode, task: Task | null, t: Dictionary): string {
-  const fixed: Partial<Record<DialogMode, string>> = {
-    wipeColumn: t.board.deleteColumn,
-    wipeTask: t.task.deleteTask,
-    create: t.task.newTask,
-    edit: t.task.editTask,
-  };
-  return fixed[mode] ?? task?.title ?? '';
-}
-
-/** Copy of a task in which one subtask carries its new state. */
-function withToggled(task: Task, change: SubtaskToggle): Task {
-  const subtasks = task.subtasks.map((subtask) =>
-    subtask.id === change.subtaskId ? { ...subtask, isDone: change.isDone } : subtask,
-  );
-  return { ...task, subtasks };
 }

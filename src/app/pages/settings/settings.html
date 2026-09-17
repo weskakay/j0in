@@ -37,6 +37,33 @@
   </ul>
 </section>
 
+<section class="conf__block">
+  <h2 class="conf__heading">{{ t().features.title }}</h2>
+  <p class="conf__note">{{ t().features.note }}</p>
+
+  @let stackOn = features.cardStack();
+  <ul class="switches">
+    <li class="switch">
+      <button
+        class="switch__btn"
+        type="button"
+        role="switch"
+        [attr.aria-checked]="stackOn"
+        (click)="features.toggleCardStack()"
+      >
+        <span class="switch__track" [class.switch__track--on]="stackOn" aria-hidden="true">
+          <span class="switch__knob"></span>
+        </span>
+        <span class="switch__text">
+          <span class="switch__label">{{ t().features.cardStack }}</span>
+          <span class="switch__note">{{ t().features.cardStackNote }}</span>
+        </span>
+        <span class="switch__state">{{ stackOn ? t().features.on : t().features.off }}</span>
+      </button>
+    </li>
+  </ul>
+</section>
+
 @if (ready()) {
   <section class="conf__block">
     <h2 class="conf__heading">{{ t().settings.categories }}</h2>
