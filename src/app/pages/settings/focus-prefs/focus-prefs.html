@@ -1,0 +1,44 @@
+<div class="pref">
+  <span class="pref__label">{{ t().prefs.focusDefault }}</span>
+  <div class="segment" role="group" [attr.aria-label]="t().prefs.focusDefault">
+    @for (minutes of lengths; track minutes) {
+      <button
+        class="segment__btn"
+        type="button"
+        [class.segment__btn--on]="prefs().focusDefault === minutes"
+        [attr.aria-pressed]="prefs().focusDefault === minutes"
+        (click)="pickLength(minutes)"
+      >
+        {{ minutes }} {{ t().home.minutes }}
+      </button>
+    }
+  </div>
+</div>
+
+<div class="pref">
+  <span class="pref__text">
+    <span class="pref__label" id="pref-goal">{{ t().prefs.focusGoal }}</span>
+    <span class="pref__note">{{ t().prefs.focusGoalNote }}</span>
+  </span>
+  <div class="stepper" role="group" aria-labelledby="pref-goal">
+    <button class="stepper__btn" type="button" [attr.aria-label]="t().prefs.less"
+      [disabled]="atEdge(prefs().focusGoal, ranges.goal, -1)" (click)="stepGoal(-1)">−</button>
+    <span class="stepper__value" aria-live="polite">{{ goal() }} {{ t().prefs.hours }}</span>
+    <button class="stepper__btn" type="button" [attr.aria-label]="t().prefs.more"
+      [disabled]="atEdge(prefs().focusGoal, ranges.goal, 1)" (click)="stepGoal(1)">+</button>
+  </div>
+</div>
+
+<div class="pref">
+  <span class="pref__text">
+    <span class="pref__label" id="pref-capacity">{{ t().prefs.capacity }}</span>
+    <span class="pref__note">{{ t().prefs.capacityNote }}</span>
+  </span>
+  <div class="stepper" role="group" aria-labelledby="pref-capacity">
+    <button class="stepper__btn" type="button" [attr.aria-label]="t().prefs.less"
+      [disabled]="atEdge(prefs().weekCapacity, ranges.capacity, -1)" (click)="stepCapacity(-1)">−</button>
+    <span class="stepper__value" aria-live="polite">{{ prefs().weekCapacity }} {{ t().prefs.hours }}</span>
+    <button class="stepper__btn" type="button" [attr.aria-label]="t().prefs.more"
+      [disabled]="atEdge(prefs().weekCapacity, ranges.capacity, 1)" (click)="stepCapacity(1)">+</button>
+  </div>
+</div>
