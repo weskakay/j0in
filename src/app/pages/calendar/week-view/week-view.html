@@ -1,0 +1,55 @@
+@if (data.connected()) {
+  <section class="plan" [attr.aria-label]="t().calendar.unplanned">
+    <h2 class="plan__title">{{ t().calendar.unplanned }}</h2>
+    <p class="plan__hint">{{ t().calendar.dropHint }}</p>
+    <ul class="plan__cards">
+      @for (task of unplanned(); track task.id) {
+        <li class="plan__card" draggable="true" (dragstart)="onDragStart($event, task)">{{ task.title }}</li>
+      } @empty {
+        <li class="plan__empty">{{ t().calendar.unplannedEmpty }}</li>
+      }
+    </ul>
+  </section>
+}
+
+<div class="week">
+  <div class="week__grid">
+    <span class="week__corner" aria-hidden="true"></span>
+    @for (day of data.week(); track day; let i = $index) {
+      <div class="week__head" [class.week__head--today]="day === data.today">
+        <span class="week__name">{{ data.weekdayNames()[i] }}</span>
+        <span class="week__number">{{ dayNumber(day) }}</span>
+        <ul class="week__allday">
+          @for (entry of allDay(day); track entry.id) {
+            <li class="tag" [style.--entry]="entry.color">
+              @if (entry.taskId) {
+                <a class="tag__text" [routerLink]="['/board', entry.taskId]">{{ entry.title }}</a>
+              } @else {
+                <span class="tag__text">{{ entry.title }}</span>
+              }
+            </li>
+          }
+        </ul>
+      </div>
+    }
+
+    <div class="week__hours" aria-hidden="true">
+      @for (hour of hours; track hour) {
+        <span class="week__hour">{{ hour }}:00</span>
+      }
+    </div>
+    @for (day of data.week(); track day) {
+      <div class="week__day" role="group" [class.week__day--today]="day === data.today" [attr.aria-label]="data.label(day)">
+        @for (hour of hours; track hour) {
+          <div class="week__slot" (dragover)="onDragOver($event)" (drop)="onDrop($event, day, hour)"></div>
+        }
+        @for (entry of timed(day); track entry.id) {
+          <div class="block" [style.top.px]="top(entry)" [style.height.px]="height(entry)" [style.--entry]="entry.color">
+            <span class="block__title">{{ entry.title }}</span>
+            <span class="block__time">{{ span(entry) }}</span>
+          </div>
+        }
+      </div>
+    }
+  </div>
+</div>
