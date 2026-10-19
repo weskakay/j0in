@@ -1,4 +1,7 @@
 import { Component, computed, inject, signal } from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
+import { ActivatedRoute, RouterLink } from '@angular/router';
+import { map } from 'rxjs';
 import { AuthService } from '../../core/auth.service';
 import { BoardStore } from '../../core/board.store';
 import { AccessService } from '../../core/access.service';
@@ -7,6 +10,9 @@ import { LanguageService } from '../../core/language.service';
 import { FeaturesService } from '../../core/features.service';
 import { ThemeService, type Theme } from '../../core/theme.service';
 import { LookPicker } from './look-picker/look-picker';
+import { Switch } from '../../ui/switch/switch';
+import { FocusPrefs } from './focus-prefs/focus-prefs';
+import { sectionFrom, sectionsFor } from './settings-sections';
 import type { AccessRequest, Category, TimePhase } from '../../data/models';
 import type { Dictionary } from '../../data/i18n';
 import { ColorPicker } from '../../layout/color-picker/color-picker';
@@ -45,7 +51,7 @@ interface DoneMessage {
 /** Appearance, the board's name, and what belongs to the account. */
 @Component({
   selector: 'app-settings',
-  imports: [ColorPicker, CategoryManager, PhaseManager, AccessList, LookPicker],
+  imports: [ColorPicker, CategoryManager, PhaseManager, AccessList, LookPicker, Switch, FocusPrefs, RouterLink],
   templateUrl: './settings.html',
   styleUrl: './settings.scss',
 })
@@ -74,6 +80,15 @@ export class Settings {
 
   /** Whether this account decides who may use the app. */
   protected readonly isOwner = computed(() => this.user()?.role === 'owner');
+
+  /** The sections on offer; access only for the owner. */
+  protected readonly sections = computed(() => sectionsFor(this.isOwner()));
+
+  /** The section on screen, from the address so it can be linked to. */
+  protected readonly section = toSignal(
+    inject(ActivatedRoute).queryParamMap.pipe(map((params) => sectionFrom(params.get('section'), this.isOwner()))),
+    { initialValue: 'look' as const },
+  );
 
   /** The requests for access, for the owner's cards. */
   protected readonly requests = this.access.requests;

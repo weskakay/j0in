@@ -8,218 +8,217 @@
   <p class="conf__done" role="status">{{ message }}</p>
 }
 
-<section class="conf__block">
-  <h2 class="conf__heading">{{ t().settings.appearance }}</h2>
-  <p class="conf__note">{{ t().settings.appearanceNote }}</p>
-
-  <h3 class="conf__label">{{ t().look.title }}</h3>
-  <p class="conf__note">{{ t().look.note }}</p>
-  <app-look-picker />
-
-  <app-color-picker
-    [caption]="t().settings.accent"
-    [value]="accent()"
-    (picked)="pickAccent($event)"
-  />
-  <p class="conf__note">{{ t().settings.accentNote }}</p>
-
-  <ul class="conf__choices">
-    @for (choice of choices(); track choice.value) {
-      <li>
-        <button
-          class="choice"
-          type="button"
-          [class.choice--on]="theme() === choice.value"
-          [attr.aria-pressed]="theme() === choice.value"
-          (click)="pickTheme(choice.value)"
-        >
-          <span class="choice__label">{{ choice.label }}</span>
-          <span class="choice__note">{{ choice.note }}</span>
-        </button>
-      </li>
+<div class="conf__layout">
+  <nav class="conf__nav" [attr.aria-label]="t().prefs.nav">
+    @if (user(); as me) {
+      <p class="conf__me">
+        <span class="conf__me-name">{{ me.name }}</span>
+        <span class="conf__me-mail">{{ me.email }}</span>
+      </p>
     }
-  </ul>
-</section>
+    <ul class="conf__nav-list">
+      @for (entry of sections(); track entry.key) {
+        <li>
+          <a
+            class="conf__nav-link"
+            routerLink="/settings"
+            [queryParams]="{ section: entry.key }"
+            [class.conf__nav-link--on]="section() === entry.key"
+            [attr.aria-current]="section() === entry.key ? 'page' : null"
+          >
+            <span class="conf__nav-tile conf__nav-tile--{{ entry.key }}" aria-hidden="true"></span>
+            {{ t().prefs[entry.key] }}
+          </a>
+        </li>
+      }
+    </ul>
+  </nav>
 
-<section class="conf__block">
-  <h2 class="conf__heading">{{ t().features.title }}</h2>
-  <p class="conf__note">{{ t().features.note }}</p>
+  <div class="conf__content">
+    <section class="conf__block" id="look" [class.conf__block--away]="section() !== 'look'">
+      <h2 class="conf__heading">{{ t().settings.appearance }}</h2>
+      <p class="conf__note">{{ t().settings.appearanceNote }}</p>
 
-  @let stackOn = features.cardStack();
-  <ul class="switches">
-    <li class="switch">
-      <button
-        class="switch__btn"
-        type="button"
-        role="switch"
-        [attr.aria-checked]="stackOn"
-        (click)="features.toggleCardStack()"
-      >
-        <span class="switch__track" [class.switch__track--on]="stackOn" aria-hidden="true">
-          <span class="switch__knob"></span>
-        </span>
-        <span class="switch__text">
-          <span class="switch__label">{{ t().features.cardStack }}</span>
-          <span class="switch__note">{{ t().features.cardStackNote }}</span>
-        </span>
-        <span class="switch__state">{{ stackOn ? t().features.on : t().features.off }}</span>
-      </button>
-    </li>
+      <h3 class="conf__label">{{ t().look.title }}</h3>
+      <p class="conf__note">{{ t().look.note }}</p>
+      <app-look-picker />
+
+      <app-color-picker
+        [caption]="t().settings.accent"
+        [value]="accent()"
+        (picked)="pickAccent($event)"
+      />
+      <p class="conf__note">{{ t().settings.accentNote }}</p>
+
+      <ul class="conf__choices">
+        @for (choice of choices(); track choice.value) {
+          <li>
+            <button
+              class="choice"
+              type="button"
+              [class.choice--on]="theme() === choice.value"
+              [attr.aria-pressed]="theme() === choice.value"
+              (click)="pickTheme(choice.value)"
+            >
+              <span class="choice__label">{{ choice.label }}</span>
+              <span class="choice__note">{{ choice.note }}</span>
+            </button>
+          </li>
+        }
+      </ul>
+
+      <app-switch
+        [label]="t().features.cardStack"
+        [note]="t().features.cardStackNote"
+        [on]="features.cardStack()"
+        [states]="[t().features.on, t().features.off]"
+        (toggled)="features.toggleCardStack()"
+      />
+    </section>
 
     @if (ready()) {
-      @let timeOn = timeTracking();
-      <li class="switch">
-        <button
-          class="switch__btn"
-          type="button"
-          role="switch"
-          [attr.aria-checked]="timeOn"
+      <section class="conf__block" id="board" [class.conf__block--away]="section() !== 'board'">
+        <h2 class="conf__heading">{{ t().prefs.board }}</h2>
+        <label class="conf__field">
+          <span class="conf__label">{{ t().settings.boardName }}</span>
+          <input
+            class="conf__input"
+            type="text"
+            [value]="boardName()"
+            [disabled]="busy()"
+            (blur)="renameBoard($event)"
+          />
+        </label>
+        <p class="conf__note">{{ t().settings.boardNameNote }}</p>
+
+        <h3 class="conf__label">{{ t().settings.categories }}</h3>
+        <p class="conf__note">{{ t().settings.categoriesNote }}</p>
+        <app-category-manager
+          [categories]="categories()"
+          [usage]="categoryUsage()"
+          [busy]="busy()"
+          (created)="addCategory($event)"
+          (edited)="saveCategory($event)"
+          (removed)="removeCategory($event)"
+        />
+
+        @if (isGuest()) {
+          <h3 class="conf__label">{{ t().settings.demo }}</h3>
+          <p class="conf__note">{{ t().settings.demoNote }}</p>
+          <button class="conf__btn" type="button" [disabled]="busy()" (click)="resetDemo()">
+            {{ busy() ? t().settings.demoResetting : t().settings.demoReset }}
+          </button>
+
+        }
+      </section>
+
+      <section class="conf__block" id="time" [class.conf__block--away]="section() !== 'time'">
+        <h2 class="conf__heading">{{ t().prefs.time }}</h2>
+        <app-switch
+          [label]="t().features.timeTracking"
+          [note]="t().features.timeTrackingNote"
+          [on]="timeTracking()"
+          [states]="[t().features.on, t().features.off]"
           [disabled]="busy()"
-          (click)="toggleTimeTracking()"
-        >
-          <span class="switch__track" [class.switch__track--on]="timeOn" aria-hidden="true">
-            <span class="switch__knob"></span>
-          </span>
-          <span class="switch__text">
-            <span class="switch__label">{{ t().features.timeTracking }}</span>
-            <span class="switch__note">{{ t().features.timeTrackingNote }}</span>
-          </span>
-          <span class="switch__state">{{ timeOn ? t().features.on : t().features.off }}</span>
-        </button>
-      </li>
-    }
-  </ul>
-</section>
+          (toggled)="toggleTimeTracking()"
+        />
+        @if (timeTracking()) {
+          <h3 class="conf__label">{{ t().settings.phases }}</h3>
+          <p class="conf__note">{{ t().settings.phasesNote }}</p>
+          <app-phase-manager
+            [phases]="phases()"
+            [busy]="busy()"
+            (created)="addPhase($event)"
+            (edited)="savePhase($event)"
+            (removed)="removePhase($event)"
+          />
 
-@if (ready()) {
-  <section class="conf__block">
-    <h2 class="conf__heading">{{ t().settings.categories }}</h2>
-    <p class="conf__note">{{ t().settings.categoriesNote }}</p>
-    <app-category-manager
-      [categories]="categories()"
-      [usage]="categoryUsage()"
-      [busy]="busy()"
-      (created)="addCategory($event)"
-      (edited)="saveCategory($event)"
-      (removed)="removeCategory($event)"
-    />
-  </section>
+        }
+      </section>
 
-  @if (timeTracking()) {
-    <section class="conf__block">
-      <h2 class="conf__heading">{{ t().settings.phases }}</h2>
-      <p class="conf__note">{{ t().settings.phasesNote }}</p>
-      <app-phase-manager
-        [phases]="phases()"
-        [busy]="busy()"
-        (created)="addPhase($event)"
-        (edited)="savePhase($event)"
-        (removed)="removePhase($event)"
-      />
-    </section>
-  }
-
-  <section class="conf__block">
-    <h2 class="conf__heading">{{ t().settings.board }}</h2>
-    <label class="conf__field">
-      <span class="conf__label">{{ t().settings.boardName }}</span>
-      <input
-        class="conf__input"
-        type="text"
-        [value]="boardName()"
-        [disabled]="busy()"
-        (blur)="renameBoard($event)"
-      />
-    </label>
-    <p class="conf__note">{{ t().settings.boardNameNote }}</p>
-  </section>
-
-  @if (isGuest()) {
-    <section class="conf__block">
-      <h2 class="conf__heading">{{ t().settings.demo }}</h2>
-      <p class="conf__note">{{ t().settings.demoNote }}</p>
-      <button class="conf__btn" type="button" [disabled]="busy()" (click)="resetDemo()">
-        {{ busy() ? t().settings.demoResetting : t().settings.demoReset }}
-      </button>
-    </section>
-  }
-}
-
-@if (isOwner()) {
-  <section class="conf__block">
-    <h2 class="conf__heading">{{ t().settings.access }}</h2>
-    <p class="conf__note">{{ t().settings.accessNote }}</p>
-    <app-access-list
-      [requests]="requests()"
-      [loading]="requestsLoading()"
-      [deciding]="deciding()"
-      (approved)="approve($event)"
-      (declined)="decline($event)"
-    />
-  </section>
-}
-
-<section class="conf__block" [class.conf__block--off]="!canUseCalendar()">
-  <h2 class="conf__heading">{{ t().settings.calendar }}</h2>
-
-  @if (!canUseCalendar()) {
-    <p class="conf__note">
-      {{ isGuest() ? t().settings.calendarGuest : t().settings.calendarLocked }}
-    </p>
-    <button class="conf__btn" type="button" disabled>{{ t().settings.calendarConnect }}</button>
-  } @else {
-    <p class="conf__note">{{ t().settings.calendarNote }}</p>
-
-    @if (calendarProblem()) {
-      <p class="conf__warning" role="alert">{{ t().settings.calendarFailed }}</p>
+      <section class="conf__block" id="focus" [class.conf__block--away]="section() !== 'focus'">
+        <h2 class="conf__heading">{{ t().prefs.focus }}</h2>
+        <p class="conf__note">{{ t().prefs.focusNote }}</p>
+        <app-focus-prefs />
+      </section>
     }
 
-    @if (!calendarStatus().available) {
-      <p class="conf__note">{{ t().settings.calendarOff }}</p>
-    } @else if (calendarStatus().connected) {
-      <p class="conf__note">
-        {{ t().settings.calendarConnected }} <strong>{{ calendarStatus().email }}</strong>
+    <section class="conf__block" id="calendar" [class.conf__block--away]="section() !== 'calendar'">
+      <h2 class="conf__heading">{{ t().settings.calendar }}</h2>
+
+      @if (!canUseCalendar()) {
+        <p class="conf__note">
+          {{ isGuest() ? t().settings.calendarGuest : t().settings.calendarLocked }}
+        </p>
+        <button class="conf__btn" type="button" disabled>{{ t().settings.calendarConnect }}</button>
+      } @else {
+        <p class="conf__note">{{ t().settings.calendarNote }}</p>
+
+        @if (calendarProblem()) {
+          <p class="conf__warning" role="alert">{{ t().settings.calendarFailed }}</p>
+        }
+
+        @if (!calendarStatus().available) {
+          <p class="conf__note">{{ t().settings.calendarOff }}</p>
+        } @else if (calendarStatus().connected) {
+          <p class="conf__note">
+            {{ t().settings.calendarConnected }} <strong>{{ calendarStatus().email }}</strong>
+          </p>
+          <button
+            class="conf__btn"
+            type="button"
+            [disabled]="calendarBusy()"
+            (click)="disconnectCalendar()"
+          >
+            {{ t().settings.calendarDisconnect }}
+          </button>
+        } @else {
+          <button
+            class="conf__btn"
+            type="button"
+            [disabled]="calendarBusy()"
+            (click)="connectCalendar()"
+          >
+            {{ t().settings.calendarConnect }}
+          </button>
+        }
+      }
+    </section>
+
+    @if (isOwner()) {
+      <section class="conf__block" id="access" [class.conf__block--away]="section() !== 'access'">
+        <h2 class="conf__heading">{{ t().settings.access }}</h2>
+        <p class="conf__note">{{ t().settings.accessNote }}</p>
+        <app-access-list
+          [requests]="requests()"
+          [loading]="requestsLoading()"
+          [deciding]="deciding()"
+          (approved)="approve($event)"
+          (declined)="decline($event)"
+        />
+
+      </section>
+    }
+
+    <section class="conf__block" id="account" [class.conf__block--away]="section() !== 'account'">
+      <h2 class="conf__heading">{{ t().settings.account }}</h2>
+      <dl class="conf__facts">
+        <div class="conf__fact">
+          <dt>{{ t().settings.signedInAs }}</dt>
+          <dd>{{ user()?.name }}</dd>
+        </div>
+        <div class="conf__fact">
+          <dt>{{ t().settings.email }}</dt>
+          <dd>{{ user()?.email }}</dd>
+        </div>
+      </dl>
+      <button class="conf__btn" type="button" (click)="signOut()">{{ t().settings.signOut }}</button>
+
+      <h3 class="conf__label">{{ t().settings.legal }}</h3>
+      <p class="legal-links">
+        <a href="https://weskakay.de/impressum" target="_blank" rel="noopener">{{ t().auth.imprint }}</a>
+        <a href="https://weskakay.de/datenschutz" target="_blank" rel="noopener">{{ t().auth.privacy }}</a>
       </p>
-      <button
-        class="conf__btn"
-        type="button"
-        [disabled]="calendarBusy()"
-        (click)="disconnectCalendar()"
-      >
-        {{ t().settings.calendarDisconnect }}
-      </button>
-    } @else {
-      <button
-        class="conf__btn"
-        type="button"
-        [disabled]="calendarBusy()"
-        (click)="connectCalendar()"
-      >
-        {{ t().settings.calendarConnect }}
-      </button>
-    }
-  }
-</section>
-
-<section class="conf__block">
-  <h2 class="conf__heading">{{ t().settings.legal }}</h2>
-  <p class="legal-links">
-    <a href="https://weskakay.de/impressum" target="_blank" rel="noopener">{{ t().auth.imprint }}</a>
-    <a href="https://weskakay.de/datenschutz" target="_blank" rel="noopener">{{ t().auth.privacy }}</a>
-  </p>
-</section>
-
-<section class="conf__block">
-  <h2 class="conf__heading">{{ t().settings.account }}</h2>
-  <dl class="conf__facts">
-    <div class="conf__fact">
-      <dt>{{ t().settings.signedInAs }}</dt>
-      <dd>{{ user()?.name }}</dd>
-    </div>
-    <div class="conf__fact">
-      <dt>{{ t().settings.email }}</dt>
-      <dd>{{ user()?.email }}</dd>
-    </div>
-  </dl>
-  <button class="conf__btn" type="button" (click)="signOut()">{{ t().settings.signOut }}</button>
-</section>
+    </section>
+  </div>
+</div>
