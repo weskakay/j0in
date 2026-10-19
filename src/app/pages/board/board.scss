@@ -34,6 +34,32 @@
   gap: var(--j0in-space-lg);
 }
 
+/* Or, when picked in the settings, one column per screen, swiped sideways.
+   Only this row scrolls; the page itself keeps its width. Phones only, the
+   wide board further down has its own row. */
+@media (max-width: 899px) {
+  .board__columns--swipe {
+    flex-direction: row;
+    align-items: flex-start;
+    gap: var(--j0in-space-md);
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    scroll-snap-type: x mandatory;
+  }
+
+  .board__columns--swipe > .column,
+  .board__columns--swipe > app-add-column {
+    flex: 0 0 100%;
+    scroll-snap-align: start;
+  }
+
+  /* While a card is carried the row creeps along under the finger, so the
+     snapping must not pull it back. */
+  .board__columns--dragging {
+    scroll-snap-type: none;
+  }
+}
+
 
 .board__confirm {
   margin-bottom: var(--j0in-space-md);
@@ -97,7 +123,7 @@
 .column__slot {
   height: 4px;
   border-radius: var(--j0in-radius-pill);
-  background: var(--j0in-accent);
+  background: var(--j0in-accent-mark);
 }
 
 /* The card itself hangs on the pointer, lifted and slightly tilted, at the

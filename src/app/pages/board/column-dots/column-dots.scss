@@ -1,0 +1,39 @@
+.dots {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+/* The button keeps the full tap size, the dot inside it stays small. */
+.dots__dot {
+  display: grid;
+  place-items: center;
+  width: var(--j0in-tap-target);
+  height: var(--j0in-tap-target);
+  border: 0;
+  background: transparent;
+
+  &::before {
+    content: "";
+    width: var(--j0in-space-sm);
+    height: var(--j0in-space-sm);
+    border-radius: var(--j0in-radius-pill);
+    background: var(--j0in-text-muted);
+    opacity: 0.5;
+    transition:
+      width var(--j0in-transition),
+      opacity var(--j0in-transition);
+  }
+}
+
+.dots__dot--on::before {
+  width: var(--j0in-space-lg);
+  background: var(--j0in-accent-mark);
+  opacity: 1;
+}
+
+@media (min-width: 900px) {
+  .dots {
+    display: none;
+  }
+}

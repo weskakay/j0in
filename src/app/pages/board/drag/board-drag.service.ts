@@ -4,6 +4,9 @@ import type { Task } from '../../../data/models';
 /** How close to the edge the pointer has to be before the page creeps along. */
 const EDGE = 90;
 
+/** The same at the sides, narrower, since a phone is only a few fingers wide. */
+const SIDE_EDGE = 40;
+
 /** How many pixels each frame moves while creeping. */
 const STEP = 12;
 
@@ -65,26 +68,32 @@ export class BoardDrag {
 
   private frame: number | null = null;
 
+  /** The row of columns, held for the length of a drag so it can creep sideways. */
+  private row: HTMLElement | null = null;
+
   /** Begins a drag and remembers where it started. */
   start(task: Task, at: Point, grab: Grab): void {
     this.task.set(task);
     this.point.set(at);
     this.grab.set(grab);
     this.aimAt(at);
+    this.row = document.querySelector<HTMLElement>('.board__columns');
     this.frame = requestAnimationFrame(() => this.creepAlong());
   }
 
   /**
-   * Scrolls the page while the pointer rests near the top or bottom edge.
-   * On a phone the columns sit above each other, so without this the target
-   * column is simply out of reach.
+   * Scrolls while the pointer rests near an edge: the page up and down, since
+   * stacked columns would otherwise be out of reach, and the row of columns
+   * sideways, where they stand next to each other or are swiped.
    */
   private creepAlong(): void {
-    const { y } = this.point();
-    const up = y < EDGE;
-    const down = y > window.innerHeight - EDGE;
-    if (up || down) {
-      window.scrollBy(0, up ? -STEP : STEP);
+    const { x, y } = this.point();
+    const vertical = nearEdge(y, 0, window.innerHeight, EDGE);
+    const box = this.row?.getBoundingClientRect();
+    const sideways = box ? nearEdge(x, box.left, box.right, SIDE_EDGE) : 0;
+    if (vertical !== 0 || sideways !== 0) {
+      window.scrollBy(0, vertical * STEP);
+      this.row?.scrollBy(sideways * STEP, 0);
       this.aimAt(this.point());
     }
     this.frame = requestAnimationFrame(() => this.creepAlong());
@@ -134,6 +143,7 @@ export class BoardDrag {
       cancelAnimationFrame(this.frame);
       this.frame = null;
     }
+    this.row = null;
     this.task.set(null);
     this.overColumn.set(null);
     this.overSlot.set(null);
@@ -187,4 +197,12 @@ function columnUnder(at: Point): string | null {
   const element = document.elementFromPoint(at.x, at.y);
   const column = element?.closest<HTMLElement>('[data-column-id]');
   return column?.dataset['columnId'] ?? null;
+}
+
+/** -1 near the start of a stretch, 1 near its end, 0 in between. */
+function nearEdge(value: number, start: number, end: number, edge: number): -1 | 0 | 1 {
+  if (value < start + edge) {
+    return -1;
+  }
+  return value > end - edge ? 1 : 0;
 }

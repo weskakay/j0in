@@ -34,4 +34,11 @@ describe('FeaturesService', () => {
     localStorage.setItem('j0in-card-stack', 'weiss nicht');
     expect(make().cardStack()).toBe(true);
   });
+
+  it('legt die Spalten am Handy zu Beginn untereinander und merkt sich das Wischen', () => {
+    const first = make();
+    expect(first.swipeColumns()).toBe(false);
+    first.toggleSwipeColumns();
+    expect(make().swipeColumns()).toBe(true);
+  });
 });

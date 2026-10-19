@@ -23,7 +23,21 @@
   @if (plannerOpen()) {
     <app-planner />
   }
-  <div class="board__columns" [style.--j0in-column-width.px]="columnWidth()">
+  @if (swipe()) {
+    <app-column-dots
+      [names]="columnNames()"
+      [active]="shownColumn()"
+      (jump)="showColumn(columnRow, $event)"
+    />
+  }
+  <div
+    #columnRow
+    class="board__columns"
+    [class.board__columns--swipe]="swipe()"
+    [class.board__columns--dragging]="drag.task()"
+    [style.--j0in-column-width.px]="columnWidth()"
+    (scroll)="followColumns(columnRow)"
+  >
     @for (entry of view.board(); track entry.column.id; let c = $index) {
       <section
         class="column"

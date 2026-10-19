@@ -1,0 +1,12 @@
+<nav class="dots" [attr.aria-label]="t().features.swipeColumns">
+  @for (name of names(); track $index) {
+    <button
+      class="dots__dot"
+      type="button"
+      [class.dots__dot--on]="$index === active()"
+      [attr.aria-current]="$index === active() ? 'true' : null"
+      [attr.aria-label]="t().features.columnDot + ' ' + name"
+      (click)="jump.emit($index)"
+    ></button>
+  }
+</nav>

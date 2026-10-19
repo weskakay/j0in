@@ -27,6 +27,8 @@ import { BoardView } from './filters/board-view.service';
 import { CardKeys } from './keys/card-keys.service';
 import { TaskList } from './list/task-list';
 import { AddColumn } from './add-column/add-column';
+import { ColumnDots } from './column-dots/column-dots';
+import { FeaturesService } from '../../core/features.service';
 
 /**
  * The board: every column with its cards, or the same cards as a list. A
@@ -50,6 +52,7 @@ import { AddColumn } from './add-column/add-column';
     FilterBar,
     TaskList,
     AddColumn,
+    ColumnDots,
   ],
   providers: [BoardDrag, ColumnStack, BoardView, CardKeys],
   templateUrl: './board.html',
@@ -74,6 +77,15 @@ export class Board {
 
   /** Every piece of text, in the language currently on screen. */
   protected readonly t = this.language.dict;
+
+  /** Whether a phone shows one column at a time, swiped sideways. */
+  protected readonly swipe = inject(FeaturesService).swipeColumns;
+
+  /** The column on screen while they are swiped, counted from zero. */
+  protected readonly shownColumn = signal(0);
+
+  /** The names of the columns on screen, for the dots below them. */
+  protected readonly columnNames = computed(() => this.view.board().map((entry) => entry.column.name));
 
   /** How wide one column is, dragged by the edge between two of them. */
   protected readonly columnWidth = this.layout.columnWidth;
@@ -337,4 +349,24 @@ export class Board {
       this.closePanel();
     }
   }
+
+  /** Notes which column has come into view after a swipe. */
+  protected followColumns(row: HTMLElement): void {
+    if (this.swipe()) {
+      const last = Math.max(0, this.columnNames().length - 1);
+      this.shownColumn.set(Math.min(last, Math.round(row.scrollLeft / columnStep(row))));
+    }
+  }
+
+  /** Brings one column into view, picked from the dots. */
+  protected showColumn(row: HTMLElement, index: number): void {
+    const calm = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+    row.scrollTo({ left: index * columnStep(row), behavior: calm ? 'auto' : 'smooth' });
+  }
+}
+
+/** How far apart two columns sit in the row, gap included. */
+function columnStep(row: HTMLElement): number {
+  const [first, second] = Array.from(row.querySelectorAll<HTMLElement>('.column'));
+  return second ? second.offsetLeft - first.offsetLeft : Math.max(1, row.clientWidth);
 }
