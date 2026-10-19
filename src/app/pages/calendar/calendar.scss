@@ -1,0 +1,66 @@
+@use "glass" as *;
+
+.steps {
+  @include surface;
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  padding: 2px;
+  border-radius: var(--j0in-radius-pill);
+}
+
+.steps__btn,
+.steps__today {
+  display: grid;
+  place-items: center;
+  min-width: var(--j0in-tap-target);
+  min-height: var(--j0in-tap-target);
+  border-radius: var(--j0in-radius-pill);
+  background: transparent;
+
+  &:hover {
+    background: var(--j0in-fill);
+  }
+}
+
+.steps__today {
+  padding: 0 var(--j0in-space-md);
+  font-weight: var(--j0in-fw-bold);
+}
+
+.calendar__new {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--j0in-space-sm);
+  min-height: var(--j0in-tap-target);
+  padding: 0 var(--j0in-space-md);
+  border-radius: var(--j0in-radius-pill);
+  background: var(--j0in-accent-strong);
+  box-shadow: var(--j0in-glow);
+  color: var(--j0in-text-on-color);
+  font-weight: var(--j0in-fw-bold);
+  text-decoration: none;
+  white-space: nowrap;
+
+  &:hover {
+    background: var(--j0in-accent-hover);
+  }
+}
+
+.calendar__hint {
+  margin-bottom: var(--j0in-space-md);
+  color: var(--j0in-text-muted);
+}
+
+.calendar__layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--j0in-space-md);
+  align-items: start;
+}
+
+@media (min-width: 1280px) {
+  .calendar__layout {
+    grid-template-columns: minmax(0, 1fr) 330px;
+  }
+}

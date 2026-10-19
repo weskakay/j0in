@@ -1,0 +1,53 @@
+<header class="page-head">
+  <div class="page-head__lead">
+    <h1 class="page-head__title">{{ data.heading() }}</h1>
+    <p class="page-head__sub">{{ data.weekCount() }} {{ t().calendar.weekEntries }}</p>
+  </div>
+
+  <div class="page-head__actions">
+    <div class="steps" role="group" [attr.aria-label]="data.heading()">
+      <button class="steps__btn" type="button" [attr.aria-label]="t().calendar.previous" (click)="data.step(-1)">
+        <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
+          <path d="M15 6l-6 6 6 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+        </svg>
+      </button>
+      <button class="steps__today" type="button" (click)="toToday()">{{ t().calendar.today }}</button>
+      <button class="steps__btn" type="button" [attr.aria-label]="t().calendar.next" (click)="data.step(1)">
+        <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
+          <path d="M9 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+        </svg>
+      </button>
+    </div>
+    <div class="segment" role="group" [attr.aria-label]="t().calendar.title">
+      <button class="segment__btn" type="button" [class.segment__btn--on]="data.view() === 'month'"
+        [attr.aria-pressed]="data.view() === 'month'" (click)="data.view.set('month')">{{ t().calendar.month }}</button>
+      <button class="segment__btn" type="button" [class.segment__btn--on]="data.view() === 'week'"
+        [attr.aria-pressed]="data.view() === 'week'" (click)="data.view.set('week')">{{ t().calendar.week }}</button>
+    </div>
+    <a class="calendar__new" routerLink="/board" [queryParams]="{ new: 1 }">
+      <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
+        <path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" />
+      </svg>
+      {{ t().topbar.newTask }}
+    </a>
+  </div>
+</header>
+
+@if (!data.connected()) {
+  <p class="calendar__hint">{{ t().calendar.connectHint }}</p>
+}
+
+@if (loading() && !ready()) {
+  <app-loader [label]="t().common.loading" />
+}
+
+@if (ready()) {
+  <div class="calendar__layout">
+    @if (data.view() === 'month') {
+      <app-month-view />
+    } @else {
+      <app-week-view />
+    }
+    <app-agenda />
+  </div>
+}
