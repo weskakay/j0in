@@ -23,12 +23,15 @@
 }
 
 .conf__block {
-  max-width: 620px;
-  margin-bottom: var(--j0in-space-xl);
+  max-width: 760px;
+  margin-bottom: var(--j0in-space-lg);
   padding: var(--j0in-space-lg);
-  border: 1px solid var(--j0in-border);
-  border-radius: var(--j0in-radius-md);
-  background: var(--j0in-surface);
+  border: var(--j0in-panel-border);
+  border-radius: var(--j0in-panel-radius);
+  background: var(--j0in-panel-bg);
+  -webkit-backdrop-filter: var(--j0in-panel-blur);
+  backdrop-filter: var(--j0in-panel-blur);
+  box-shadow: var(--j0in-panel-shadow);
 }
 
 .conf__heading {
@@ -56,6 +59,7 @@
 
 .choice {
   display: flex;
+  height: 100%;
   flex-direction: column;
   gap: var(--j0in-space-xs);
   width: 100%;
@@ -144,114 +148,123 @@
   }
 }
 
-/* A section a guest can read but not use: visible, so the feature is known,
-   dimmed, so it is clear it belongs to an account of your own. */
-.conf__block--off {
-  opacity: 0.6;
-}
-
-/* Feature switches */
-
-.switches {
+.conf__switches {
   display: flex;
   flex-direction: column;
   gap: var(--j0in-space-sm);
 }
 
-/* Narrow screens give the text its own row, or it ends up in a tiny column. */
-.switch__btn {
+/* Navigation on the left, the sections on the right. On a phone every
+   section stands one below the other and the navigation steps aside. */
+.conf__layout {
   display: grid;
-  grid-template-columns: auto 1fr;
-  grid-template-areas:
-    'track state'
-    'text text';
-  align-items: start;
-  gap: var(--j0in-space-sm) var(--j0in-space-md);
-  width: 100%;
-  padding: var(--j0in-space-md);
-  border: 1px solid var(--j0in-border);
-  border-radius: var(--j0in-radius-md);
-  background: var(--j0in-surface);
-  color: inherit;
-  text-align: left;
-  transition: border-color var(--j0in-transition);
-
-  &:hover,
-  &:focus-visible {
-    border-color: var(--j0in-accent-ink);
-  }
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--j0in-space-md);
 }
 
-/* Track height and inset drive the knob, so the two cannot drift apart. */
-.switch__track {
-  position: relative;
-  grid-area: track;
-  width: var(--switch-width);
-  height: var(--switch-height);
-  margin-top: 2px;
-  border-radius: var(--j0in-radius-pill);
-  background: var(--j0in-border);
-  transition: background var(--j0in-transition);
-  --switch-height: 26px;
-  --switch-width: 44px;
-  --switch-inset: 3px;
-  --switch-knob: calc(var(--switch-height) - 2 * var(--switch-inset));
+.conf__nav {
+  display: none;
 }
 
-.switch__track--on {
-  background: var(--j0in-accent);
-}
-
-.switch__knob {
-  position: absolute;
-  top: var(--switch-inset);
-  left: var(--switch-inset);
-  width: var(--switch-knob);
-  height: var(--switch-knob);
-  border-radius: 50%;
-  background: var(--j0in-surface);
-  transition: transform var(--j0in-transition);
-}
-
-.switch__track--on .switch__knob {
-  transform: translateX(calc(var(--switch-width) - var(--switch-knob) - 2 * var(--switch-inset)));
-}
-
-.switch__text {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  grid-area: text;
+.conf__content {
   min-width: 0;
 }
 
-.switch__label {
-  font-weight: 600;
+.conf__me {
+  display: flex;
+  flex-direction: column;
+  padding: var(--j0in-space-sm);
 }
 
-.switch__note {
+.conf__me-name {
+  font-weight: var(--j0in-fw-bold);
+}
+
+.conf__me-mail {
+  overflow: hidden;
   color: var(--j0in-text-muted);
-  font-size: var(--j0in-fs-body);
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
-.switch__state {
-  grid-area: state;
-  justify-self: end;
-  color: var(--j0in-text-muted);
-  font-size: var(--j0in-fs-body);
+.conf__nav-list {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
 }
 
-/* Wide enough for the three in a row, the way they were drawn. */
-@media (min-width: 30rem) {
-  .switch__btn {
-    grid-template-columns: auto 1fr auto;
-    grid-template-areas: 'track text state';
+.conf__nav-link {
+  display: flex;
+  align-items: center;
+  gap: var(--j0in-space-sm);
+  min-height: var(--j0in-tap-target);
+  padding: 0 var(--j0in-space-sm);
+  border-radius: var(--j0in-radius-md);
+  color: inherit;
+  text-decoration: none;
+
+  &:hover {
+    background: var(--j0in-fill);
   }
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .switch__track,
-  .switch__knob {
-    transition: none;
+.conf__nav-link--on {
+  background: var(--j0in-lens);
+  box-shadow: var(--j0in-lens-shadow);
+  font-weight: var(--j0in-fw-bold);
+}
+
+.conf__nav-tile {
+  width: 28px;
+  height: 28px;
+  border-radius: 30%;
+  background: var(--j0in-accent);
+}
+
+.conf__nav-tile--look {
+  background: var(--j0in-purple);
+}
+
+.conf__nav-tile--time {
+  background: var(--j0in-warning);
+}
+
+.conf__nav-tile--focus {
+  background: var(--j0in-success);
+}
+
+.conf__nav-tile--calendar {
+  background: var(--j0in-danger);
+}
+
+.conf__nav-tile--access {
+  background: var(--j0in-text-muted);
+}
+
+.conf__nav-tile--account {
+  background: var(--j0in-text);
+}
+
+@media (min-width: 900px) {
+  .conf__layout {
+    grid-template-columns: 272px minmax(0, 1fr);
+    align-items: start;
+  }
+
+  .conf__nav {
+    position: sticky;
+    top: calc(var(--j0in-shell-gap) + var(--j0in-top-height));
+    display: block;
+    padding: var(--j0in-space-sm);
+    border: var(--j0in-panel-border);
+    border-radius: var(--j0in-panel-radius);
+    background: var(--j0in-panel-bg);
+    -webkit-backdrop-filter: var(--j0in-panel-blur);
+    backdrop-filter: var(--j0in-panel-blur);
+    box-shadow: var(--j0in-panel-shadow);
+  }
+
+  .conf__block--away {
+    display: none;
   }
 }

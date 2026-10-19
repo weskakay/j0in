@@ -44,7 +44,7 @@
 }
 
 .look__side,
-.look__pane {
+.look__sheet {
   border: 1px solid var(--j0in-border);
 }
 
@@ -52,7 +52,7 @@
   flex: 0 0 28%;
 }
 
-.look__pane {
+.look__sheet {
   flex: 1;
 }
 
@@ -62,12 +62,12 @@
   background: var(--j0in-bg);
 
   .look__side,
-  .look__pane {
+  .look__sheet {
     border-width: 0 1px 0 0;
     background: var(--j0in-surface);
   }
 
-  .look__pane {
+  .look__sheet {
     background: transparent;
   }
 }
@@ -79,7 +79,7 @@
     var(--j0in-bg);
 
   .look__side,
-  .look__pane {
+  .look__sheet {
     border-radius: 10px;
     border-color: var(--j0in-sketch-edge);
     background: var(--j0in-sketch-surface);
