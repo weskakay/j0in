@@ -1,0 +1,88 @@
+@use "glass" as *;
+
+:host {
+  position: relative;
+  display: none;
+}
+
+.bell {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: var(--j0in-tap-target);
+  height: var(--j0in-tap-target);
+  border: 1px solid var(--j0in-border);
+  border-radius: var(--j0in-radius-pill);
+  background: var(--j0in-fill);
+
+  &:hover {
+    background: var(--j0in-fill-hover);
+  }
+}
+
+.bell__dot {
+  position: absolute;
+  top: 8px;
+  right: 9px;
+  width: 9px;
+  height: 9px;
+  border-radius: var(--j0in-radius-pill);
+  background: var(--j0in-danger);
+}
+
+.notices {
+  @include surface-thick;
+  position: absolute;
+  top: calc(var(--j0in-tap-target) + var(--j0in-space-sm));
+  right: 0;
+  z-index: 20;
+  width: 300px;
+  padding: var(--j0in-space-md);
+  border-radius: var(--j0in-radius-lg);
+  box-shadow: var(--j0in-panel-shadow), var(--j0in-shadow-md);
+}
+
+.notices__title {
+  margin-bottom: var(--j0in-space-sm);
+  font-weight: var(--j0in-fw-bold);
+}
+
+.notices__list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--j0in-space-xs);
+}
+
+.notices__row {
+  display: flex;
+  align-items: center;
+  gap: var(--j0in-space-sm);
+  min-height: var(--j0in-tap-target);
+}
+
+.notices__unread {
+  flex: 0 0 auto;
+  width: 8px;
+  height: 8px;
+  border-radius: var(--j0in-radius-pill);
+  background: var(--j0in-accent);
+}
+
+.notices__empty {
+  color: var(--j0in-text-muted);
+}
+
+.notices__link {
+  display: flex;
+  align-items: center;
+  min-height: var(--j0in-tap-target);
+  color: var(--j0in-accent-ink);
+  font-weight: var(--j0in-fw-bold);
+}
+
+/* On a phone the count sits on "more", where the settings are. */
+@media (min-width: 600px) {
+  :host {
+    display: block;
+  }
+}

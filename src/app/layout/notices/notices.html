@@ -1,0 +1,35 @@
+<button
+  class="bell"
+  type="button"
+  aria-controls="notices-list"
+  [attr.aria-expanded]="open()"
+  [attr.aria-label]="count() > 0 ? count() + ' ' + t().topbar.requests : t().topbar.noRequests"
+  (click)="toggle()"
+>
+  <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
+    <path d="M6 16V11a6 6 0 1 1 12 0v5l2 2H4zM10 21h4" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linejoin="round" stroke-linecap="round" />
+  </svg>
+  @if (count() > 0) {
+    <span class="bell__dot" aria-hidden="true"></span>
+  }
+</button>
+
+@if (open()) {
+  <div class="notices" id="notices-list">
+    <p class="notices__title">{{ t().notices.title }}</p>
+    <ul class="notices__list">
+      @for (request of requests(); track request.id) {
+        <li class="notices__row">
+          <span class="notices__unread" aria-hidden="true"></span>
+          <span class="notices__text"><strong>{{ request.name }}</strong> {{ t().notices.requested }}</span>
+        </li>
+      } @empty {
+        <li class="notices__empty">{{ t().notices.empty }}</li>
+      }
+    </ul>
+    <a class="notices__link" routerLink="/settings" [queryParams]="{ section: 'access' }" (click)="open.set(false)">
+      {{ t().notices.open }}
+    </a>
+  </div>
+}
