@@ -1,0 +1,80 @@
+<form class="form" [formGroup]="form" (ngSubmit)="save()" novalidate>
+  <label class="form__field">
+    <span class="form__label">{{ t().projects.name }}</span>
+    <input class="form__input" type="text" formControlName="name" autocomplete="off" />
+    <span class="form__hint" role="alert">
+      @if (form.controls.name.touched && form.controls.name.invalid) {
+        {{ t().projects.nameMissing }}
+      }
+    </span>
+  </label>
+
+  <app-color-picker [caption]="t().projects.color" [value]="color()" (picked)="color.set($event)" />
+
+  <fieldset class="form__field form__set">
+    <legend class="form__label">{{ t().projects.icon }}</legend>
+    <div class="form__icons" role="radiogroup" [attr.aria-label]="t().projects.icon">
+      @for (choice of icons; track choice.name) {
+        <button
+          class="form__icon"
+          type="button"
+          role="radio"
+          [class.form__icon--on]="icon() === choice.name"
+          [attr.aria-checked]="icon() === choice.name"
+          [attr.tabindex]="(icon() ?? icons[0].name) === choice.name ? 0 : -1"
+          [attr.data-icon]="choice.name"
+          [attr.aria-label]="t().projects.icons[choice.name]"
+          [style.--tile]="color()"
+          (click)="icon.set(choice.name)"
+          (keydown)="stepIcon($event)"
+        >
+          <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
+            <path [attr.d]="choice.path" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+        </button>
+      }
+    </div>
+  </fieldset>
+
+  <label class="form__field">
+    <span class="form__label">{{ t().projects.description }}</span>
+    <textarea class="form__input form__input--area" rows="3" formControlName="description"></textarea>
+    <span class="form__hint" role="alert">
+      @if (form.controls.description.touched && form.controls.description.invalid) {
+        {{ t().projects.descriptionTooLong }}
+      }
+    </span>
+  </label>
+
+  <div class="form__row">
+    <label class="form__field">
+      <span class="form__label">{{ t().projects.statusLabel }}</span>
+      <select class="form__input" formControlName="status">
+        @for (state of states; track state) {
+          <option [value]="state">{{ t().projects.status[state] }}</option>
+        }
+      </select>
+    </label>
+    <label class="form__field">
+      <span class="form__label">{{ t().projects.dueDate }}</span>
+      <input class="form__input" type="date" formControlName="dueDate" />
+    </label>
+  </div>
+
+  @if (problem(); as message) {
+    <p class="form__problem" role="alert">{{ message }}</p>
+  }
+
+  <footer class="form__actions">
+    @if (project(); as current) {
+      <button class="form__btn form__btn--danger" type="button" (click)="remove()">
+        {{ confirming() ? current.name + ' ' + t().projects.confirmRemove : t().projects.remove }}
+      </button>
+    }
+    <button class="form__btn" type="button" (click)="cancelled.emit()">{{ t().common.cancel }}</button>
+    <button class="form__btn form__btn--primary" type="submit" [disabled]="saving() || form.invalid">
+      {{ saveLabel() }}
+    </button>
+  </footer>
+</form>
