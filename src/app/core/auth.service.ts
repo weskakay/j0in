@@ -1,5 +1,7 @@
 import { Injectable, computed, inject, signal } from '@angular/core';
 import { Observable, tap } from 'rxjs';
+import { Router } from '@angular/router';
+import { BoardStore } from './board.store';
 import { ApiService } from './api.service';
 import type { User } from '../data/models';
 import { LanguageService } from './language.service';
@@ -26,6 +28,8 @@ interface SignInInput {
 export class AuthService {
   private readonly api = inject(ApiService);
   private readonly language = inject(LanguageService);
+  private readonly board = inject(BoardStore);
+  private readonly router = inject(Router);
   private readonly currentUser = signal<User | null>(null);
   private readonly checked = signal(false);
 
@@ -77,6 +81,16 @@ export class AuthService {
   /** Ends the session on the server and forgets the user here. */
   signOut(): Observable<unknown> {
     return this.api.post('/auth/logout').pipe(tap(() => this.currentUser.set(null)));
+  }
+
+  /**
+   * Signs out from anywhere in the app: drops the cached board, so the next
+   * account never sees this one's, and returns to the sign-in screen.
+   */
+  leave(): void {
+    this.board.clear();
+    const toLogin = () => void this.router.navigate(['/login']);
+    this.signOut().subscribe({ next: toLogin, error: toLogin });
   }
 
   /** The API answers with an empty object when nobody is signed in. */

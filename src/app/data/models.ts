@@ -75,6 +75,8 @@ export interface TimeEntry {
   running: boolean;
   /** Seconds booked; for a running entry, the seconds up to the moment the board was read. */
   seconds: number;
+  /** Focus length in minutes; the run ends on its own once it is reached. Null runs open-ended. */
+  target: number | null;
 }
 
 /** What the time form collects, for booking by hand as well as for editing. */
@@ -113,6 +115,10 @@ export interface Task {
   subtasks: Subtask[];
   contactIds: string[];
   timeEntries: TimeEntry[];
+  /** When the card reached the last column, as the server writes it; null while open. */
+  doneAt: string | null;
+  /** How long the card is expected to take, in minutes. */
+  estimateMinutes: number | null;
 }
 
 /** A subtask on its way to the server, before it has an id. */
@@ -131,6 +137,7 @@ export interface TaskInput {
   priority: Priority;
   contactIds: string[];
   subtasks: SubtaskInput[];
+  estimateMinutes: number | null;
 }
 
 /** Everything the board screen needs, delivered in one call. */

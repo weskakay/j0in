@@ -1,7 +1,9 @@
 import type { Dictionary } from './types';
+import { EN_SCREENS } from './screens.en';
 
 /** English wording. */
 export const EN: Dictionary = {
+  ...EN_SCREENS,
   common: {
     save: 'Save',
     cancel: 'Cancel',
@@ -14,7 +16,9 @@ export const EN: Dictionary = {
   },
   nav: {
     label: 'Main navigation',
-    summary: 'Overview',
+    home: 'Home',
+    insights: 'Insights',
+    categories: 'Categories',
     board: 'Board',
     contacts: 'Contacts',
     settings: 'Settings',
@@ -54,7 +58,6 @@ export const EN: Dictionary = {
     privacy: 'Privacy',
   },
   board: {
-    search: 'Search a task',
     addColumn: 'Add a column',
     columnName: 'Name of the column',
     columnWidth: 'Drag the column width',
@@ -96,7 +99,6 @@ export const EN: Dictionary = {
     medium: 'Medium',
     low: 'Low',
     assignTo: 'Assign to',
-    assignedTo: 'Assigned to',
     subtasks: 'Subtasks',
     subtaskAdd: 'Add a subtask',
     subtaskPlaceholder: 'What needs doing?',
@@ -108,20 +110,6 @@ export const EN: Dictionary = {
     morning: 'Good morning',
     day: 'Good afternoon',
     evening: 'Good evening',
-    sub: 'This is what is on',
-    subFallback: 'your board',
-    empty: 'No tasks yet. On the',
-    emptyLink: 'board',
-    urgentOne: 'urgent task',
-    urgentMany: 'urgent tasks',
-    nextDue: 'next deadline on',
-    noDue: 'no deadline set',
-    overdueOne: 'deadline passed',
-    overdueMany: 'deadlines passed',
-    totalOne: 'task in total',
-    totalMany: 'tasks in total',
-    subtasksDone: 'subtasks done',
-    breakdown: 'Breakdown',
     byColumn: 'Spread across the columns',
     byPriority: 'Priorities',
     byDeadline: 'Deadlines',
@@ -318,12 +306,14 @@ export const EN: Dictionary = {
     'session.no_board': 'There is no board for this account',
     'session.signed_out': 'You are no longer signed in',
     'subtask.not_found': 'That subtask no longer exists',
+    'task.bad_estimate': 'The estimate has to be between 0 and 100 hours',
     'task.bad_priority': 'That priority is unknown',
     'task.due_required': 'A task needs a due date',
     'task.not_found': 'That task no longer exists',
     'task.title_required': 'A task needs a title',
     'phase.name_required': 'A phase needs a name of 60 characters at most',
     'phase.not_found': 'That phase no longer exists',
+    'time.bad_target': 'Focus runs for 15, 25 or 50 minutes',
     'time.minutes_invalid': 'The duration must lie between 1 minute and 24 hours',
     'time.not_found': 'That time entry no longer exists',
     'time.note_too_long': 'The note can be 200 characters at most',

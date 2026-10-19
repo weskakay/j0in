@@ -89,11 +89,6 @@ export class BoardStore {
     }));
   });
 
-  /** A search is running and not a single card matches it. */
-  readonly noMatches = computed(
-    () => this.query() !== '' && this.board().every((entry) => entry.tasks.length === 0),
-  );
-
   /** Fetches the board; call it when a screen that needs it opens. */
   load(): void {
     this.loading.set(true);

@@ -104,3 +104,13 @@ export function pickPhase(phases: TimePhase[], ...wishes: (string | null)[]): st
   const known = (id: string | null): boolean => phases.some((phase) => phase.id === id);
   return wishes.find(known) ?? phases[0]?.id ?? null;
 }
+
+/** The locale dates and numbers are written in for a language. */
+export function localeOf(lang: Lang): string {
+  return lang === 'de' ? 'de-DE' : 'en-GB';
+}
+
+/** Seconds as hours with at most one decimal, written the way the language does: 2,5 or 2.5. */
+export function hoursIn(seconds: number, lang: Lang): string {
+  return new Intl.NumberFormat(localeOf(lang), { maximumFractionDigits: 1 }).format(seconds / 3600);
+}

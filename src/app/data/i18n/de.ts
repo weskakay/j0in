@@ -1,7 +1,9 @@
 import type { Dictionary } from './types';
+import { DE_SCREENS } from './screens.de';
 
 /** German wording, the language the board was built in. */
 export const DE: Dictionary = {
+  ...DE_SCREENS,
   common: {
     save: 'Speichern',
     cancel: 'Abbrechen',
@@ -14,7 +16,9 @@ export const DE: Dictionary = {
   },
   nav: {
     label: 'Hauptnavigation',
-    summary: 'Übersicht',
+    home: 'Start',
+    insights: 'Auswertung',
+    categories: 'Kategorien',
     board: 'Board',
     contacts: 'Kontakte',
     settings: 'Einstellungen',
@@ -55,7 +59,6 @@ export const DE: Dictionary = {
     privacy: 'Datenschutz',
   },
   board: {
-    search: 'Aufgabe suchen',
     addColumn: 'Spalte hinzufügen',
     columnName: 'Name der Spalte',
     columnWidth: 'Spaltenbreite ziehen',
@@ -97,7 +100,6 @@ export const DE: Dictionary = {
     medium: 'Mittel',
     low: 'Niedrig',
     assignTo: 'Zuweisen an',
-    assignedTo: 'Zugewiesen an',
     subtasks: 'Teilaufgaben',
     subtaskAdd: 'Teilaufgabe hinzufügen',
     subtaskPlaceholder: 'Was ist zu tun?',
@@ -109,20 +111,6 @@ export const DE: Dictionary = {
     morning: 'Guten Morgen',
     day: 'Guten Tag',
     evening: 'Guten Abend',
-    sub: 'Das steht heute auf',
-    subFallback: 'deinem Board',
-    empty: 'Noch keine Aufgaben. Auf dem',
-    emptyLink: 'Board',
-    urgentOne: 'dringende Aufgabe',
-    urgentMany: 'dringende Aufgaben',
-    nextDue: 'nächste Frist am',
-    noDue: 'keine Frist gesetzt',
-    overdueOne: 'Frist überschritten',
-    overdueMany: 'Fristen überschritten',
-    totalOne: 'Aufgabe insgesamt',
-    totalMany: 'Aufgaben insgesamt',
-    subtasksDone: 'Teilaufgaben erledigt',
-    breakdown: 'Auswertung',
     byColumn: 'Verteilung auf die Spalten',
     byPriority: 'Prioritäten',
     byDeadline: 'Fristen',
@@ -319,12 +307,14 @@ export const DE: Dictionary = {
     'session.no_board': 'Zu diesem Konto gehört kein Board',
     'session.signed_out': 'Du bist nicht mehr angemeldet',
     'subtask.not_found': 'Diese Teilaufgabe gibt es nicht mehr',
+    'task.bad_estimate': 'Die Schätzung muss zwischen 0 und 100 Stunden liegen',
     'task.bad_priority': 'Diese Priorität kennen wir nicht',
     'task.due_required': 'Die Aufgabe braucht eine Frist',
     'task.not_found': 'Diese Aufgabe gibt es nicht mehr',
     'task.title_required': 'Die Aufgabe braucht einen Titel',
     'phase.name_required': 'Die Phase braucht einen Namen mit höchstens 60 Zeichen',
     'phase.not_found': 'Diese Phase gibt es nicht mehr',
+    'time.bad_target': 'Fokus geht mit 15, 25 oder 50 Minuten',
     'time.minutes_invalid': 'Die Dauer muss zwischen 1 Minute und 24 Stunden liegen',
     'time.not_found': 'Diesen Zeiteintrag gibt es nicht mehr',
     'time.note_too_long': 'Die Notiz darf höchstens 200 Zeichen lang sein',

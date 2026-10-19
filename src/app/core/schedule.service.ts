@@ -94,6 +94,7 @@ function newCard(columnId: string, title: string, date: string): TaskInput {
     priority: 'medium',
     contactIds: [],
     subtasks: [],
+    estimateMinutes: null,
   };
 }
 

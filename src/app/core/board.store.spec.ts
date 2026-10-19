@@ -22,12 +22,12 @@ const BOARD: BoardData = {
     {
       id: 't1', columnId: 'c1', categoryId: 'k1', title: 'Dach decken',
       description: 'Ziegel bestellen', dueDate: '2026-09-01', priority: 'urgent',
-      position: 1, subtasks: [], contactIds: [], timeEntries: [],
+      position: 1, subtasks: [], contactIds: [], timeEntries: [], doneAt: null, estimateMinutes: null,
     },
     {
       id: 't2', columnId: 'c2', categoryId: null, title: 'Keller räumen',
       description: null, dueDate: null, priority: 'low',
-      position: 1, subtasks: [], contactIds: [], timeEntries: [],
+      position: 1, subtasks: [], contactIds: [], timeEntries: [], doneAt: null, estimateMinutes: null,
     },
   ],
 };
@@ -94,20 +94,6 @@ describe('BoardStore', () => {
 
     store.setSearch('  ');
     expect(store.tasks().length).toBe(2);
-  });
-
-  it('meldet nur dann keinen Treffer, wenn wirklich gesucht wurde', () => {
-    deliverBoard();
-    expect(store.noMatches()).toBe(false);
-
-    store.setSearch('dach');
-    expect(store.noMatches()).toBe(false);
-
-    store.setSearch('gibt es nicht');
-    expect(store.noMatches()).toBe(true);
-
-    store.setSearch('   ');
-    expect(store.noMatches()).toBe(false);
   });
 
   it('lässt die Spalten stehen, auch wenn keine Karte passt', () => {

@@ -1,3 +1,5 @@
+import type { ScreenTexts } from './screens';
+
 /** The two languages the interface is offered in. */
 export type Lang = 'de' | 'en';
 
@@ -35,12 +37,14 @@ export type ErrorCode =
   | 'session.no_board'
   | 'session.signed_out'
   | 'subtask.not_found'
+  | 'task.bad_estimate'
   | 'task.bad_priority'
   | 'task.due_required'
   | 'task.not_found'
   | 'task.title_required'
   | 'phase.name_required'
   | 'phase.not_found'
+  | 'time.bad_target'
   | 'time.minutes_invalid'
   | 'time.not_found'
   | 'time.note_too_long'
@@ -48,7 +52,7 @@ export type ErrorCode =
   | 'network.unknown';
 
 /** Every piece of text the interface shows, in one shape per language. */
-export interface Dictionary {
+export interface Dictionary extends ScreenTexts {
   common: {
     save: string;
     cancel: string;
@@ -61,7 +65,9 @@ export interface Dictionary {
   };
   nav: {
     label: string;
-    summary: string;
+    home: string;
+    insights: string;
+    categories: string;
     board: string;
     contacts: string;
     settings: string;
@@ -100,7 +106,6 @@ export interface Dictionary {
     privacy: string;
   };
   board: {
-    search: string;
     addColumn: string;
     columnName: string;
     columnWidth: string;
@@ -142,7 +147,6 @@ export interface Dictionary {
     medium: string;
     low: string;
     assignTo: string;
-    assignedTo: string;
     subtasks: string;
     subtaskAdd: string;
     subtaskPlaceholder: string;
@@ -154,20 +158,6 @@ export interface Dictionary {
     morning: string;
     day: string;
     evening: string;
-    sub: string;
-    subFallback: string;
-    empty: string;
-    emptyLink: string;
-    urgentOne: string;
-    urgentMany: string;
-    nextDue: string;
-    noDue: string;
-    overdueOne: string;
-    overdueMany: string;
-    totalOne: string;
-    totalMany: string;
-    subtasksDone: string;
-    breakdown: string;
     byColumn: string;
     byPriority: string;
     byDeadline: string;

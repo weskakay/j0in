@@ -2,8 +2,11 @@ import { Injectable, computed, effect, inject, signal } from '@angular/core';
 import { type Observable, tap } from 'rxjs';
 import type { Task, TimeEntry, TimeEntryInput } from '../data/models';
 import { lastPhaseId, pickPhase, taskSeconds } from '../data/format';
+import { focusLeft, focusShare, type FocusLength } from '../data/focus';
 import { ApiService } from './api.service';
 import { BoardStore } from './board.store';
+import { LanguageService } from './language.service';
+import { ToastService } from './toast.service';
 
 /** How often a running timer is redrawn. */
 const TICK = 1000;
@@ -23,8 +26,12 @@ export interface RunningTimer {
 export class TimeTracker {
   private readonly api = inject(ApiService);
   private readonly store = inject(BoardStore);
+  private readonly toasts = inject(ToastService);
+  private readonly language = inject(LanguageService);
   private readonly now = signal(Date.now());
   private readonly chosen = signal<string | null>(null);
+  /** The focus run already sent off as finished, so it is stopped only once. */
+  private finished: string | null = null;
 
   /** True while a start or stop is on its way, so a double tap sends only one. */
   readonly busy = signal(false);
@@ -44,6 +51,28 @@ export class TimeTracker {
   readonly nextPhaseId = computed(() =>
     pickPhase(this.store.phases(), this.chosen(), lastPhaseId(this.store.tasks())),
   );
+
+  /** Seconds left of a running focus, or null when none runs or it is open-ended. */
+  readonly left = computed(() => {
+    const running = this.running();
+    return running ? focusLeft(running.entry, this.sinceRead()) : null;
+  });
+
+  /** How far the running timer has come, between 0 and 1, for the rings. */
+  readonly share = computed(() => {
+    const running = this.running();
+    return running ? focusShare(running.entry, this.sinceRead()) : 0;
+  });
+
+  /** Ends a focus run the moment its time is up, and says so. */
+  private readonly finishing = effect(() => {
+    const running = this.running();
+    if (running && this.left() === 0 && running.entry.id !== this.finished) {
+      this.finished = running.entry.id;
+      this.send(this.api.delete(`/tasks/${running.taskId}/timer`));
+      this.toasts.show(this.language.dict().pill.finished);
+    }
+  });
 
   /** Moves the clock on once a second, but only while a timer runs. */
   private readonly ticking = effect((onCleanup) => {
@@ -82,6 +111,26 @@ export class TimeTracker {
     this.send(this.api.post(`/tasks/${task.id}/timer`, { phaseId }));
   }
 
+  /**
+   * Starts a focus run of fixed length on a task. It is the same timer as on
+   * the card, only with an end: the server stops it there even with the tab
+   * closed, and the time lands on the card like any other entry.
+   */
+  startFocus(taskId: string, minutes: FocusLength): void {
+    const phaseId = this.nextPhaseId();
+    this.chosen.set(phaseId);
+    const started = this.language.dict().pill.started;
+    this.send(this.api.post(`/tasks/${taskId}/timer`, { phaseId, targetMinutes: minutes }), started);
+  }
+
+  /** Stops whatever runs on this board, used by the focus pill. */
+  stop(): void {
+    const running = this.running();
+    if (running) {
+      this.send(this.api.delete(`/tasks/${running.taskId}/timer`), this.language.dict().pill.stopped);
+    }
+  }
+
   /** Books time on a task by hand. */
   add(taskId: string, input: TimeEntryInput): Observable<unknown> {
     return this.api.post(`/tasks/${taskId}/time`, input).pipe(tap(() => this.store.refresh()));
@@ -97,11 +146,16 @@ export class TimeTracker {
     return this.api.delete(`/time/${entryId}`).pipe(tap(() => this.store.refresh()));
   }
 
-  /** Sends a start or stop and reads the board back once it went through. */
-  private send(request: Observable<unknown>): void {
+  /** Sends a start or stop, reads the board back and says so once it went through. */
+  private send(request: Observable<unknown>, done?: string): void {
     this.busy.set(true);
     request.subscribe({
-      next: () => this.settle(),
+      next: () => {
+        this.settle();
+        if (done) {
+          this.toasts.show(done);
+        }
+      },
       error: (failure: Error) => this.settle(failure),
     });
   }

@@ -20,6 +20,8 @@ const CARD: Task = {
   subtasks: [],
   contactIds: [],
   timeEntries: [],
+  doneAt: null,
+  estimateMinutes: null,
 };
 
 /** Signs a user in through the restore call, so the services see an account. */

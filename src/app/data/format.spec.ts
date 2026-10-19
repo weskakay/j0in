@@ -5,6 +5,7 @@ import {
   donePercent,
   dateIn,
   durationText,
+  hoursIn,
   initialsOf,
   lastPhaseId,
   pickPhase,
@@ -27,6 +28,8 @@ function task(parts: Partial<Task> = {}): Task {
     subtasks: [],
     contactIds: [],
     timeEntries: [],
+    doneAt: null,
+    estimateMinutes: null,
     ...parts,
   };
 }
@@ -120,6 +123,7 @@ function entry(parts: Partial<TimeEntry> = {}): TimeEntry {
     startedAt: '2026-09-17 09:00:00',
     running: false,
     seconds: 600,
+    target: null,
     ...parts,
   };
 }
@@ -189,5 +193,13 @@ describe('Phase für den nächsten Start', () => {
 
   it('antwortet ohne Phasen mit null', () => {
     expect(pickPhase([], 'ph1')).toBeNull();
+  });
+});
+
+describe('hoursIn', () => {
+  it('writes hours with one decimal in each language', () => {
+    expect(hoursIn(9000, 'de')).toBe('2,5');
+    expect(hoursIn(9000, 'en')).toBe('2.5');
+    expect(hoursIn(7200, 'de')).toBe('2');
   });
 });

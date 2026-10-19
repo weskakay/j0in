@@ -17,12 +17,18 @@ export class ThemeService {
   /** The current choice. */
   readonly theme = signal<Theme>(readTheme());
 
+  /** Whether the operating system asks for light, kept current while the app runs. */
+  private readonly systemLight = signal(prefersLight());
+
   /** The accent colour in use, or the empty string for the built-in one. */
   readonly accent = signal<string>(readAccent());
 
   constructor() {
     this.apply(this.theme());
     this.applyAccent(this.accent());
+    window.matchMedia?.('(prefers-color-scheme: light)').addEventListener?.('change', (event) =>
+      this.systemLight.set(event.matches),
+    );
   }
 
   /** Stores the choice and puts it on screen at once. */
@@ -30,6 +36,20 @@ export class ThemeService {
     this.theme.set(theme);
     this.apply(theme);
     save(THEME_KEY, theme);
+  }
+
+  /** Whether the screen ends up dark right now, whatever the choice behind it. */
+  isDark(): boolean {
+    const theme = this.theme();
+    if (theme !== 'system') {
+      return theme === 'dark';
+    }
+    return !this.systemLight();
+  }
+
+  /** Switches between light and dark, leaving the system setting behind. */
+  toggle(): void {
+    this.set(this.isDark() ? 'light' : 'dark');
   }
 
   /** Switches the accent colour; an empty value restores the built-in one. */
@@ -68,7 +88,12 @@ export class ThemeService {
  * one that could drift away from it.
  */
 function darker(color: string): string {
-  return `color-mix(in srgb, ${color} 82%, black)`;
+  return `color-mix(in srgb, ${color} 62%, black)`;
+}
+
+/** Whether the operating system asks for a light screen right now. */
+function prefersLight(): boolean {
+  return window.matchMedia?.('(prefers-color-scheme: light)').matches ?? false;
 }
 
 /** Reads the stored choice, falling back to following the system. */
