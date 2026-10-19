@@ -1,0 +1,77 @@
+<header class="page-head">
+  <div class="page-head__lead">
+    <h1 class="page-head__title">{{ t().projects.title }}</h1>
+    <p class="page-head__sub">
+      {{ stats().active }} {{ t().projects.activeWord }} · {{ stats().shipped }} {{ t().projects.shippedWord }}
+    </p>
+  </div>
+
+  <ul class="kpis page-head__stats">
+    <li class="kpi">
+      <span class="kpi__label">{{ t().projects.kpiActive }}</span>
+      <span class="kpi__value">{{ stats().active }}</span>
+    </li>
+    <li class="kpi">
+      <span class="kpi__label">{{ t().projects.kpiShipped }}</span>
+      <span class="kpi__value">{{ stats().shipped }}</span>
+    </li>
+    <li class="kpi">
+      <span class="kpi__label">{{ t().projects.kpiOnTrack }}</span>
+      <span class="kpi__value">{{ stats().onTrack }}<span class="kpi__unit"> %</span></span>
+    </li>
+    <li class="kpi">
+      <span class="kpi__label">{{ t().projects.kpiDueMonth }}</span>
+      <span class="kpi__value">{{ stats().dueMonth }}</span>
+    </li>
+  </ul>
+
+  <div class="page-head__actions">
+    <div class="segment projects__filter" role="group" [attr.aria-label]="t().projects.filterLabel">
+      @for (one of filters; track one) {
+        <button
+          class="segment__btn"
+          type="button"
+          [class.segment__btn--on]="filter() === one"
+          [attr.aria-pressed]="filter() === one"
+          (click)="filter.set(one)"
+        >
+          {{ label(one) }}
+        </button>
+      }
+    </div>
+    <button class="projects__new" type="button" (click)="editing.set(null)">
+      <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
+        <path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" />
+      </svg>
+      {{ t().projects.create }}
+    </button>
+  </div>
+</header>
+
+@if (loading() && !ready()) {
+  <app-loader [label]="t().common.loading" />
+}
+
+@if (ready()) {
+  <div class="projects__grid">
+    @for (row of rows(); track row.category.id) {
+      <app-project-card [row]="row" (pinned)="togglePin($event)" (edit)="editing.set($event)" />
+    } @empty {
+      <p class="projects__empty">{{ t().projects.empty }}</p>
+    }
+  </div>
+}
+
+@if (editing() !== undefined) {
+  @let current = editing();
+  <app-dialog [heading]="current ? t().projects.edit : t().projects.create" (closed)="close()">
+    <app-project-form
+      [project]="current ?? null"
+      [saving]="busy()"
+      [problem]="problem()"
+      (submitted)="save($event)"
+      (removed)="remove()"
+      (cancelled)="close()"
+    />
+  </app-dialog>
+}

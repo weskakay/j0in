@@ -1,0 +1,33 @@
+/* Many states: the switch scrolls sideways on a phone instead of wrapping. */
+.projects__filter {
+  max-width: 100%;
+  overflow-x: auto;
+}
+
+.projects__new {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--j0in-space-sm);
+  min-height: var(--j0in-tap-target);
+  padding: 0 var(--j0in-space-md);
+  border-radius: var(--j0in-radius-pill);
+  background: var(--j0in-accent-strong);
+  box-shadow: var(--j0in-glow);
+  color: var(--j0in-text-on-color);
+  font-weight: var(--j0in-fw-bold);
+  white-space: nowrap;
+
+  &:hover {
+    background: var(--j0in-accent-hover);
+  }
+}
+
+.projects__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 360px), 1fr));
+  gap: var(--j0in-space-md);
+}
+
+.projects__empty {
+  color: var(--j0in-text-muted);
+}
