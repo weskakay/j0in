@@ -137,17 +137,13 @@
     text-decoration: none;
   }
 
+  /* The same mark as the browser tab, so the app and its tab look alike. */
   .side__logo {
-    display: grid;
     flex: 0 0 auto;
-    place-items: center;
     width: 40px;
     height: 40px;
     border-radius: var(--j0in-radius-md);
-    background: linear-gradient(140deg, var(--j0in-accent), var(--j0in-accent-hover));
     box-shadow: var(--j0in-glow);
-    color: var(--j0in-text-on-color);
-    font-weight: var(--j0in-fw-bold);
   }
 
   .side__name {

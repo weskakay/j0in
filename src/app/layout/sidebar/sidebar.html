@@ -1,7 +1,7 @@
 <nav class="side" appSheen [class.side--folded]="folded()" [attr.aria-label]="t().nav.label">
   <div class="side__top">
-    <a class="side__brand" routerLink="/home">
-      <span class="side__logo" aria-hidden="true">J0</span>
+    <a class="side__brand" routerLink="/home" [attr.aria-label]="folded() ? 'J0IN' : null">
+      <img class="side__logo" src="favicon.svg" alt="" width="40" height="40" />
       <span class="side__name">J<span class="side__zero">0</span>IN</span>
     </a>
     @if (!autoFolded()) {
