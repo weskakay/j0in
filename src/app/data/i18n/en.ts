@@ -141,6 +141,10 @@ export const EN: Dictionary = {
     cardStack: 'Cards as a stack',
     cardStackNote:
       'Columns holding more than three cards show one card large, its neighbours peeking out above and below. Switched off the full list is back. Applies to this device only.',
+    swipeColumns: 'Swipe columns on a phone',
+    swipeColumnsNote:
+      'On a phone each column fills the screen and the next one is a swipe away. Switched off all columns stand below each other. Applies to this device only.',
+    columnDot: 'Go to column',
     timeTracking: 'Track time on the cards',
     timeTrackingNote:
       'A button on every card starts the timer, and inside the card time can be added by hand. Applies to the whole board. Switched off, all booked time is kept.',
@@ -151,7 +155,8 @@ export const EN: Dictionary = {
     appearanceNote: 'Applies to this device only and is kept for your next visit.',
     accent: 'Accent colour',
     accentNote:
-      'Colours the navigation, the buttons and the charts. Tapping the same colour again brings the built-in one back.',
+      'Colours the navigation, the buttons and the charts. The colour wheel opens a colour of your own, and the text stays readable. Tapping the same colour again brings the built-in one back.',
+    accentCustom: 'Colour of your own',
     system: 'Follow the system',
     systemNote: 'follows what your device is set to',
     light: 'Light',

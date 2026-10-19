@@ -1,10 +1,21 @@
 import { Injectable, signal } from '@angular/core';
+import { accentShades, isHexColor } from '../data/accent';
 import { isKnownSwatch } from '../data/palette';
 
 /** What the visitor picked: follow the system, or a fixed choice. */
 export type Theme = 'system' | 'light' | 'dark';
 
 const THEME_KEY = 'j0in-theme';
+
+/** Everything an accent may set on the document, cleared before each change. */
+const ACCENT_PROPERTIES = [
+  '--j0in-accent',
+  '--j0in-accent-strong',
+  '--j0in-accent-hover',
+  '--j0in-on-accent',
+  '--j0in-accent-ink-dark',
+  '--j0in-accent-ink-light',
+];
 const ACCENT_KEY = 'j0in-accent';
 
 /**
@@ -59,16 +70,23 @@ export class ThemeService {
     save(ACCENT_KEY, color);
   }
 
-  /** Writes the accent onto the document, or removes the override. */
+  /**
+   * Writes the accent onto the document, or removes the override. A colour of
+   * our own keeps the shades the stylesheet derives; one picked freely brings
+   * its own, worked out so labels and links stay readable.
+   */
   private applyAccent(color: string): void {
-    const root = document.documentElement;
+    const style = document.documentElement.style;
+    ACCENT_PROPERTIES.forEach((property) => style.removeProperty(property));
     if (color === '') {
-      root.style.removeProperty('--j0in-accent');
-      root.style.removeProperty('--j0in-accent-hover');
       return;
     }
-    root.style.setProperty('--j0in-accent', color);
-    root.style.setProperty('--j0in-accent-hover', darker(color));
+    style.setProperty('--j0in-accent', color);
+    if (isKnownSwatch(color)) {
+      style.setProperty('--j0in-accent-hover', darker(color));
+      return;
+    }
+    applyShades(style, color);
   }
 
   /** Writes the choice onto the document, or removes it to follow the system. */
@@ -80,6 +98,16 @@ export class ThemeService {
     }
     root.setAttribute('data-theme', theme);
   }
+}
+
+/** Sets the readable shades of a freely picked accent. */
+function applyShades(style: CSSStyleDeclaration, color: string): void {
+  const shades = accentShades(color);
+  style.setProperty('--j0in-accent-strong', shades.strong);
+  style.setProperty('--j0in-accent-hover', shades.hover);
+  style.setProperty('--j0in-on-accent', shades.onAccent);
+  style.setProperty('--j0in-accent-ink-dark', shades.inkDark);
+  style.setProperty('--j0in-accent-ink-light', shades.inkLight);
 }
 
 /**
@@ -102,10 +130,10 @@ function readTheme(): Theme {
   return stored === 'light' || stored === 'dark' ? stored : 'system';
 }
 
-/** Reads the stored accent, but only if it is a colour this app offers. */
+/** Reads the stored accent, but only if it is a plain #rrggbb colour. */
 function readAccent(): string {
   const stored = read(ACCENT_KEY);
-  return isKnownSwatch(stored) ? stored : '';
+  return isHexColor(stored) ? stored : '';
 }
 
 /** Reads one value, treating a browser that refuses as an empty one. */

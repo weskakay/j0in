@@ -59,9 +59,20 @@ describe('ThemeService', () => {
     expect(document.documentElement.style.getPropertyValue('--j0in-accent')).toBe('');
   });
 
-  it('übernimmt keine gespeicherte Farbe, die es nicht anbietet', () => {
-    localStorage.setItem('j0in-accent', '#123456');
+  it('übernimmt nur gespeicherte Farben in der Form #rrggbb', () => {
+    localStorage.setItem('j0in-accent', 'url(x)');
     expect(make().accent()).toBe('');
+    localStorage.setItem('j0in-accent', '#123456');
+    expect(make().accent()).toBe('#123456');
+  });
+
+  it('gibt einer frei gewählten hellen Farbe dunkle Schrift auf Knöpfen', () => {
+    const themes = make();
+    themes.setAccent('#ffee00');
+    const root = document.documentElement.style;
+    expect(root.getPropertyValue('--j0in-on-accent')).toBe('rgb(13 22 32)');
+    themes.setAccent('');
+    expect(root.getPropertyValue('--j0in-on-accent')).toBe('');
   });
 
   it('ignoriert einen unbekannten gespeicherten Wert für das Aussehen', () => {

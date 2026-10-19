@@ -195,6 +195,9 @@ export interface Dictionary extends ScreenTexts, PageTexts {
     off: string;
     cardStack: string;
     cardStackNote: string;
+    swipeColumns: string;
+    swipeColumnsNote: string;
+    columnDot: string;
     timeTracking: string;
     timeTrackingNote: string;
   };
@@ -204,6 +207,7 @@ export interface Dictionary extends ScreenTexts, PageTexts {
     appearanceNote: string;
     accent: string;
     accentNote: string;
+    accentCustom: string;
     system: string;
     systemNote: string;
     light: string;

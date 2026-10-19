@@ -142,6 +142,10 @@ export const DE: Dictionary = {
     cardStack: 'Karten als Stapel',
     cardStackNote:
       'Spalten mit mehr als drei Karten zeigen eine Karte groß, die Nachbarn schauen darunter und darüber hervor. Abgeschaltet steht wieder die volle Liste da. Gilt nur auf diesem Gerät.',
+    swipeColumns: 'Spalten am Handy wischen',
+    swipeColumnsNote:
+      'Auf dem Handy steht eine Spalte pro Bildschirm, die nächste kommt mit einem Wisch zur Seite. Abgeschaltet stehen alle Spalten untereinander. Gilt nur auf diesem Gerät.',
+    columnDot: 'Zur Spalte',
     timeTracking: 'Zeit auf den Karten messen',
     timeTrackingNote:
       'Ein Knopf auf jeder Karte startet den Timer, in der Karte selbst lässt sich Zeit nachtragen. Gilt für das ganze Board. Abgeschaltet bleiben alle gebuchten Zeiten erhalten.',
@@ -152,7 +156,8 @@ export const DE: Dictionary = {
     appearanceNote: 'Gilt nur auf diesem Gerät und bleibt beim nächsten Besuch erhalten.',
     accent: 'Akzentfarbe',
     accentNote:
-      'Färbt Navigation, Knöpfe und Diagramme. Noch einmal auf dieselbe Farbe tippen stellt die Standardfarbe wieder her.',
+      'Färbt Navigation, Knöpfe und Diagramme. Der Farbkreis öffnet eine eigene Farbe, die Schrift bleibt dabei lesbar. Noch einmal auf dieselbe Farbe tippen stellt die Standardfarbe wieder her.',
+    accentCustom: 'Eigene Farbe',
     system: 'Wie das System',
     systemNote: 'folgt der Einstellung deines Geräts',
     light: 'Hell',

@@ -9,8 +9,9 @@ export interface Swatch {
  *
  * These are values, not styling: they are stored in the database on the
  * category and in the browser for the accent, so they live with the data and
- * not in a stylesheet. Fixed choices rather than a free picker, because every
- * one of them has been checked against both themes.
+ * not in a stylesheet. Every one of them has been checked against both
+ * themes; the accent may also take a free colour, whose shades are then
+ * worked out in data/accent.ts.
  */
 export const SWATCHES: Swatch[] = [
   { label: 'Blau', value: '#29abe2' },

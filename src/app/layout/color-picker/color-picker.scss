@@ -33,3 +33,31 @@
 .swatches__item--on {
   box-shadow: 0 0 0 2px var(--j0in-surface), 0 0 0 4px var(--j0in-text);
 }
+
+/* The free choice shows the whole colour wheel until a colour is picked,
+   then that colour. The real input lies over it, invisible but focusable. */
+.swatches__custom {
+  display: block;
+  background-clip: border-box;
+  background-image: conic-gradient(red, yellow, lime, aqua, blue, magenta, red);
+  cursor: pointer;
+
+  &:has(:focus-visible) {
+    outline: 2px solid var(--j0in-accent-ink);
+    outline-offset: 2px;
+  }
+}
+
+.swatches__custom--set {
+  background-image: none;
+  background-color: var(--custom);
+}
+
+.swatches__input {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  cursor: pointer;
+}

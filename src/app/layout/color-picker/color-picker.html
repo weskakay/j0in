@@ -12,5 +12,21 @@
         (click)="picked.emit(swatch.value)"
       ></button>
     }
+    @if (customLabel()) {
+      <label
+        class="swatches__item swatches__custom"
+        [class.swatches__item--on]="custom()"
+        [class.swatches__custom--set]="custom()"
+        [style.--custom]="custom() ? value() : null"
+      >
+        <input
+          class="swatches__input"
+          type="color"
+          [value]="customStart()"
+          [attr.aria-label]="custom() ? customLabel() + ': ' + value() : customLabel()"
+          (change)="pickCustom($event)"
+        />
+      </label>
+    }
   </span>
 </fieldset>

@@ -46,6 +46,7 @@
       <app-color-picker
         [caption]="t().settings.accent"
         [value]="accent()"
+        [customLabel]="t().settings.accentCustom"
         (picked)="pickAccent($event)"
       />
       <p class="conf__note">{{ t().settings.accentNote }}</p>
@@ -73,6 +74,13 @@
         [on]="features.cardStack()"
         [states]="[t().features.on, t().features.off]"
         (toggled)="features.toggleCardStack()"
+      />
+      <app-switch
+        [label]="t().features.swipeColumns"
+        [note]="t().features.swipeColumnsNote"
+        [on]="features.swipeColumns()"
+        [states]="[t().features.on, t().features.off]"
+        (toggled)="features.toggleSwipeColumns()"
       />
     </section>
 
