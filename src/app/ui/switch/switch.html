@@ -1,0 +1,19 @@
+<button
+  class="switch__btn"
+  type="button"
+  role="switch"
+  [attr.aria-checked]="on()"
+  [disabled]="disabled()"
+  (click)="toggled.emit()"
+>
+  <span class="switch__track" [class.switch__track--on]="on()" aria-hidden="true">
+    <span class="switch__knob"></span>
+  </span>
+  <span class="switch__text">
+    <span class="switch__label">{{ label() }}</span>
+    @if (note()) {
+      <span class="switch__note">{{ note() }}</span>
+    }
+  </span>
+  <span class="switch__state">{{ on() ? states()[0] : states()[1] }}</span>
+</button>

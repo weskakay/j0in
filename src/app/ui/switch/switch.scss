@@ -1,0 +1,102 @@
+:host {
+  display: block;
+}
+
+/* Narrow screens give the text its own row, or it ends up in a tiny column. */
+.switch__btn {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  grid-template-areas:
+    'track state'
+    'text text';
+  align-items: start;
+  gap: var(--j0in-space-sm) var(--j0in-space-md);
+  width: 100%;
+  padding: var(--j0in-space-md);
+  border: 1px solid var(--j0in-border);
+  border-radius: var(--j0in-radius-md);
+  background: var(--j0in-fill);
+  color: inherit;
+  text-align: left;
+  transition: border-color var(--j0in-transition);
+
+  &:hover,
+  &:focus-visible {
+    border-color: var(--j0in-accent-ink);
+  }
+}
+
+/* Track height and inset drive the knob, so the two cannot drift apart. */
+.switch__track {
+  position: relative;
+  grid-area: track;
+  width: var(--switch-width);
+  height: var(--switch-height);
+  margin-top: 2px;
+  border-radius: var(--j0in-radius-pill);
+  background: var(--j0in-fill-hover);
+  transition: background var(--j0in-transition);
+  --switch-height: 26px;
+  --switch-width: 44px;
+  --switch-inset: 3px;
+  --switch-knob: calc(var(--switch-height) - 2 * var(--switch-inset));
+}
+
+.switch__track--on {
+  background: var(--j0in-accent-strong);
+}
+
+.switch__knob {
+  position: absolute;
+  top: var(--switch-inset);
+  left: var(--switch-inset);
+  width: var(--switch-knob);
+  height: var(--switch-knob);
+  border-radius: 50%;
+  background: var(--j0in-text-on-color);
+  box-shadow: var(--j0in-shadow-sm);
+  transition: transform var(--j0in-transition);
+}
+
+.switch__track--on .switch__knob {
+  transform: translateX(calc(var(--switch-width) - var(--switch-knob) - 2 * var(--switch-inset)));
+}
+
+.switch__text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  grid-area: text;
+  min-width: 0;
+}
+
+.switch__label {
+  font-weight: var(--j0in-fw-bold);
+}
+
+.switch__note {
+  color: var(--j0in-text-muted);
+  font-size: var(--j0in-fs-body);
+}
+
+.switch__state {
+  grid-area: state;
+  justify-self: end;
+  color: var(--j0in-text-muted);
+  font-size: var(--j0in-fs-body);
+}
+
+/* Wide enough for the three in a row, the way they were drawn. */
+@media (min-width: 30rem) {
+  .switch__btn {
+    grid-template-columns: auto 1fr auto;
+    grid-template-areas: 'track text state';
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .switch__track,
+  .switch__knob {
+    transition: none;
+  }
+}
