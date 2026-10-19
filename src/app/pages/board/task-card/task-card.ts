@@ -5,8 +5,10 @@ import {
   clockText,
   doneCount,
   donePercent,
+  dateIn,
   durationText,
   initialsOf,
+  today,
 } from '../../../data/format';
 import { LanguageService } from '../../../core/language.service';
 import { TimeTracker } from '../../../core/time-tracker.service';
@@ -47,6 +49,9 @@ export class TaskCard {
    */
   readonly preview = input(false);
 
+  /** True for a card in the last column, which is never overdue. */
+  readonly finished = input(false);
+
   /** Fires when the card is activated by click or keyboard. */
   readonly open = output<Task>();
 
@@ -74,6 +79,21 @@ export class TaskCard {
   /** A ticking clock while the timer runs, the plain total otherwise. */
   protected readonly timeLabel = computed(() =>
     this.running() ? clockText(this.seconds()) : durationText(this.seconds()),
+  );
+
+  /** Overdue, due today or later, for the colour of the date. */
+  protected readonly dueState = computed(() => {
+    const due = this.task().dueDate ?? '';
+    const day = today();
+    if (due === '' || this.finished()) {
+      return 'later';
+    }
+    return due < day ? 'late' : due === day ? 'today' : 'later';
+  });
+
+  /** The due date, or the word for today when it is today. */
+  protected readonly dueText = computed(() =>
+    this.dueState() === 'today' ? this.t().summary.today : dateIn(this.task().dueDate, this.language.lang()),
   );
 
   /** Letters for one assignee's avatar. */

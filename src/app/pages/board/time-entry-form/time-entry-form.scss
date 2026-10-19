@@ -43,7 +43,7 @@
    fields below it down. */
 .entry__hint {
   min-height: 1.5em;
-  color: var(--j0in-danger);
+  color: var(--j0in-danger-ink);
   font-size: var(--j0in-fs-body);
 }
 
@@ -63,8 +63,8 @@
 }
 
 .entry__btn--primary {
-  border-color: var(--j0in-accent);
-  background: var(--j0in-accent);
+  border-color: var(--j0in-accent-ink);
+  background: var(--j0in-accent-strong);
   color: var(--j0in-text-on-color);
 
   &:hover {

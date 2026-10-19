@@ -4,6 +4,9 @@ import type { Category, Column, Contact, SubtaskInput, Task, TaskInput } from '.
 import { initialsOf } from '../../../data/format';
 import { LanguageService } from '../../../core/language.service';
 
+/** The longest estimate the server accepts, in hours. */
+const MAX_HOURS = 100;
+
 /** Collects everything a task needs, for creating as well as editing. */
 @Component({
   selector: 'app-task-form',
@@ -56,6 +59,7 @@ export class TaskForm implements OnInit {
     description: [''],
     dueDate: ['', Validators.required],
     priority: ['medium', Validators.required],
+    estimate: ['', [Validators.min(0), Validators.max(MAX_HOURS)]],
   });
 
   /** Text of the button that saves, which differs between the two uses. */
@@ -122,6 +126,7 @@ export class TaskForm implements OnInit {
       priority: value.priority as TaskInput['priority'],
       contactIds: this.picked(),
       subtasks: this.subtasks().filter((s) => s.title.trim() !== ''),
+      estimateMinutes: minutesFrom(value.estimate),
     };
   }
 
@@ -135,8 +140,22 @@ export class TaskForm implements OnInit {
       description: task?.description ?? '',
       dueDate: task?.dueDate ?? '',
       priority: task?.priority ?? 'medium',
+      estimate: hoursFrom(task?.estimateMinutes ?? null),
     });
     this.subtasks.set((task?.subtasks ?? []).map((s) => ({ title: s.title, isDone: s.isDone })));
     this.picked.set([...(task?.contactIds ?? [])]);
   }
+}
+
+/** Typed hours as whole minutes, or null when the field was left empty. */
+function minutesFrom(hours: string | number | null): number | null {
+  if (hours === '' || hours === null) {
+    return null;
+  }
+  return Math.round(Number(hours) * 60);
+}
+
+/** Stored minutes as the hours the field shows, empty when there are none. */
+function hoursFrom(minutes: number | null): string {
+  return minutes === null ? '' : `${Math.round((minutes / 60) * 100) / 100}`;
 }

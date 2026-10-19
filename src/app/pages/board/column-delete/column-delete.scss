@@ -29,7 +29,7 @@
   border-left: 3px solid var(--j0in-danger);
   border-radius: var(--j0in-radius-sm);
   background: var(--j0in-surface-raised);
-  color: var(--j0in-danger);
+  color: var(--j0in-danger-ink);
   font-size: var(--j0in-fs-sm);
 }
 
@@ -50,7 +50,7 @@
 }
 
 .wipe__btn--danger {
-  border-color: var(--j0in-danger);
+  border-color: var(--j0in-danger-ink);
   background: var(--j0in-danger);
   color: var(--j0in-text-on-color);
 

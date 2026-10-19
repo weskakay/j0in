@@ -46,7 +46,7 @@
 
   &:hover,
   &:focus-visible {
-    color: var(--j0in-accent);
+    color: var(--j0in-accent-ink);
   }
 
   svg {
@@ -67,7 +67,7 @@
     position: absolute;
     inset: var(--j0in-space-xs);
     border-radius: 50%;
-    background: var(--j0in-accent);
+    background: var(--j0in-accent-strong);
     transition: background var(--j0in-transition);
   }
 
@@ -88,13 +88,13 @@
   gap: var(--j0in-space-sm);
   width: 100%;
   padding: var(--j0in-space-md);
-  border: 1px solid var(--j0in-border);
+  border: var(--j0in-panel-border);
   border-radius: var(--j0in-radius-md);
-  background: var(--j0in-surface-raised);
+  background: var(--j0in-card-bg);
   box-shadow: var(--j0in-shadow-sm);
   text-align: left;
   transition:
-    transform var(--j0in-transition),
+    transform var(--j0in-transition) var(--j0in-spring),
     box-shadow var(--j0in-transition);
 
   &:hover {
@@ -165,7 +165,7 @@
 }
 
 .card__time--running {
-  color: var(--j0in-accent);
+  color: var(--j0in-accent-ink);
   font-weight: var(--j0in-fw-bold);
 }
 
@@ -178,6 +178,23 @@
   align-items: center;
   justify-content: space-between;
   gap: var(--j0in-space-sm);
+}
+
+.card__due {
+  margin-left: auto;
+  color: var(--j0in-text-muted);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.card__due--late {
+  color: var(--j0in-danger-ink);
+  font-weight: var(--j0in-fw-bold);
+}
+
+.card__due--today {
+  color: var(--j0in-accent-ink);
+  font-weight: var(--j0in-fw-bold);
 }
 
 .card__people {
@@ -195,7 +212,7 @@
   border: 2px solid var(--j0in-surface-raised);
   border-radius: var(--j0in-radius-pill);
   color: var(--j0in-text-on-color);
-  font-size: 12px;
+  font-size: var(--j0in-fs-sm);
   font-weight: var(--j0in-fw-bold);
 }
 
@@ -206,13 +223,13 @@
 }
 
 .card__prio--urgent {
-  color: var(--j0in-prio-urgent);
+  color: var(--j0in-prio-urgent-ink);
 }
 
 .card__prio--medium {
-  color: var(--j0in-prio-medium);
+  color: var(--j0in-prio-medium-ink);
 }
 
 .card__prio--low {
-  color: var(--j0in-prio-low);
+  color: var(--j0in-prio-low-ink);
 }

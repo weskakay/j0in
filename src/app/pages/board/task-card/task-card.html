@@ -77,11 +77,14 @@
   <span class="card__foot">
     <span class="card__people">
       @for (person of assignees(); track person.id) {
-        <span class="card__avatar" [style.background]="person.color" [title]="person.name">
+        <span class="card__avatar" [style.background]="person.color" [title]="person.name" role="img" [attr.aria-label]="person.name">
           {{ initials(person) }}
         </span>
       }
     </span>
+    @if (dueText(); as due) {
+      <span class="card__due card__due--{{ dueState() }}">{{ due }}</span>
+    }
     <span class="card__prio card__prio--{{ task().priority }}">
       {{ priority() }}
     </span>

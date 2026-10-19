@@ -1,0 +1,153 @@
+@use "glass" as *;
+
+:host {
+  display: flex;
+  flex-direction: column;
+  gap: var(--j0in-space-lg);
+}
+
+.group {
+  @include surface;
+  padding: var(--j0in-space-md);
+}
+
+.group__name {
+  display: flex;
+  align-items: center;
+  gap: var(--j0in-space-sm);
+  margin-bottom: var(--j0in-space-sm);
+  font-size: var(--j0in-fs-lg);
+}
+
+.group__count {
+  padding: 0 var(--j0in-space-sm);
+  border-radius: var(--j0in-radius-pill);
+  background: var(--j0in-fill);
+  color: var(--j0in-text-muted);
+  font-size: var(--j0in-fs-body);
+}
+
+.row {
+  display: grid;
+  grid-template-columns: var(--j0in-tap-target) minmax(0, 1fr);
+  align-items: center;
+  column-gap: var(--j0in-space-sm);
+  padding: var(--j0in-space-xs) 0;
+  border-top: 1px solid var(--j0in-border);
+}
+
+.row__check {
+  display: grid;
+  place-items: center;
+  width: var(--j0in-tap-target);
+  height: var(--j0in-tap-target);
+  border: 0;
+  background: transparent;
+  color: var(--j0in-text-on-color);
+
+  &::before {
+    content: "";
+    grid-area: 1 / 1;
+    width: 24px;
+    height: 24px;
+    border: 2px solid var(--j0in-text-muted);
+    border-radius: var(--j0in-radius-pill);
+  }
+
+  svg {
+    grid-area: 1 / 1;
+  }
+}
+
+.row--done .row__check::before {
+  border-color: var(--j0in-success);
+  background: var(--j0in-success);
+}
+
+.row__title {
+  min-height: var(--j0in-tap-target);
+  padding: 0;
+  border: 0;
+  background: transparent;
+  text-align: left;
+  overflow-wrap: anywhere;
+
+  &:hover {
+    color: var(--j0in-accent-ink);
+  }
+}
+
+.row--done .row__title {
+  color: var(--j0in-text-muted);
+  text-decoration: line-through;
+}
+
+.row__meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--j0in-space-sm);
+  grid-column: 2;
+  padding-bottom: var(--j0in-space-xs);
+  color: var(--j0in-text-muted);
+}
+
+.row__chip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--j0in-space-xs);
+  padding: 0 var(--j0in-space-sm);
+  border-radius: var(--j0in-radius-pill);
+  background: var(--j0in-fill);
+}
+
+.row__dot {
+  width: 10px;
+  height: 10px;
+  border-radius: var(--j0in-radius-pill);
+}
+
+.row__prio--urgent {
+  color: var(--j0in-prio-urgent-ink);
+  font-weight: var(--j0in-fw-bold);
+}
+
+.row__due--late {
+  color: var(--j0in-danger-ink);
+  font-weight: var(--j0in-fw-bold);
+}
+
+.row__people {
+  display: flex;
+}
+
+.row__avatar {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  margin-right: -6px;
+  border: 2px solid var(--j0in-surface-raised);
+  border-radius: var(--j0in-radius-pill);
+  color: var(--j0in-text-on-color);
+  font-weight: var(--j0in-fw-bold);
+}
+
+.rows__empty {
+  padding: var(--j0in-space-sm) 0;
+  color: var(--j0in-text-muted);
+}
+
+/* Wide screens: one line per card, the details in fixed columns. */
+@media (min-width: 900px) {
+  .row {
+    grid-template-columns: var(--j0in-tap-target) minmax(0, 1fr) auto;
+  }
+
+  .row__meta {
+    grid-column: 3;
+    flex-wrap: nowrap;
+    justify-content: flex-end;
+    padding-bottom: 0;
+  }
+}

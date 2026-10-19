@@ -1,47 +1,4 @@
-.board__head {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--j0in-space-md);
-  margin-bottom: var(--j0in-space-lg);
-}
-
-.board__title {
-  font-size: var(--j0in-fs-title);
-}
-
-/* Search and the button for a new column sit together, both belong to the
-   board as a whole rather than to one column. */
-.board__tools {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: var(--j0in-space-sm);
-}
-
-.board__search {
-  position: relative;
-  flex: 1 1 220px;
-  max-width: 360px;
-}
-
-.board__search-label {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  overflow: hidden;
-  clip-path: inset(50%);
-}
-
-.board__search-field {
-  width: 100%;
-  min-height: var(--j0in-tap-target);
-  padding: 0 var(--j0in-space-md);
-  border: 1px solid var(--j0in-border);
-  border-radius: var(--j0in-radius-pill);
-  background: var(--j0in-surface);
-}
+@use "board-stack";
 
 .board__note {
   margin-bottom: var(--j0in-space-md);
@@ -54,7 +11,7 @@
   align-items: center;
   gap: var(--j0in-space-sm);
   margin-bottom: var(--j0in-space-md);
-  color: var(--j0in-danger);
+  color: var(--j0in-danger-ink);
 }
 
 .board__empty {
@@ -77,13 +34,6 @@
   gap: var(--j0in-space-lg);
 }
 
-.board__column-field {
-  min-height: var(--j0in-tap-target);
-  padding: 0 var(--j0in-space-md);
-  border: 1px solid var(--j0in-accent);
-  border-radius: var(--j0in-radius-md);
-  background: var(--j0in-bg);
-}
 
 .board__confirm {
   margin-bottom: var(--j0in-space-md);
@@ -106,7 +56,7 @@
 }
 
 .board__confirm-btn--danger {
-  border-color: var(--j0in-danger);
+  border-color: var(--j0in-danger-ink);
   background: var(--j0in-danger);
   color: var(--j0in-text-on-color);
 
@@ -116,29 +66,14 @@
   }
 }
 
-.board__add-column {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: var(--j0in-space-sm);
-  flex: 0 0 auto;
-  align-self: flex-start;
-  white-space: nowrap;
-  min-height: var(--j0in-tap-target);
-  padding: 0 var(--j0in-space-md);
-  border: 1px dashed var(--j0in-border);
-  border-radius: var(--j0in-radius-md);
-  background: transparent;
-  color: var(--j0in-text-muted);
-  font-size: var(--j0in-fs-sm);
-  transition:
-    border-color var(--j0in-transition),
-    color var(--j0in-transition);
 
-  &:hover {
-    border-color: var(--j0in-accent);
-    color: var(--j0in-text);
-  }
+/* In the glass look every column is a surface of its own; the J0IN look keeps
+   the cards straight on the page. */
+.column {
+  padding: var(--j0in-column-pad);
+  border-radius: var(--j0in-panel-radius);
+  background: var(--j0in-column-bg);
+  border: var(--j0in-column-border);
 }
 
 .column__list {
@@ -172,7 +107,7 @@
   z-index: 50;
   pointer-events: none;
   transform: rotate(3deg) scale(1.02);
-  filter: drop-shadow(0 12px 24px rgb(0 0 0 / 35%));
+  filter: var(--j0in-ghost-shadow);
   cursor: grabbing;
 }
 
@@ -202,26 +137,6 @@
   }
 }
 
-/* Same shape as the button for a new column, so the tools read as one row. */
-.board__planner-toggle {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: var(--j0in-space-sm);
-  flex: 0 0 auto;
-  align-self: flex-start;
-  white-space: nowrap;
-  min-height: var(--j0in-tap-target);
-  padding: 0 var(--j0in-space-md);
-  border: 1px solid var(--j0in-border);
-  border-radius: var(--j0in-radius-md);
-  background: transparent;
-  color: var(--j0in-text-muted);
-
-  &:hover {
-    color: var(--j0in-text);
-  }
-}
 
 /* Phone: the day sits above the board. Wide screens put it alongside. */
 .board__split {
@@ -243,153 +158,3 @@
   }
 }
 
-/* Stack */
-
-/* Browsing controls, right under the column heading. */
-/* On a narrow screen the button for the full list drops onto its own line. */
-.stack__bar {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: var(--j0in-space-sm);
-  margin-bottom: var(--j0in-space-sm);
-}
-
-.stack__btn {
-  display: flex;
-  flex: 0 0 var(--j0in-tap-target);
-  align-items: center;
-  justify-content: center;
-  width: var(--j0in-tap-target);
-  height: var(--j0in-tap-target);
-  border: 1px solid var(--j0in-border);
-  border-radius: var(--j0in-radius-pill);
-  background: var(--j0in-surface);
-  color: var(--j0in-text);
-  transition: border-color var(--j0in-transition);
-
-  &:hover:not(:disabled),
-  &:focus-visible:not(:disabled) {
-    border-color: var(--j0in-accent);
-  }
-
-  &:disabled {
-    opacity: 0.35;
-    cursor: default;
-  }
-}
-
-.stack__count {
-  color: var(--j0in-text-muted);
-  font-size: var(--j0in-fs-body);
-  font-variant-numeric: tabular-nums;
-  white-space: nowrap;
-}
-
-.stack__toggle {
-  margin-left: auto;
-  min-height: var(--j0in-tap-target);
-  padding: 0 var(--j0in-space-md);
-  border: 1px dashed var(--j0in-border);
-  border-radius: var(--j0in-radius-pill);
-  background: transparent;
-  color: var(--j0in-text-muted);
-  font-size: var(--j0in-fs-body);
-  white-space: nowrap;
-
-  &:hover,
-  &:focus-visible {
-    border-color: var(--j0in-accent);
-    color: var(--j0in-text);
-  }
-}
-
-/* The card in focus stays in the flow and gives the stack its height. Its
-   neighbours are pinned to its top and bottom edge, so what peeks out does
-   not depend on how tall a card is. */
-.column__list--stack {
-  position: relative;
-  display: block;
-  padding-block: var(--j0in-stack-room);
-  overflow: hidden;
-  overscroll-behavior: contain;
-
-  /* How much of the nearest neighbour shows, and how much of that the one
-     behind it gives up again. */
-  --j0in-stack-room: 46px;
-  --j0in-stack-peek: 20px;
-
-  /* The cards behind fade out towards the edge instead of being cut off. */
-  mask-image: linear-gradient(
-    to bottom,
-    transparent 0,
-    black var(--j0in-stack-room),
-    black calc(100% - var(--j0in-stack-room)),
-    transparent 100%
-  );
-}
-
-.column__card--stacked {
-  transition:
-    transform var(--j0in-transition),
-    opacity var(--j0in-transition);
-}
-
-/* Over everything else, so nothing behind it shows through. */
-.column__card--stacked[data-side='focus'] {
-  position: relative;
-  z-index: 3;
-}
-
-.column__card--stacked[data-side='above'],
-.column__card--stacked[data-side='below'] {
-  position: absolute;
-  left: 0;
-  right: 0;
-  cursor: pointer;
-}
-
-/* Pinned to the edge it lies on, and scaled from that same edge so the
-   sliver that shows keeps its place. */
-.column__card--stacked[data-side='above'] {
-  bottom: calc(100% - var(--j0in-stack-room));
-  transform-origin: bottom center;
-}
-
-.column__card--stacked[data-side='below'] {
-  top: calc(100% - var(--j0in-stack-room));
-  transform-origin: top center;
-}
-
-.column__card--stacked[data-depth='1'] {
-  z-index: 2;
-  opacity: 0.62;
-  transform: scale(0.95);
-}
-
-.column__card--stacked[data-depth='2'] {
-  z-index: 1;
-  opacity: 0.32;
-  transform: scale(0.9);
-}
-
-/* The second one back gives up a strip again, so both are recognisable. */
-.column__card--stacked[data-side='above'][data-depth='2'] {
-  bottom: calc(100% - var(--j0in-stack-room) + var(--j0in-stack-peek));
-}
-
-.column__card--stacked[data-side='below'][data-depth='2'] {
-  top: calc(100% - var(--j0in-stack-room) + var(--j0in-stack-peek));
-}
-
-/* Too far back to be of any help. Taken out of the tab order with it, the
-   button for the full list is the way to those cards. */
-.column__card--away {
-  display: none;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .column__card--stacked {
-    transition: none;
-  }
-}

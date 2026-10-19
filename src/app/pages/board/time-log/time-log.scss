@@ -31,7 +31,7 @@
 }
 
 .time__total--running {
-  color: var(--j0in-accent);
+  color: var(--j0in-accent-ink);
   font-weight: var(--j0in-fw-bold);
 }
 
@@ -81,13 +81,13 @@
   border: 1px solid var(--j0in-accent);
   border-radius: var(--j0in-radius-pill);
   background: transparent;
-  color: var(--j0in-accent);
+  color: var(--j0in-accent-ink);
   transition:
     background var(--j0in-transition),
     color var(--j0in-transition);
 
   &:hover {
-    background: var(--j0in-accent);
+    background: var(--j0in-accent-strong);
     color: var(--j0in-text-on-color);
   }
 
@@ -97,7 +97,7 @@
 }
 
 .time__toggle--running {
-  background: var(--j0in-accent);
+  background: var(--j0in-accent-strong);
   color: var(--j0in-text-on-color);
 
   &:hover {
@@ -156,5 +156,5 @@
 }
 
 .time__icon--danger:hover {
-  color: var(--j0in-danger);
+  color: var(--j0in-danger-ink);
 }

@@ -1,59 +1,112 @@
-@if (category(); as label) {
-  <span class="detail__category" [style.background]="label.color">{{ label.name }}</span>
-}
+<div class="detail__chips">
+  @if (category(); as label) {
+    <span class="detail__chip">
+      <span class="detail__dot" [style.background]="label.color" aria-hidden="true"></span>
+      {{ label.name }}
+    </span>
+  }
+  <span class="detail__chip detail__prio--{{ task().priority }}">{{ priority() }}</span>
+</div>
 
 @if (task().description) {
   <p class="detail__text">{{ task().description }}</p>
 }
 
-<dl class="detail__facts">
-  <div class="detail__fact">
-    <dt>{{ t().task.due }}</dt>
-    <dd>{{ due() || t().task.noDue }}</dd>
+<section class="detail__block">
+  <h3 class="detail__label">{{ t().panel.status }}</h3>
+  <div class="detail__columns">
+    <div class="segment" role="group" [attr.aria-label]="t().panel.status">
+      @for (column of columns(); track column.id) {
+        <button
+          class="segment__btn"
+          type="button"
+          [class.segment__btn--on]="column.id === task().columnId"
+          [attr.aria-pressed]="column.id === task().columnId"
+          (click)="column.id !== task().columnId && moved.emit(column.id)"
+        >
+          {{ column.name }}
+        </button>
+      }
+    </div>
   </div>
-  <div class="detail__fact">
-    <dt>{{ t().task.priority }}</dt>
-    <dd class="detail__prio detail__prio--{{ task().priority }}">{{ priority() }}</dd>
+</section>
+
+<dl class="detail__tiles">
+  <div class="tile">
+    <dt class="tile__label">{{ t().panel.assignee }}</dt>
+    <dd class="tile__value">
+      @for (person of assignees(); track person.id) {
+        <span class="detail__avatar" [style.background]="person.color" aria-hidden="true">
+          {{ initials(person) }}
+        </span>
+      } @empty {
+        {{ t().panel.nobody }}
+      }
+      @if (assignees().length > 0) {
+        <span class="tile__names">{{ names() }}</span>
+      }
+    </dd>
+  </div>
+  <div class="tile">
+    <dt class="tile__label">{{ t().panel.due }}</dt>
+    <dd class="tile__value" [class.tile__value--late]="late()">{{ due() || t().task.noDue }}</dd>
+  </div>
+  <div class="tile">
+    <dt class="tile__label">{{ t().panel.estimate }}</dt>
+    <dd class="tile__value">{{ estimate() || t().panel.noEstimate }}</dd>
+  </div>
+  <div class="tile">
+    <dt class="tile__label">{{ t().panel.category }}</dt>
+    <dd class="tile__value">
+      @if (category(); as label) {
+        <a class="tile__link" routerLink="/board" [queryParams]="{ category: label.id }">{{ label.name }}</a>
+      } @else {
+        {{ t().panel.noCategory }}
+      }
+    </dd>
   </div>
 </dl>
 
-@if (assignees().length > 0) {
-  <section class="detail__block">
-    <h3 class="detail__label">{{ t().task.assignedTo }}</h3>
-    <ul class="detail__people">
-      @for (person of assignees(); track person.id) {
-        <li class="detail__person">
-          <span class="detail__avatar" [style.background]="person.color">
-            {{ initials(person) }}
-          </span>
-          {{ person.name }}
-        </li>
-      }
-    </ul>
-  </section>
-}
-
-@if (task().subtasks.length > 0) {
-  <section class="detail__block">
-    <h3 class="detail__label">{{ t().task.subtasks }}</h3>
-    <ul class="detail__subtasks">
-      @for (subtask of task().subtasks; track subtask.id) {
-        <li>
-          <label class="detail__subtask">
-            <input
-              type="checkbox"
-              [checked]="subtask.isDone"
-              (change)="onToggle(subtask, $event)"
-            />
-            <span [class.detail__subtask-done]="subtask.isDone">{{ subtask.title }}</span>
-          </label>
-        </li>
-      }
-    </ul>
-  </section>
-}
+<section class="detail__block">
+  <h3 class="detail__label">
+    {{ t().task.subtasks }}
+    @if (task().subtasks.length > 0) {
+      <span class="detail__count">{{ progress() }}</span>
+    }
+  </h3>
+  <ul class="detail__subtasks">
+    @for (subtask of task().subtasks; track subtask.id) {
+      <li>
+        <label class="detail__subtask">
+          <input type="checkbox" [checked]="subtask.isDone" (change)="onToggle(subtask, $event)" />
+          <span [class.detail__subtask-done]="subtask.isDone">{{ subtask.title }}</span>
+        </label>
+      </li>
+    }
+  </ul>
+  <form class="detail__add" (submit)="$event.preventDefault(); addSubtask(newSubtask)">
+    <input
+      #newSubtask
+      class="detail__add-field"
+      type="text"
+      maxlength="200"
+      [placeholder]="t().panel.subtaskPlaceholder"
+      [attr.aria-label]="t().panel.subtaskPlaceholder"
+    />
+    <button class="detail__btn" type="submit">{{ t().panel.subtaskAdd }}</button>
+  </form>
+</section>
 
 @if (tracking()) {
+  @if (!running()) {
+    <button class="detail__btn detail__btn--focus" type="button" (click)="startFocus()">
+      <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+        <circle cx="12" cy="12" r="8" fill="none" stroke="currentColor" stroke-width="2" />
+        <circle cx="12" cy="12" r="3" fill="currentColor" />
+      </svg>
+      {{ t().panel.focusStart }}
+    </button>
+  }
   <app-time-log [task]="task()" />
 }
 

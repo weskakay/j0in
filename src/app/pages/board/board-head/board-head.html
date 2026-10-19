@@ -1,0 +1,69 @@
+<header class="page-head">
+  <div class="page-head__lead">
+    <h1 class="page-head__title">{{ name() || 'Board' }}</h1>
+    <p class="page-head__sub">
+      {{ stats().open }} {{ t().filter.openIn }} {{ spread() }} {{ t().filter.categoriesWord }}
+    </p>
+  </div>
+
+  <ul class="kpis page-head__stats">
+    <li class="kpi">
+      <span class="kpi__label">{{ t().filter.open }}</span>
+      <span class="kpi__value">{{ stats().open }}</span>
+    </li>
+    <li class="kpi">
+      <span class="kpi__label">{{ t().filter.dueWeek }}</span>
+      <span class="kpi__value">{{ stats().dueWeek }}</span>
+    </li>
+    <li class="kpi" [class.kpi--alert]="stats().overdue > 0">
+      <span class="kpi__label">{{ t().filter.overdue }}</span>
+      <span class="kpi__value">{{ stats().overdue }}</span>
+    </li>
+    <li class="kpi">
+      <span class="kpi__label">{{ t().filter.doneWeek }}</span>
+      <span class="kpi__value">{{ stats().doneWeek }}</span>
+    </li>
+  </ul>
+
+  <div class="page-head__actions">
+    <div class="segment" role="group" [attr.aria-label]="t().filter.view">
+      <button
+        class="segment__btn"
+        type="button"
+        [class.segment__btn--on]="current() === 'board'"
+        [attr.aria-pressed]="current() === 'board'"
+        (click)="show('board')"
+      >
+        {{ t().filter.board }}
+      </button>
+      <button
+        class="segment__btn"
+        type="button"
+        [class.segment__btn--on]="current() === 'list'"
+        [attr.aria-pressed]="current() === 'list'"
+        (click)="show('list')"
+      >
+        {{ t().filter.list }}
+      </button>
+    </div>
+
+    @if (canPlan()) {
+      <button class="head__btn" type="button" [attr.aria-pressed]="plannerOpen()" (click)="togglePlanner()">
+        <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
+          <path d="M4 6h16v14H4zM4 10h16M8 3v3M16 3v3" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" />
+        </svg>
+        {{ plannerOpen() ? t().planner.hide : t().planner.show }}
+      </button>
+    }
+
+
+    <button class="head__btn head__btn--primary" type="button" (click)="create.emit()">
+      <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
+        <path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" />
+      </svg>
+      {{ t().topbar.newTask }}
+    </button>
+  </div>
+
+</header>

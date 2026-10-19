@@ -1,0 +1,83 @@
+@use "glass" as *;
+
+:host {
+  display: block;
+  margin-bottom: var(--j0in-space-lg);
+}
+
+.bar {
+  @include surface;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--j0in-space-sm);
+  padding: var(--j0in-space-sm);
+  border-radius: var(--j0in-radius-lg);
+}
+
+.bar__hidden {
+  @include hidden-label;
+}
+
+.bar__search {
+  display: flex;
+  flex: 1 1 220px;
+  align-items: center;
+  gap: var(--j0in-space-sm);
+  min-height: var(--j0in-tap-target);
+  padding: 0 var(--j0in-space-md);
+  border-radius: var(--j0in-radius-pill);
+  background: var(--j0in-fill);
+  color: var(--j0in-text-muted);
+}
+
+.bar__field {
+  flex: 1;
+  min-width: 0;
+  min-height: var(--j0in-tap-target);
+  border: 0;
+  background: transparent;
+  color: var(--j0in-text);
+
+  &:focus-visible {
+    outline: none;
+  }
+}
+
+.bar__search:focus-within {
+  outline: 2px solid var(--j0in-accent-ink);
+  outline-offset: 2px;
+}
+
+.bar__pick {
+  flex: 1 1 160px;
+}
+
+.bar__select {
+  width: 100%;
+  min-height: var(--j0in-tap-target);
+  padding: 0 var(--j0in-space-md);
+  border: 1px solid var(--j0in-border);
+  border-radius: var(--j0in-radius-pill);
+  background: var(--j0in-fill);
+}
+
+.bar__select option {
+  background: var(--j0in-panel-solid);
+}
+
+.bar__reset {
+  min-height: var(--j0in-tap-target);
+  padding: 0 var(--j0in-space-md);
+  border: 0;
+  border-radius: var(--j0in-radius-pill);
+  background: transparent;
+  color: var(--j0in-accent-ink);
+  font-weight: var(--j0in-fw-bold);
+}
+
+@media (min-width: 900px) {
+  .bar__pick {
+    flex: 0 1 220px;
+  }
+}

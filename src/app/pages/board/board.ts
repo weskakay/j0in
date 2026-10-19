@@ -1,8 +1,11 @@
-import { Component, ElementRef, computed, effect, inject, signal, viewChild } from '@angular/core';
+import { Component, computed, effect, inject, signal, untracked } from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
+import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
+import { filter, map } from 'rxjs';
 import { BoardStore, type ColumnDisposal, type ColumnWithTasks } from '../../core/board.store';
 import { LanguageService } from '../../core/language.service';
 import type { Category, Column, Task, TaskInput } from '../../data/models';
-import { headingFor, withToggled, type DialogMode } from './board-dialog';
+import { headingFor, withNewSubtask, type DialogMode } from './board-dialog';
 import { TaskCard } from './task-card/task-card';
 import { Dialog } from '../../layout/dialog/dialog';
 import { TaskDetail, type SubtaskToggle } from './task-detail/task-detail';
@@ -15,13 +18,21 @@ import { ColumnDelete } from './column-delete/column-delete';
 import { ColumnGrip } from './resize/column-grip';
 import { Planner } from './planner/planner';
 import { ColumnStack } from './stack/column-stack.service';
-import { focusCard, holdsFocus } from './stack/stack-focus';
-import { ARROWS, VERTICAL, nextPlace } from './keys/card-move';
 import { LayoutService } from '../../core/layout.service';
 import { CalendarService } from '../../core/calendar.service';
 import { ScheduleService } from '../../core/schedule.service';
+import { BoardHead } from './board-head/board-head';
+import { FilterBar } from './filters/filter-bar';
+import { BoardView } from './filters/board-view.service';
+import { CardKeys } from './keys/card-keys.service';
+import { TaskList } from './list/task-list';
+import { AddColumn } from './add-column/add-column';
 
-/** The board: every column with its cards, plus the task dialog. */
+/**
+ * The board: every column with its cards, or the same cards as a list. A
+ * card opens in a panel beside the board under its own address, so it can
+ * be linked to and the back button closes it again.
+ */
 @Component({
   selector: 'app-board',
   imports: [
@@ -35,21 +46,31 @@ import { ScheduleService } from '../../core/schedule.service';
     ColumnDelete,
     ColumnGrip,
     Planner,
+    BoardHead,
+    FilterBar,
+    TaskList,
+    AddColumn,
   ],
-  providers: [BoardDrag, ColumnStack],
+  providers: [BoardDrag, ColumnStack, BoardView, CardKeys],
   templateUrl: './board.html',
   styleUrl: './board.scss',
 })
 export class Board {
   private readonly store = inject(BoardStore);
-  /** The running drag, read straight by the template for the preview. */
-  protected readonly drag = inject(BoardDrag);
+  private readonly router = inject(Router);
+  private readonly route = inject(ActivatedRoute);
   private readonly language = inject(LanguageService);
   private readonly layout = inject(LayoutService);
   private readonly calendar = inject(CalendarService);
   private readonly planned = inject(ScheduleService);
+  /** The running drag, read straight by the template for the preview. */
+  protected readonly drag = inject(BoardDrag);
   /** Which card each column has in focus, read by the template as well. */
   protected readonly stack = inject(ColumnStack);
+  /** Filter, layout and the filtered columns. */
+  protected readonly view = inject(BoardView);
+  /** What the keyboard and the wheel do with the cards. */
+  protected readonly keys = inject(CardKeys);
 
   /** Every piece of text, in the language currently on screen. */
   protected readonly t = this.language.dict;
@@ -57,28 +78,14 @@ export class Board {
   /** How wide one column is, dragged by the edge between two of them. */
   protected readonly columnWidth = this.layout.columnWidth;
 
-  /** Whether the day can be planned at all, see the schedule service. */
-  protected readonly canPlan = this.planned.possible;
-
   /** True while the day stands beside the board. */
-  protected readonly plannerOpen = computed(() => this.canPlan() && this.layout.plannerOpen());
-
-  /** Shows the day beside the board, or puts it away. */
-  protected togglePlanner(): void {
-    this.layout.togglePlanner();
-  }
-
-  /** The name of the board, shown as the heading of the screen. */
-  protected readonly boardName = this.store.name;
-
-  /** Columns together with the cards that belong in them. */
-  protected readonly board = this.store.board;
-
-  /** The search found nothing, so the board says so instead of staying blank. */
-  protected readonly noMatches = this.store.noMatches;
+  protected readonly plannerOpen = computed(() => this.planned.possible() && this.layout.plannerOpen());
 
   /** All columns, offered in the form. */
   protected readonly columns = this.store.columns;
+
+  /** The column that means done, so its cards are never shown as overdue. */
+  protected readonly lastColumnId = computed(() => this.columns().at(-1)?.id ?? '');
 
   /** All categories, offered in the form. */
   protected readonly categories = this.store.categories;
@@ -95,20 +102,23 @@ export class Board {
   /** Whether a board has arrived at all. */
   protected readonly ready = this.store.ready;
 
-  /** Which dialog is open. */
+  /** The id of the card open in the panel, read from the address. */
+  protected readonly taskId = toSignal(
+    this.router.events.pipe(
+      filter((event) => event instanceof NavigationEnd),
+      map(() => this.openId()),
+    ),
+    { initialValue: this.openId() },
+  );
+
+  /** The open card as the store holds it, so a started timer shows at once. */
+  protected readonly shownTask = computed(() => this.store.tasks().find((task) => task.id === this.taskId()) ?? null);
+
+  /** Which dialog is open on top of the board. */
   protected readonly mode = signal<DialogMode>('none');
 
-  /** The task the dialog is about, or null while creating. */
+  /** The task being edited or deleted, or null while creating. */
   protected readonly current = signal<Task | null>(null);
-
-  /**
-   * The open task as the store holds it right now. The detail view reads this
-   * one, so a started timer or booked time shows without reopening the card.
-   */
-  protected readonly shownTask = computed(() => {
-    const opened = this.current();
-    return this.store.tasks().find((task) => task.id === opened?.id) ?? opened;
-  });
 
   /** The column a newly created task lands in. */
   protected readonly targetColumn = signal('');
@@ -119,24 +129,12 @@ export class Board {
   /** The column whose removal is being confirmed. */
   protected readonly doomed = signal<Column | null>(null);
 
-  /** True while the field for a new column name is open. */
-  protected readonly namingColumn = signal(false);
-
-  private readonly columnField = viewChild<ElementRef<HTMLInputElement>>('columnField');
-
-  /** Puts the cursor into the name field as soon as it appears. */
-  private readonly focusColumnField = effect(() => {
-    this.columnField()?.nativeElement.focus();
-  });
-
   /** Heading of the open dialog. */
-  protected readonly heading = computed(() =>
-    headingFor(this.mode(), this.current(), this.t()),
-  );
+  protected readonly heading = computed(() => headingFor(this.mode(), this.current(), this.t()));
 
   /** How many cards sit in the column that is about to go. */
   protected readonly doomedCount = computed(
-    () => this.board().find((entry) => entry.column.id === this.doomed()?.id)?.tasks.length ?? 0,
+    () => this.store.tasks().filter((task) => task.columnId === this.doomed()?.id).length,
   );
 
   /** The columns those cards could move to. */
@@ -144,8 +142,25 @@ export class Board {
     this.columns().filter((column) => column.id !== this.doomed()?.id),
   );
 
+  private readonly params = toSignal(this.route.queryParamMap, { requireSync: true });
+
+  /** A link with ?new=1, from the top bar or the palette, opens the empty form. */
+  private readonly newFromLink = effect(() => {
+    const first = this.columns()[0];
+    if (this.params().has('new') && first) {
+      untracked(() => this.openNew(first.id));
+      const keep = { relativeTo: this.route, queryParamsHandling: 'merge' as const, replaceUrl: true };
+      void this.router.navigate([], { ...keep, queryParams: { new: null } });
+    }
+  });
+
   constructor() {
     this.store.load();
+  }
+
+  /** The id in the address below /board, or null. */
+  private openId(): string | null {
+    return this.route.firstChild?.snapshot.paramMap.get('taskId') ?? null;
   }
 
   /** The category of a task, for the coloured label on its card. */
@@ -153,15 +168,14 @@ export class Board {
     return this.store.categoryOf(task);
   }
 
-  /** Narrows the visible cards to those matching the typed term. */
-  protected onSearch(event: Event): void {
-    this.store.setSearch((event.target as HTMLInputElement).value);
+  /** Opens a card in the panel, keeping filter and layout. */
+  protected openTask(task: Task): void {
+    void this.router.navigate(['/board', task.id], { queryParamsHandling: 'preserve' });
   }
 
-  /** Opens a card for reading. */
-  protected openTask(task: Task): void {
-    this.current.set(task);
-    this.mode.set('detail');
+  /** Closes the panel. */
+  protected closePanel(): void {
+    void this.router.navigate(['/board'], { queryParamsHandling: 'preserve' });
   }
 
   /** Opens the empty form for a new card in the given column. */
@@ -171,29 +185,58 @@ export class Board {
     this.mode.set('create');
   }
 
-  /** Switches the open dialog from reading to editing. */
+  /** Opens the empty form for the first column. */
+  protected openNewFirst(): void {
+    const first = this.columns()[0];
+    if (first) {
+      this.openNew(first.id);
+    }
+  }
+
+  /** Opens the open card in the form. */
   protected startEdit(): void {
+    this.current.set(this.shownTask());
     this.mode.set('edit');
   }
 
-  /** Closes whatever dialog is open. */
+  /** Closes the dialog on top; the panel stays. */
   protected closeDialog(): void {
     this.mode.set('none');
     this.current.set(null);
     this.doomed.set(null);
   }
 
-  /** Ticks a subtask off straight from the detail view. */
+  /** Ticks a subtask off straight from the panel. */
   protected onToggle(change: SubtaskToggle): void {
-    const task = this.current();
-    if (!task) {
-      return;
+    const id = this.taskId();
+    if (id) {
+      this.store.toggleSubtask(id, change.subtaskId, change.isDone);
     }
-    this.store.toggleSubtask(task.id, change.subtaskId, change.isDone);
-    this.current.set(withToggled(task, change));
   }
 
-  /** Saves the form, either as a new task or over the open one. */
+  /** Moves the open card to the end of another column. */
+  protected onMove(columnId: string): void {
+    const id = this.taskId();
+    const position = this.store.tasks().filter((task) => task.columnId === columnId).length + 1;
+    if (id) {
+      this.store.moveTask(id, columnId, position).subscribe({
+        next: () => this.store.refresh(),
+        error: (failure: Error) => this.store.error.set(failure.message),
+      });
+    }
+  }
+
+  /** Adds a subtask to the open card. */
+  protected onAddSubtask(title: string): void {
+    const task = this.shownTask();
+    if (task) {
+      this.store.updateTask(task.id, withNewSubtask(task, title)).subscribe({
+        error: (failure: Error) => this.store.error.set(failure.message),
+      });
+    }
+  }
+
+  /** Saves the form, either as a new task or over the one being edited. */
   protected onSubmit(input: TaskInput): void {
     const task = this.current();
     this.busy.set(true);
@@ -206,10 +249,11 @@ export class Board {
 
   /** Asks once before a task disappears. */
   protected askDelete(): void {
+    this.current.set(this.shownTask());
     this.mode.set('wipeTask');
   }
 
-  /** Deletes the open task after the confirmation. */
+  /** Deletes the task after the confirmation and closes its panel. */
   protected onDelete(): void {
     const task = this.current();
     if (!task) {
@@ -217,74 +261,9 @@ export class Board {
     }
     this.busy.set(true);
     this.store.deleteTask(task.id).subscribe({
-      next: () => this.finish(),
+      next: () => this.finish(true),
       error: () => this.busy.set(false),
     });
-  }
-
-  /**
-   * Moves a card with the keyboard. Alt and an arrow key shifts it, which
-   * keeps the plain arrows free for scrolling and reading.
-   */
-  protected onCardKeydown(event: KeyboardEvent, task: Task, entry: ColumnWithTasks): void {
-    if (!event.altKey && this.stack.stacked(entry) && VERTICAL.includes(event.key)) {
-      event.preventDefault();
-      this.browse(entry, event.key === 'ArrowUp' ? -1 : 1);
-      return;
-    }
-    if (!event.altKey || !ARROWS.includes(event.key)) {
-      return;
-    }
-    event.preventDefault();
-    this.nudge(task, entry, event.key);
-  }
-
-  /** Moves a card one place and keeps the stack looking at it. */
-  private nudge(task: Task, entry: ColumnWithTasks, key: string): void {
-    const target = nextPlace(this.board(), task, key);
-    if (!target) {
-      return;
-    }
-    if (this.stack.stacked(entry) && VERTICAL.includes(key)) {
-      this.stack.step(entry, key === 'ArrowUp' ? -1 : 1);
-    }
-    this.store.moveTask(task.id, target.columnId, target.position).subscribe({
-      next: () => this.store.load(),
-    });
-  }
-
-  /**
-   * Browses the stack and takes the keyboard along, otherwise it would be
-   * left sitting on a card that has just slid out of the way.
-   */
-  private browse(entry: ColumnWithTasks, delta: number): void {
-    this.stack.step(entry, delta);
-    this.carryFocus(entry);
-  }
-
-  /** The wheel browses too, and keeps the keyboard on the card in focus. */
-  protected onStackWheel(event: WheelEvent, entry: ColumnWithTasks, list: Element): void {
-    if (this.stack.onWheel(event, entry) && holdsFocus(list)) {
-      this.carryFocus(entry);
-    }
-  }
-
-  /** Puts the keyboard on whichever card the stack now has in focus. */
-  private carryFocus(entry: ColumnWithTasks): void {
-    const task = entry.tasks[this.stack.focusOf(entry)];
-    if (task) {
-      requestAnimationFrame(() => focusCard(task.id));
-    }
-  }
-
-  /**
-   * Tabbing onto a card that merely peeks out brings it forward, so the
-   * keyboard never sits on something faded out behind another card.
-   */
-  protected onCardFocus(entry: ColumnWithTasks, index: number): void {
-    if (this.stack.stacked(entry) && this.stack.offset(entry, index) !== 0) {
-      this.stack.to(entry, index);
-    }
   }
 
   /**
@@ -314,39 +293,11 @@ export class Board {
       this.planned.schedule(landing.task.id, landing.minutes, this.calendar.day());
       return;
     }
-    this.store.moveTask(landing.task.id, landing.columnId, landing.position).subscribe({
+    const position = this.view.positionIn(landing.columnId, landing.position);
+    this.store.moveTask(landing.task.id, landing.columnId, position).subscribe({
       next: () => this.store.load(),
+      error: (failure: Error) => this.store.error.set(failure.message),
     });
-  }
-
-  /** Opens the field for the name of a new column. */
-  protected startColumn(): void {
-    this.namingColumn.set(true);
-  }
-
-  /** Closes that field without creating anything. */
-  protected cancelColumn(): void {
-    this.namingColumn.set(false);
-  }
-
-  /** Creates the column, unless the field was left empty. */
-  protected addColumn(event: Event): void {
-    const field = event.target as HTMLInputElement;
-    const name = field.value.trim();
-    this.namingColumn.set(false);
-    if (name !== '') {
-      this.store.createColumn(name).subscribe();
-    }
-  }
-
-  /** Enter creates the column, Escape drops the field. */
-  protected onColumnKeydown(event: KeyboardEvent): void {
-    if (event.key === 'Enter') {
-      this.addColumn(event);
-    }
-    if (event.key === 'Escape') {
-      this.cancelColumn();
-    }
   }
 
   /** Saves a column's new name. */
@@ -368,16 +319,9 @@ export class Board {
     }
     this.busy.set(true);
     this.store.deleteColumn(column.id, disposal).subscribe({
-      next: () => this.finishColumn(),
+      next: () => this.finish(),
       error: () => this.busy.set(false),
     });
-  }
-
-  /** Leaves the column dialog once the removal went through. */
-  private finishColumn(): void {
-    this.busy.set(false);
-    this.doomed.set(null);
-    this.mode.set('none');
   }
 
   /** Tries the load again after a failure. */
@@ -385,9 +329,12 @@ export class Board {
     this.store.load();
   }
 
-  /** Leaves the dialog once a write went through. */
-  private finish(): void {
+  /** Leaves the dialog once a write went through, and the panel too after a delete. */
+  private finish(closePanel = false): void {
     this.busy.set(false);
     this.closeDialog();
+    if (closePanel) {
+      this.closePanel();
+    }
   }
 }

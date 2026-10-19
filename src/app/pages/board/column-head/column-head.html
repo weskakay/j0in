@@ -10,6 +10,7 @@
       (blur)="confirm()"
     />
   } @else {
+    <span class="head__dot head__dot--{{ tone() % 4 }}" aria-hidden="true"></span>
     <h2 class="head__name">{{ column().name }}</h2>
     <span class="head__count">{{ count() }}</span>
 

@@ -1,0 +1,18 @@
+@if (naming()) {
+  <input
+    class="add__field"
+    type="text"
+    #field
+    [placeholder]="t().board.columnName"
+    [attr.aria-label]="t().board.columnName"
+    (keydown)="onKeydown($event)"
+    (blur)="add($event)"
+  />
+} @else {
+  <button class="add__btn" type="button" (click)="start()">
+    <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
+      <path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+    </svg>
+    {{ t().board.addColumn }}
+  </button>
+}

@@ -1,0 +1,34 @@
+<div class="bar" role="search" [attr.aria-label]="t().filter.label">
+  <label class="bar__search">
+    <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
+      <circle cx="11" cy="11" r="7" fill="none" stroke="currentColor" stroke-width="2" />
+      <path d="m20 20-3.5-3.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+    </svg>
+    <span class="bar__hidden">{{ t().filter.text }}</span>
+    <input class="bar__field" type="search" [placeholder]="t().filter.text" (input)="onSearch($event)" />
+  </label>
+
+  <label class="bar__pick">
+    <span class="bar__hidden">{{ t().filter.category }}</span>
+    <select class="bar__select" (change)="onCategory($event)">
+      <option value="" [selected]="filter().category === null">{{ t().filter.allCategories }}</option>
+      @for (category of categories(); track category.id) {
+        <option [value]="category.id" [selected]="filter().category === category.id">{{ category.name }}</option>
+      }
+    </select>
+  </label>
+
+  <label class="bar__pick">
+    <span class="bar__hidden">{{ t().filter.priority }}</span>
+    <select class="bar__select" (change)="onPriority($event)">
+      <option value="" [selected]="filter().priority === null">{{ t().filter.allPriorities }}</option>
+      <option value="urgent" [selected]="filter().priority === 'urgent'">{{ t().task.urgent }}</option>
+      <option value="medium" [selected]="filter().priority === 'medium'">{{ t().task.medium }}</option>
+      <option value="low" [selected]="filter().priority === 'low'">{{ t().task.low }}</option>
+    </select>
+  </label>
+
+  @if (filtering()) {
+    <button class="bar__reset" type="button" (click)="reset()">{{ t().filter.reset }}</button>
+  }
+</div>

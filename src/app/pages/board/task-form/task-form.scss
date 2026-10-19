@@ -37,7 +37,7 @@
 }
 
 .form__hint {
-  color: var(--j0in-danger);
+  color: var(--j0in-danger-ink);
   font-size: var(--j0in-fs-sm);
 }
 
@@ -71,7 +71,7 @@
 }
 
 .form__person--on {
-  border-color: var(--j0in-accent);
+  border-color: var(--j0in-accent-ink);
   background: var(--j0in-surface-raised);
 }
 
@@ -82,7 +82,7 @@
   height: 32px;
   border-radius: var(--j0in-radius-pill);
   color: var(--j0in-text-on-color);
-  font-size: 12px;
+  font-size: var(--j0in-fs-sm);
   font-weight: var(--j0in-fw-bold);
 }
 
@@ -111,7 +111,7 @@
   color: var(--j0in-text-muted);
 
   &:hover {
-    color: var(--j0in-danger);
+    color: var(--j0in-danger-ink);
   }
 }
 
@@ -127,7 +127,7 @@
 
   &:hover {
     color: var(--j0in-text);
-    border-color: var(--j0in-accent);
+    border-color: var(--j0in-accent-ink);
   }
 }
 
@@ -148,8 +148,8 @@
 }
 
 .form__btn--primary {
-  border-color: var(--j0in-accent);
-  background: var(--j0in-accent);
+  border-color: var(--j0in-accent-ink);
+  background: var(--j0in-accent-strong);
   color: var(--j0in-text-on-color);
 
   &:hover {

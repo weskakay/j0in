@@ -1,0 +1,55 @@
+@for (entry of board(); track entry.column.id) {
+  <section class="group" [attr.aria-label]="entry.column.name">
+    <h2 class="group__name">
+      {{ entry.column.name }} <span class="group__count">{{ entry.tasks.length }}</span>
+    </h2>
+
+    <ul class="rows">
+      @for (task of entry.tasks; track task.id) {
+        <li class="row" [class.row--done]="isDone(task)">
+          <button
+            class="row__check"
+            type="button"
+            role="checkbox"
+            [attr.aria-checked]="isDone(task)"
+            [attr.aria-label]="t().list.markDone + ' ' + task.title"
+            (click)="toggleDone(task)"
+          >
+            @if (isDone(task)) {
+              <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true">
+                <path d="m5 12.5 4.5 4.5L19 7.5" fill="none" stroke="currentColor" stroke-width="3"
+                  stroke-linecap="round" stroke-linejoin="round" />
+              </svg>
+            }
+          </button>
+
+          <button class="row__title" type="button" (click)="open.emit(task)">{{ task.title }}</button>
+
+          <span class="row__meta">
+            @if (categoryOf(task); as category) {
+              <span class="row__chip">
+                <span class="row__dot" [style.background]="category.color" aria-hidden="true"></span>
+                {{ category.name }}
+              </span>
+            }
+            <span class="row__prio row__prio--{{ task.priority }}">{{ t().task[task.priority] }}</span>
+            @if (task.dueDate) {
+              <span class="row__due" [class.row__due--late]="!isDone(task) && task.dueDate < day">
+                {{ due(task) }}
+              </span>
+            }
+            <span class="row__people">
+              @for (person of peopleOf(task); track person.id) {
+                <span class="row__avatar" [style.background]="person.color" [title]="person.name" role="img" [attr.aria-label]="person.name">
+                  {{ initials(person) }}
+                </span>
+              }
+            </span>
+          </span>
+        </li>
+      } @empty {
+        <li class="rows__empty">{{ t().list.empty }}</li>
+      }
+    </ul>
+  </section>
+}

@@ -50,6 +50,14 @@
         <option value="low">{{ t().task.low }}</option>
       </select>
     </label>
+
+    <label class="form__field">
+      <span class="form__label">{{ t().panel.estimateHours }}</span>
+      <input class="form__input" type="number" min="0" max="100" step="0.25" formControlName="estimate" />
+      @if (form.controls.estimate.touched && form.controls.estimate.invalid) {
+        <span class="form__hint" role="alert">{{ t().panel.estimateInvalid }}</span>
+      }
+    </label>
   </div>
 
   @if (contacts().length > 0) {

@@ -30,6 +30,9 @@ export class ColumnHead {
   /** How many cards sit in it. */
   readonly count = input(0);
 
+  /** Its place on the board, which picks the colour of the dot. */
+  readonly tone = input(0);
+
   /** Fires with the new name once renaming is confirmed. */
   readonly renamed = output<string>();
 

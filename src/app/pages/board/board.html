@@ -1,51 +1,5 @@
-<header class="board__head">
-  <h1 class="board__title">{{ boardName() || 'Board' }}</h1>
-  <div class="board__tools">
-    <label class="board__search">
-    <span class="board__search-label">{{ t().board.search }}</span>
-    <input
-      class="board__search-field"
-      type="search"
-      [placeholder]="t().board.search"
-        (input)="onSearch($event)"
-      />
-    </label>
-
-    @if (canPlan()) {
-      <button class="board__planner-toggle" type="button" (click)="togglePlanner()">
-      <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
-        <path
-          d="M4 6h16v14H4zM4 10h16M8 3v3M16 3v3"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2"
-          stroke-linecap="round"
-        />
-      </svg>
-        {{ plannerOpen() ? t().planner.hide : t().planner.show }}
-      </button>
-    }
-
-    @if (namingColumn()) {
-      <input
-        class="board__column-field"
-        type="text"
-        [placeholder]="t().board.columnName"
-        [attr.aria-label]="t().board.columnName"
-        #columnField
-        (keydown)="onColumnKeydown($event)"
-        (blur)="addColumn($event)"
-      />
-    } @else {
-      <button class="board__add-column" type="button" (click)="startColumn()">
-        <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
-          <path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
-        </svg>
-        {{ t().board.addColumn }}
-      </button>
-    }
-  </div>
-</header>
+<app-board-head (create)="openNewFirst()" />
+<app-filter-bar />
 
 @if (error(); as message) {
   <p class="board__error" role="alert">
@@ -58,17 +12,19 @@
   <app-loader [label]="t().common.loading" />
 }
 
-@if (ready() && noMatches()) {
+@if (ready() && view.noMatches()) {
   <p class="board__empty" role="status">{{ t().board.empty }}</p>
 }
 
-@if (ready()) {
+@if (ready() && view.layout() === 'list') {
+  <app-task-list [board]="view.board()" (open)="openTask($event)" />
+} @else if (ready()) {
   <div class="board__split" [class.board__split--planner]="plannerOpen()">
   @if (plannerOpen()) {
     <app-planner />
   }
   <div class="board__columns" [style.--j0in-column-width.px]="columnWidth()">
-    @for (entry of board(); track entry.column.id) {
+    @for (entry of view.board(); track entry.column.id; let c = $index) {
       <section
         class="column"
         [class.column--over]="drag.overColumn() === entry.column.id && drag.task()"
@@ -80,6 +36,7 @@
         <app-column-head
           [column]="entry.column"
           [count]="entry.tasks.length"
+          [tone]="c"
           (renamed)="onRenameColumn(entry.column.id, $event)"
           (removed)="askRemoveColumn(entry.column)"
           (added)="openNew(entry.column.id)"
@@ -138,7 +95,7 @@
           #list
           class="column__list"
           [class.column__list--stack]="stacked"
-          (wheel)="onStackWheel($event, entry, list)"
+          (wheel)="keys.onWheel($event, entry, list)"
         >
           @for (task of entry.tasks; track task.id; let i = $index) {
             @if (showSlot(entry.column.id, i)) {
@@ -158,9 +115,10 @@
                 [task]="task"
                 [category]="categoryOf(task)"
                 [contacts]="contacts()"
+                [finished]="entry.column.id === lastColumnId()"
                 (open)="onCardOpen(entry, i, $event)"
-                (keyed)="onCardKeydown($event, task, entry)"
-                (focusin)="onCardFocus(entry, i)"
+                (keyed)="keys.onKeydown($event, task, entry)"
+                (focusin)="keys.onFocus(entry, i)"
               />
             </li>
           } @empty {
@@ -172,7 +130,7 @@
         </ul>
       </section>
     }
-
+    <app-add-column />
   </div>
   </div>
 }
@@ -194,6 +152,26 @@
   </div>
 }
 
+@if (shownTask(); as task) {
+  <app-dialog [side]="true" [heading]="task.title" (closed)="closePanel()">
+    <app-task-detail
+      [task]="task"
+      [category]="categoryOf(task)"
+      [contacts]="contacts()"
+      [columns]="columns()"
+      (toggled)="onToggle($event)"
+      (moved)="onMove($event)"
+      (subtaskAdded)="onAddSubtask($event)"
+      (edit)="startEdit()"
+      (remove)="askDelete()"
+    />
+  </app-dialog>
+} @else if (ready() && taskId()) {
+  <app-dialog [side]="true" [heading]="t().panel.label" (closed)="closePanel()">
+    <p>{{ t().panel.missing }}</p>
+  </app-dialog>
+}
+
 @if (mode() !== 'none') {
   <app-dialog [heading]="heading()" (closed)="closeDialog()">
     @if (mode() === 'wipeColumn' && doomed(); as column) {
@@ -210,7 +188,7 @@
         „{{ task.title }}" {{ t().board.confirmTask }}
       </p>
       <footer class="board__confirm-actions">
-        <button class="board__confirm-btn" type="button" (click)="openTask(task)">{{ t().common.cancel }}</button>
+        <button class="board__confirm-btn" type="button" (click)="closeDialog()">{{ t().common.cancel }}</button>
         <button
           class="board__confirm-btn board__confirm-btn--danger"
           type="button"
@@ -220,15 +198,6 @@
           {{ busy() ? t().board.deleting : t().board.deleteTask }}
         </button>
       </footer>
-    } @else if (mode() === 'detail' && shownTask(); as task) {
-      <app-task-detail
-        [task]="task"
-        [category]="categoryOf(task)"
-        [contacts]="contacts()"
-        (toggled)="onToggle($event)"
-        (edit)="startEdit()"
-        (remove)="askDelete()"
-      />
     } @else {
       <app-task-form
         [task]="current()"
