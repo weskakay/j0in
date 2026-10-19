@@ -170,9 +170,12 @@ export class Board {
     this.store.load();
   }
 
-  /** The id in the address below /board, or null. */
+  /**
+   * The id in the address below /board, or null. Coming straight from another
+   * page, the child route exists before its snapshot does, so both are optional.
+   */
   private openId(): string | null {
-    return this.route.firstChild?.snapshot.paramMap.get('taskId') ?? null;
+    return this.route.firstChild?.snapshot?.paramMap.get('taskId') ?? null;
   }
 
   /** The category of a task, for the coloured label on its card. */
