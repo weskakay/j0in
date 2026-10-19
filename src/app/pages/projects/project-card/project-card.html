@@ -1,0 +1,63 @@
+@let item = project();
+<header class="card__head">
+  <app-project-icon [icon]="item.icon" [color]="item.color" [name]="item.name" [large]="true" />
+  <div class="card__titles">
+    <h2 class="card__name">
+      <a class="card__link" routerLink="/board" [queryParams]="{ category: item.id }">{{ item.name }}</a>
+    </h2>
+    <span class="status status--{{ item.status }}">{{ t().projects.status[item.status] }}</span>
+  </div>
+  <button
+    class="card__icon-btn card__star"
+    type="button"
+    [class.card__star--on]="item.pinned"
+    [attr.aria-pressed]="item.pinned"
+    [attr.aria-label]="t().projects.pin + ': ' + item.name"
+    (click)="pinned.emit(item)"
+  >
+    <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
+      <path d="M12 3l2.8 5.7 6.2.9-4.5 4.4 1 6.2L12 17.3l-5.5 2.9 1-6.2L3 9.6l6.2-.9z" stroke="currentColor"
+        stroke-width="2" stroke-linejoin="round" />
+    </svg>
+  </button>
+  <button class="card__icon-btn" type="button" [attr.aria-label]="t().projects.edit + ': ' + item.name" (click)="edit.emit(item)">
+    <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
+      <path d="M4 20h4L19 9l-4-4L4 16zM13 7l4 4" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" />
+    </svg>
+  </button>
+</header>
+
+@if (item.description) {
+  <p class="card__text">{{ item.description }}</p>
+}
+
+<div class="card__milestone">
+  <span class="card__dial">
+    <app-rings class="card__ring" [rings]="ring()" />
+    <span class="card__percent">{{ row().percent }} %</span>
+  </span>
+  <span class="card__step">
+    <span class="card__label">{{ t().projects.milestone }}</span>
+    @if (milestone(); as step) {
+      <span class="card__step-title">{{ step.title }}</span>
+      <span class="card__label">{{ when(step.dueDate) || t().projects.noDue }}</span>
+    } @else {
+      <span class="card__step-title">{{ t().projects.noMilestone }}</span>
+    }
+  </span>
+</div>
+
+<footer class="card__foot">
+  <span class="card__faces">
+    @for (person of faces(); track person.id) {
+      <span class="card__face" [style.background]="person.color" role="img" [attr.aria-label]="person.name" [title]="person.name">
+        {{ initials(person) }}
+      </span>
+    }
+    @if (more() > 0) {
+      <span class="card__face card__face--more">+{{ more() }}</span>
+    }
+  </span>
+  <span class="card__count">{{ row().done }}/{{ row().total }} {{ t().projects.tasksWord }}</span>
+  <span class="card__due">{{ due() || t().projects.noDue }}</span>
+</footer>
