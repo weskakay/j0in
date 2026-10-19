@@ -11,6 +11,8 @@
 
 .top {
   @include surface;
+  -webkit-backdrop-filter: var(--j0in-bar-blur);
+  backdrop-filter: var(--j0in-bar-blur);
   display: flex;
   align-items: center;
   gap: var(--j0in-space-sm);
@@ -122,7 +124,7 @@
   border-color: var(--j0in-accent-ink);
   background: var(--j0in-accent-strong);
   box-shadow: var(--j0in-glow);
-  color: var(--j0in-text-on-color);
+  color: var(--j0in-on-accent);
 
   &:hover {
     background: var(--j0in-accent-hover);

@@ -36,10 +36,10 @@
 
   .grip:hover .grip__line,
   .grip:focus-visible .grip__line {
-    background: var(--j0in-accent);
+    background: var(--j0in-accent-mark);
   }
 }
 
 :host(.grip--held) .grip__line {
-  background: var(--j0in-accent);
+  background: var(--j0in-accent-mark);
 }

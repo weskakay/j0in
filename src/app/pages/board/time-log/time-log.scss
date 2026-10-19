@@ -88,7 +88,7 @@
 
   &:hover {
     background: var(--j0in-accent-strong);
-    color: var(--j0in-text-on-color);
+    color: var(--j0in-on-accent);
   }
 
   &:disabled {
@@ -98,7 +98,7 @@
 
 .time__toggle--running {
   background: var(--j0in-accent-strong);
-  color: var(--j0in-text-on-color);
+  color: var(--j0in-on-accent);
 
   &:hover {
     background: var(--j0in-accent-hover);

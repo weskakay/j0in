@@ -64,7 +64,7 @@ app-widget {
   width: 4px;
   height: 24px;
   border-radius: var(--j0in-radius-pill);
-  background: var(--j0in-accent);
+  background: var(--j0in-accent-mark);
 }
 
 .lines__text {
@@ -178,5 +178,5 @@ app-widget {
   display: block;
   height: 100%;
   border-radius: inherit;
-  background: var(--j0in-accent);
+  background: var(--j0in-accent-mark);
 }

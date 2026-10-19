@@ -60,7 +60,7 @@
 
 /* The circle sits inside the 44px tap area, so it reads smaller than it taps. */
 .card__timer--running {
-  color: var(--j0in-text-on-color);
+  color: var(--j0in-on-accent);
 
   &::before {
     content: '';
@@ -73,7 +73,7 @@
 
   &:hover,
   &:focus-visible {
-    color: var(--j0in-text-on-color);
+    color: var(--j0in-on-accent);
   }
 
   &:hover::before,
@@ -145,7 +145,7 @@
   display: block;
   height: 100%;
   border-radius: inherit;
-  background: var(--j0in-accent);
+  background: var(--j0in-accent-mark);
   transition: width var(--j0in-transition);
 }
 

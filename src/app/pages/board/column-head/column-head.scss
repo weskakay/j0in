@@ -13,7 +13,7 @@
   width: 10px;
   height: 10px;
   border-radius: var(--j0in-radius-pill);
-  background: var(--j0in-accent);
+  background: var(--j0in-accent-mark);
 }
 
 .head__dot--1 {
@@ -75,7 +75,7 @@
   &:hover {
     background: var(--j0in-accent-strong);
     border-color: var(--j0in-accent-ink);
-    color: var(--j0in-text-on-color);
+    color: var(--j0in-on-accent);
   }
 }
 
