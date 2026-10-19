@@ -1,5 +1,5 @@
 import { Injectable, computed, inject, signal } from '@angular/core';
-import { Observable, tap } from 'rxjs';
+import { Observable, catchError, of, tap } from 'rxjs';
 import { Router } from '@angular/router';
 import { BoardStore } from './board.store';
 import { ApiService } from './api.service';
@@ -52,11 +52,16 @@ export class AuthService {
    */
   readonly canUseCalendar = computed(() => this.currentUser()?.calendarEnabled === true);
 
-  /** Asks the server who is signed in; called once when the app starts. */
+  /**
+   * Asks the server who is signed in; called once when the app starts. When
+   * the server cannot answer, the visitor counts as signed out and lands on
+   * the login instead of an empty page.
+   */
   restore(): Observable<User | Record<string, never>> {
-    return this.api
-      .get<User | Record<string, never>>('/auth/me')
-      .pipe(tap((result) => this.applyRestored(result)));
+    return this.api.get<User | Record<string, never>>('/auth/me').pipe(
+      catchError(() => of({} as Record<string, never>)),
+      tap((result) => this.applyRestored(result)),
+    );
   }
 
   /**

@@ -123,8 +123,8 @@ export class Settings {
   /** Whether a board has arrived at all. */
   protected readonly ready = this.store.ready;
 
-  /** Message of a failed call, or null. */
-  protected readonly error = this.store.error;
+  /** The last failure, in the language on screen. */
+  protected readonly error = computed(() => this.language.message(this.store.error()));
 
   /** True while a request is running. */
   protected readonly busy = signal(false);

@@ -29,8 +29,10 @@ export class Projects {
   private readonly store = inject(BoardStore);
   private readonly toasts = inject(ToastService);
 
+  private readonly language = inject(LanguageService);
+
   /** Every piece of text, in the language currently on screen. */
-  protected readonly t = inject(LanguageService).dict;
+  protected readonly t = this.language.dict;
 
   /** True while a load is running. */
   protected readonly loading = this.store.loading;
@@ -78,7 +80,7 @@ export class Projects {
   /** Pins a project or takes it off the sidebar. */
   protected togglePin(project: Category): void {
     this.store.pinCategory(project.id, !project.pinned).subscribe({
-      error: (failure: Error) => this.toasts.show(failure.message),
+      error: (failure: Error) => this.toasts.show(this.language.message(failure.message)),
     });
   }
 
@@ -106,7 +108,7 @@ export class Projects {
   /** Keeps the dialog open and says why the change did not go through. */
   private fail(message: string): void {
     this.busy.set(false);
-    this.problem.set(message);
+    this.problem.set(this.language.message(message));
   }
 
   /** Sends a change, closes the dialog when it went through and says so. */

@@ -55,8 +55,8 @@ export class Home {
   /** True while a load is running. */
   protected readonly loading = this.store.loading;
 
-  /** Message of a failed call, or null. */
-  protected readonly error = this.store.error;
+  /** The last failure, in the language on screen. */
+  protected readonly error = computed(() => this.language.message(this.store.error()));
 
   /** Whether a board has arrived at all. */
   protected readonly ready = this.store.ready;

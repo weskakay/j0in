@@ -80,7 +80,7 @@ export class Signup {
 
   /** Puts the server's message on screen and frees the button again. */
   private showError(e: Error): void {
-    this.error.set(e.message);
+    this.error.set(this.language.message(e.message));
     this.busy.set(false);
   }
 }

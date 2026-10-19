@@ -70,7 +70,7 @@ export class Login {
 
   /** Puts the server's message on screen and frees the buttons again. */
   private showError(e: Error): void {
-    this.error.set(e.message);
+    this.error.set(this.language.message(e.message));
     this.busy.set(false);
   }
 }
