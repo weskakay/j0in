@@ -1,0 +1,115 @@
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--j0in-space-md);
+}
+
+.form__field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--j0in-space-xs);
+  min-width: 0;
+}
+
+.form__set {
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.form__label {
+  color: var(--j0in-text-muted);
+}
+
+.form__input {
+  width: 100%;
+  min-height: var(--j0in-tap-target);
+  padding: var(--j0in-space-sm) var(--j0in-space-md);
+  border: 1px solid var(--j0in-border);
+  border-radius: var(--j0in-radius-md);
+  background: var(--j0in-fill);
+}
+
+.form__input--area {
+  resize: vertical;
+}
+
+/* One line kept free, so a message never pushes the form around. */
+.form__hint {
+  min-height: calc(var(--j0in-fs-sm) * var(--j0in-lh-body));
+  color: var(--j0in-danger-ink);
+}
+
+.form__row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--j0in-space-md);
+}
+
+.form__icons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--j0in-space-xs);
+}
+
+.form__icon {
+  display: grid;
+  place-items: center;
+  width: var(--j0in-tap-target);
+  height: var(--j0in-tap-target);
+  border: 1px solid var(--j0in-border);
+  border-radius: var(--j0in-radius-md);
+  background: var(--j0in-fill);
+  color: var(--j0in-text);
+
+  &:hover {
+    border-color: var(--j0in-accent-ink);
+  }
+}
+
+.form__icon--on {
+  border-color: transparent;
+  background: linear-gradient(150deg, var(--tile), color-mix(in srgb, var(--tile) 62%, black));
+  color: var(--j0in-text-on-color);
+}
+
+.form__actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: var(--j0in-space-sm);
+  padding-top: var(--j0in-space-md);
+  border-top: 1px solid var(--j0in-border);
+}
+
+.form__btn {
+  min-height: var(--j0in-tap-target);
+  padding: 0 var(--j0in-space-lg);
+  border: 1px solid var(--j0in-border);
+  border-radius: var(--j0in-radius-pill);
+  background: transparent;
+}
+
+.form__btn--primary {
+  border-color: var(--j0in-accent-strong);
+  background: var(--j0in-accent-strong);
+  color: var(--j0in-text-on-color);
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: default;
+  }
+}
+
+.form__btn--danger {
+  margin-right: auto;
+  border-color: var(--j0in-danger-ink);
+  color: var(--j0in-danger-ink);
+}
+
+.form__problem {
+  padding: var(--j0in-space-sm) var(--j0in-space-md);
+  border-radius: var(--j0in-radius-sm);
+  background: color-mix(in srgb, var(--j0in-danger) 14%, transparent);
+  color: var(--j0in-danger-ink);
+}
