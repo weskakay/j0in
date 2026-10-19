@@ -1,0 +1,58 @@
+@let person = member().contact;
+<div class="hero" [style.--tile]="person.color">
+  <span class="hero__avatar" aria-hidden="true">{{ initials(person) }}</span>
+  <span class="hero__name">{{ person.name }}</span>
+  @if (member().project; as project) {
+    <span class="hero__project">{{ project.name }}</span>
+  }
+</div>
+
+<dl class="facts">
+  <div class="fact">
+    <dt class="fact__label">{{ t().team.email }}</dt>
+    <dd class="fact__value">
+      @if (person.email) {
+        <a [href]="'mailto:' + person.email">{{ person.email }}</a>
+      } @else {
+        {{ t().team.none }}
+      }
+    </dd>
+  </div>
+  <div class="fact">
+    <dt class="fact__label">{{ t().team.phone }}</dt>
+    <dd class="fact__value">
+      @if (person.phone) {
+        <a [href]="'tel:' + person.phone">{{ person.phone }}</a>
+      } @else {
+        {{ t().team.none }}
+      }
+    </dd>
+  </div>
+</dl>
+
+<div class="stats">
+  <app-rings class="stats__ring" [rings]="ring()" />
+  <span class="stats__text">
+    <span class="stats__value">{{ member().doneWeek }}</span>
+    <span class="stats__label">{{ t().team.doneWeek }}</span>
+    <span class="stats__label">{{ member().open.length }} {{ t().team.openTasks }}</span>
+  </span>
+</div>
+
+<section>
+  <h3 class="list__title">{{ t().team.openList }}</h3>
+  <ul class="list">
+    @for (task of member().open; track task.id) {
+      <li><a class="list__link" [routerLink]="['/board', task.id]">{{ task.title }}</a></li>
+    }
+  </ul>
+</section>
+
+<footer class="actions">
+  <button class="actions__btn actions__btn--danger" type="button" (click)="remove.emit(person)">
+    {{ t().common.delete }}
+  </button>
+  <button class="actions__btn actions__btn--primary" type="button" (click)="edit.emit(person)">
+    {{ t().team.edit }}
+  </button>
+</footer>
