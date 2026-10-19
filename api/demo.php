@@ -7,6 +7,7 @@
 function fillDemoBoard(PDO $pdo, string $boardId, string $lang = 'de'): void
 {
     $contacts = insertDemoContacts($pdo, $boardId);
+    insertDemoProjects($pdo, $boardId, $lang);
     $columns = idsByName($pdo, 'join_columns', $boardId);
     $categories = idsByName($pdo, 'join_categories', $boardId);
     $phases = phaseIdsInOrder($pdo, $boardId);
@@ -16,6 +17,46 @@ function fillDemoBoard(PDO $pdo, string $boardId, string $lang = 'de'): void
             insertDemoTime($pdo, $id, $phases, $task['time'] ?? []);
             stampDemoDone($pdo, $id, $task['done'] ?? null);
         }
+    }
+}
+
+/**
+ * Gives the guest board its projects: the two every board starts with get
+ * an icon, a state and a line about them, the others are added.
+ */
+function insertDemoProjects(PDO $pdo, string $boardId, string $lang): void
+{
+    $known = idsByName($pdo, 'join_categories', $boardId);
+    $position = 0;
+    foreach (J0IN_DEMO_PROJECTS as $name => $project) {
+        $id = $known[$name] ?? uuid();
+        if (!isset($known[$name])) {
+            $pdo->prepare('INSERT INTO join_categories (id, board_id, name, position) VALUES (?, ?, ?, 0)')
+                ->execute([$id, $boardId, $name]);
+        }
+        writeDemoProject($pdo, $id, $project, $lang, ++$position);
+    }
+}
+
+/** Writes colour, icon, state, date, pin and the line in the chosen language. */
+function writeDemoProject(PDO $pdo, string $id, array $project, string $lang, int $position): void
+{
+    [$color, $icon, $status, $due, $pinned, $text] = $project;
+    $pdo->prepare(
+        'UPDATE join_categories SET color = ?, icon = ?, status = ?, due_date = ?, pinned = ?, description = ?,
+         position = ? WHERE id = ?'
+    )->execute([
+        $color, $icon, $status, date('Y-m-d', strtotime($due)), $pinned ? 1 : 0,
+        $text[$lang] ?? $text['de'], $position, $id,
+    ]);
+}
+
+/** Puts the lines of the demo projects into another language. */
+function rewriteDemoProjects(PDO $pdo, string $boardId, string $lang): void
+{
+    $stmt = $pdo->prepare('UPDATE join_categories SET description = ? WHERE board_id = ? AND name = ?');
+    foreach (J0IN_DEMO_PROJECTS as $name => $project) {
+        $stmt->execute([$project[5][$lang] ?? $project[5]['de'], $boardId, $name]);
     }
 }
 
@@ -51,8 +92,10 @@ function rebuildDemoBoard(PDO $pdo, string $boardId, string $lang = 'de'): void
     insertStartColumns($pdo, $boardId);
     insertStartCategories($pdo, $boardId);
     insertStartPhases($pdo, $boardId, $lang);
-    $pdo->prepare('UPDATE join_boards SET name = ?, demo_reset_on = CURDATE() WHERE id = ?')
-        ->execute([boardNameIn($lang), $boardId]);
+    $pdo->prepare(
+        'UPDATE join_boards SET name = ?, demo_reset_on = CURDATE(),
+         week_capacity = DEFAULT, focus_goal = DEFAULT, focus_default = DEFAULT WHERE id = ?'
+    )->execute([boardNameIn($lang), $boardId]);
     fillDemoBoard($pdo, $boardId, $lang);
 }
 
