@@ -10,6 +10,13 @@ export const EN_SCREENS: ScreenTexts = {
     glass: 'Glass',
     glassNote: 'floating glass surfaces with a lit edge',
     saved: 'Look changed',
+    frost: 'Glass',
+    frostNote: 'How much of the background shows through the bars, cards and dialogs.',
+    frostClear: 'clear',
+    frostSolid: 'frosted',
+    refract: 'Light bending',
+    refractNote: 'The edges of the sidebar, top bar and dialogs bend the background a little, like thick glass.',
+    refractElsewhere: 'Shows in Chrome and Edge. In this browser the glass stays without bending.',
   },
   topbar: {
     search: 'Search or jump to',

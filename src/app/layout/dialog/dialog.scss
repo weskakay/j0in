@@ -23,8 +23,8 @@
   width: 100%;
   max-height: 92dvh;
   background: var(--j0in-dialog-bg);
-  -webkit-backdrop-filter: var(--j0in-panel-blur-thick);
-  backdrop-filter: var(--j0in-panel-blur-thick);
+  -webkit-backdrop-filter: var(--j0in-bar-blur-thick);
+  backdrop-filter: var(--j0in-bar-blur-thick);
   border-radius: var(--j0in-radius-md) var(--j0in-radius-md) 0 0;
   box-shadow: var(--j0in-panel-shadow), var(--j0in-shadow-md);
   animation: rise 350ms var(--j0in-spring);

@@ -2,6 +2,7 @@ import { Component, computed, inject } from '@angular/core';
 import { LanguageService } from '../../../core/language.service';
 import { LOOKS, LookService, type Look } from '../../../core/look.service';
 import { ToastService } from '../../../core/toast.service';
+import { GlassTuner } from '../glass-tuner/glass-tuner';
 
 /** One look as the picker lists it. */
 interface LookChoice {
@@ -13,6 +14,7 @@ interface LookChoice {
 /** Picks the look of the app, each choice with a small preview of itself. */
 @Component({
   selector: 'app-look-picker',
+  imports: [GlassTuner],
   templateUrl: './look-picker.html',
   styleUrl: './look-picker.scss',
 })

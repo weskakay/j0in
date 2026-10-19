@@ -1,0 +1,35 @@
+.tuner {
+  display: flex;
+  flex-direction: column;
+  gap: var(--j0in-space-sm);
+  margin-top: var(--j0in-space-md);
+}
+
+.tuner__field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--j0in-space-xs);
+}
+
+.tuner__label {
+  font-weight: var(--j0in-fw-bold);
+}
+
+.tuner__note,
+.tuner__ends {
+  color: var(--j0in-text-muted);
+}
+
+/* The native slider, tinted with the accent and tall enough to hit by finger. */
+.tuner__range {
+  width: 100%;
+  min-height: var(--j0in-tap-target);
+  accent-color: var(--j0in-accent);
+  cursor: pointer;
+}
+
+.tuner__ends {
+  display: flex;
+  justify-content: space-between;
+  margin-top: calc(-1 * var(--j0in-space-sm));
+}

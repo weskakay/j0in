@@ -1,0 +1,28 @@
+<div class="tuner">
+  <label class="tuner__field">
+    <span class="tuner__label">{{ t().look.frost }}</span>
+    <span class="tuner__note">{{ t().look.frostNote }}</span>
+    <input
+      class="tuner__range"
+      type="range"
+      min="0"
+      max="100"
+      [step]="step"
+      [value]="frost()"
+      [attr.aria-valuetext]="frost() + ' %'"
+      (input)="slide($event)"
+    />
+  </label>
+  <span class="tuner__ends" aria-hidden="true">
+    <span>{{ t().look.frostClear }}</span>
+    <span>{{ t().look.frostSolid }}</span>
+  </span>
+
+  <app-switch
+    [label]="t().look.refract"
+    [note]="canRefract ? t().look.refractNote : t().look.refractElsewhere"
+    [on]="refract()"
+    [states]="[t().features.on, t().features.off]"
+    (toggled)="toggleRefract()"
+  />
+</div>

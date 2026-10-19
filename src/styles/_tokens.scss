@@ -24,6 +24,8 @@
   // labels on accent buttons stay readable whatever accent is picked.
   --j0in-accent-strong: color-mix(in srgb, var(--j0in-accent) 72%, black);
   --j0in-accent-hover: color-mix(in srgb, var(--j0in-accent) 62%, black);
+  // Labels on those fills. A light accent picked freely turns them dark.
+  --j0in-on-accent: var(--j0in-text-on-color);
   --j0in-success: #7ae582;
   --j0in-warning: #ffa800;
   --j0in-danger: #ff3d00;
@@ -36,7 +38,10 @@
 
   // Colours used as text. On dark they are the colours themselves; the
   // light theme darkens them until they reach 4.5:1.
-  --j0in-accent-ink: var(--j0in-accent);
+  --j0in-accent-ink: var(--j0in-accent-ink-dark, var(--j0in-accent));
+  // Bars, dots and rings in the accent. The colour itself, or for one picked
+  // freely the shade that still stands out from the background.
+  --j0in-accent-mark: var(--j0in-accent-ink-dark, var(--j0in-accent));
   --j0in-danger-ink: var(--j0in-danger);
   --j0in-prio-urgent-ink: var(--j0in-prio-urgent);
   --j0in-prio-medium-ink: var(--j0in-prio-medium);
@@ -86,6 +91,12 @@
   --j0in-panel-border: 1px solid var(--j0in-border);
   --j0in-panel-blur: none;
   --j0in-panel-blur-thick: none;
+  // Sidebar, top bar and dialogs: the panel blur, or with light bending on top.
+  --j0in-bar-blur: var(--j0in-panel-blur);
+  --j0in-bar-blur-thick: var(--j0in-panel-blur-thick);
+  // How frosted the glass is, from 0 (clear) to 1 (nearly solid). The slider
+  // in the settings writes it; the glass look reads it.
+  --j0in-frost: 0.5;
   --j0in-panel-shadow: none;
   --j0in-panel-radius: var(--j0in-radius-md);
   // Sidebar and top bar: flush with the edge in the J0IN look.
@@ -131,7 +142,7 @@
   --j0in-ghost-shadow: drop-shadow(0 12px 24px rgb(0 0 0 / 35%));
 
   // Rings on the home screen
-  --j0in-ring-tasks: var(--j0in-accent);
+  --j0in-ring-tasks: var(--j0in-accent-mark);
   --j0in-ring-focus: var(--j0in-success);
   --j0in-ring-meet: var(--j0in-warning);
   --j0in-ring-track: var(--j0in-border);
@@ -149,7 +160,8 @@
   --j0in-text: #0d1620;
   --j0in-text-muted: #5a6b7c;
   --j0in-text-inverse: #ffffff;
-  --j0in-accent-ink: color-mix(in srgb, var(--j0in-accent) 58%, black);
+  --j0in-accent-ink: var(--j0in-accent-ink-light, color-mix(in srgb, var(--j0in-accent) 58%, black));
+  --j0in-accent-mark: var(--j0in-accent-ink-light, var(--j0in-accent));
   --j0in-danger-ink: color-mix(in srgb, var(--j0in-danger) 68%, black);
   --j0in-prio-urgent-ink: color-mix(in srgb, var(--j0in-prio-urgent) 68%, black);
   --j0in-prio-medium-ink: color-mix(in srgb, var(--j0in-prio-medium) 50%, black);
@@ -172,7 +184,8 @@
     --j0in-text: #0d1620;
     --j0in-text-muted: #5a6b7c;
     --j0in-text-inverse: #ffffff;
-    --j0in-accent-ink: color-mix(in srgb, var(--j0in-accent) 58%, black);
+    --j0in-accent-ink: var(--j0in-accent-ink-light, color-mix(in srgb, var(--j0in-accent) 58%, black));
+    --j0in-accent-mark: var(--j0in-accent-ink-light, var(--j0in-accent));
     --j0in-danger-ink: color-mix(in srgb, var(--j0in-danger) 68%, black);
     --j0in-prio-urgent-ink: color-mix(in srgb, var(--j0in-prio-urgent) 68%, black);
     --j0in-prio-medium-ink: color-mix(in srgb, var(--j0in-prio-medium) 50%, black);
@@ -196,8 +209,8 @@
     radial-gradient(48rem 34rem at 100% 4%, rgb(140 92 255 / 15%), transparent 60%),
     radial-gradient(44rem 30rem at 55% 110%, rgb(31 215 193 / 10%), transparent 60%),
     #0b0b0e;
-  --j0in-panel-bg: rgb(30 30 38 / 44%);
-  --j0in-panel-bg-thick: rgb(24 24 30 / 82%);
+  --j0in-panel-bg: color-mix(in srgb, rgb(30 30 38) calc(24% + var(--j0in-frost) * 40%), transparent);
+  --j0in-panel-bg-thick: color-mix(in srgb, rgb(24 24 30) calc(64% + var(--j0in-frost) * 36%), transparent);
   --j0in-panel-solid: #1c1c22;
   --j0in-panel-border: 1px solid rgb(255 255 255 / 8%);
   --j0in-panel-shadow:
@@ -226,8 +239,8 @@
     radial-gradient(48rem 34rem at 100% 4%, rgb(140 92 255 / 12%), transparent 60%),
     radial-gradient(44rem 30rem at 55% 110%, rgb(31 215 193 / 12%), transparent 60%),
     #e6eaf2;
-  --j0in-panel-bg: rgb(255 255 255 / 42%);
-  --j0in-panel-bg-thick: rgb(250 252 255 / 82%);
+  --j0in-panel-bg: color-mix(in srgb, rgb(255 255 255) calc(22% + var(--j0in-frost) * 40%), transparent);
+  --j0in-panel-bg-thick: color-mix(in srgb, rgb(250 252 255) calc(64% + var(--j0in-frost) * 36%), transparent);
   --j0in-panel-solid: #f3f5fa;
   --j0in-panel-border: 1px solid rgb(255 255 255 / 70%);
   --j0in-panel-shadow:
@@ -249,8 +262,8 @@
   @include glass-dark;
   --j0in-radius-sm: 10px;
   --j0in-radius-md: 16px;
-  --j0in-panel-blur: blur(18px) saturate(170%);
-  --j0in-panel-blur-thick: blur(30px) saturate(180%);
+  --j0in-panel-blur: blur(calc(6px + var(--j0in-frost) * 24px)) saturate(170%);
+  --j0in-panel-blur-thick: blur(calc(18px + var(--j0in-frost) * 24px)) saturate(180%);
   --j0in-panel-radius: 26px;
   --j0in-bar-radius: 26px;
   --j0in-dialog-bg: var(--j0in-panel-bg-thick);
@@ -261,6 +274,14 @@
   --j0in-sheen: 1;
   --j0in-ease: cubic-bezier(0.22, 0.8, 0.24, 1);
   --j0in-spring: cubic-bezier(0.34, 1.45, 0.55, 1);
+}
+
+// Light bending at the edges of the bars, switched on in the settings. Only
+// Chromium draws an SVG filter behind an element, so the attribute is only
+// set there; the filter itself sits in index.html.
+:root[data-look="glass"][data-refract] {
+  --j0in-bar-blur: url(#j0in-refract) var(--j0in-panel-blur);
+  --j0in-bar-blur-thick: url(#j0in-refract) var(--j0in-panel-blur-thick);
 }
 
 :root[data-look="glass"][data-theme="light"] {
@@ -288,25 +309,38 @@
 }
 
 // Someone who asked the system for less transparency gets solid surfaces.
+// Listed with the light selectors too, which would otherwise win.
 @media (prefers-reduced-transparency: reduce) {
-  :root[data-look="glass"] {
+  :root[data-look="glass"],
+  :root[data-look="glass"][data-theme="light"],
+  :root[data-look="glass"]:not([data-theme="dark"]),
+  :root[data-look="glass"][data-refract] {
     --j0in-panel-bg: var(--j0in-panel-solid);
     --j0in-panel-bg-thick: var(--j0in-panel-solid);
     --j0in-panel-blur: none;
     --j0in-panel-blur-thick: none;
+    --j0in-bar-blur: none;
+    --j0in-bar-blur-thick: none;
     --j0in-sheen: 0;
   }
 }
 
 // Without backdrop blur the surfaces would only be see-through, so they turn solid.
 @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
-  :root[data-look="glass"] {
+  :root[data-look="glass"],
+  :root[data-look="glass"][data-theme="light"],
+  :root[data-look="glass"]:not([data-theme="dark"]) {
     --j0in-panel-bg: var(--j0in-panel-solid);
     --j0in-panel-bg-thick: var(--j0in-panel-solid);
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
+  :root[data-look="glass"][data-refract] {
+    --j0in-bar-blur: var(--j0in-panel-blur);
+    --j0in-bar-blur-thick: var(--j0in-panel-blur-thick);
+  }
+
   :root,
   :root[data-look="glass"] {
     --j0in-transition: 0ms;

@@ -10,6 +10,13 @@ export const DE_SCREENS: ScreenTexts = {
     glass: 'Glas',
     glassNote: 'schwebende Glasflächen mit Lichtkante',
     saved: 'Ansicht geändert',
+    frost: 'Glas',
+    frostNote: 'Wie viel vom Hintergrund durch Leiste, Karten und Dialoge scheint.',
+    frostClear: 'klar',
+    frostSolid: 'milchig',
+    refract: 'Lichtbrechung',
+    refractNote: 'Die Ränder von Leiste, Kopfzeile und Dialogen verzerren den Hintergrund leicht, wie dickes Glas.',
+    refractElsewhere: 'Zu sehen in Chrome und Edge. In diesem Browser bleibt das Glas ohne Verzerrung.',
   },
   topbar: {
     search: 'Suchen oder springen',

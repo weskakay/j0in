@@ -13,6 +13,13 @@ export interface ScreenTexts {
     glass: string;
     glassNote: string;
     saved: string;
+    frost: string;
+    frostNote: string;
+    frostClear: string;
+    frostSolid: string;
+    refract: string;
+    refractNote: string;
+    refractElsewhere: string;
   };
   topbar: {
     search: string;
