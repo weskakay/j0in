@@ -44,12 +44,15 @@ BCRYPT and verified server side, and the browser only ever holds a session cooki
 ✅ Settings with their own navigation: look, board and projects, time, focus, calendar, access and account
 ✅ Dark and light, following the system by default
 ✅ Two looks to choose from: the flat J0IN look and a glass look with floating, see-through surfaces
+✅ The glass can be tuned from clear to frosted, with optional light bending at the edges (Chrome and Edge)
+✅ Any accent colour: six ready-made ones or a colour of your own, with labels and links kept readable
+✅ On a phone the columns stand below each other or are swiped one at a time, as you prefer
 ✅ Home screen: the day as three rings, what comes next, focus, my tasks, the week, projects and who is busy
 ✅ Board or list, figures above the board, filters for project and priority that live in the address bar
 ✅ Every task opens in a side panel under its own address: change the column, add subtasks, start a focus
 ✅ Estimates on tasks, and the moment a task reached the last column is kept for the figures
 ✅ Time tracking per task and phase, with a timer on every card
-✅ Focus runs of 15, 25 or 50 minutes, counted down in a small pill at the top of every page; default length and daily goal are set per board
+✅ Focus runs of 15, 25 or 50 minutes, counted down in a small pill at the top of every page; default length and daily goal are set per board; the tab title says when a run is done
 ✅ Command palette on Ctrl K or Cmd K: pages, actions, tasks, projects and contacts
 ✅ Insights page with priorities, columns and due dates as charts
 ✅ Google Calendar and a day planner for accounts the owner has unlocked
@@ -70,6 +73,7 @@ The guest board is reset once a day and every card on it shows one feature:
 | Open the calendar and look at the week | Calendar, switch between month and week |
 | Look at the team and its workload | Team in the menu, open a profile |
 | Set the focus length and daily goal | Settings, focus and capacity |
+| Tune the glass and swipe the columns | Settings, appearance |
 | Track time on a card | The play button on a card |
 | Browse the stack | A column with more than three cards |
 
