@@ -41,6 +41,31 @@ BCRYPT and verified server side, and the browser only ever holds a session cooki
 ✅ Contacts, grouped alphabetically, assignable to tasks
 ✅ Settings for columns, categories and the colour theme
 ✅ Dark and light, following the system by default
+✅ Two looks to choose from: the flat J0IN look and a glass look with floating, see-through surfaces
+✅ Home screen: the day as three rings, what comes next, focus, my tasks, the week, categories and who is busy
+✅ Board or list, figures above the board, filters for category and priority that live in the address bar
+✅ Every task opens in a side panel under its own address: change the column, add subtasks, start a focus
+✅ Estimates on tasks, and the moment a task reached the last column is kept for the figures
+✅ Time tracking per task and phase, with a timer on every card
+✅ Focus runs of 15, 25 or 50 minutes, counted down in a small pill at the top of every page
+✅ Command palette on Ctrl K or Cmd K: pages, actions, tasks, categories and contacts
+✅ Insights page with priorities, columns and due dates as charts
+✅ Google Calendar and a day planner for accounts the owner has unlocked
+
+## 👀 Try it as a guest
+
+The guest board is reset once a day and every card on it shows one feature:
+
+| Card | Where to look |
+|---|---|
+| Switch the look: J0IN or glass | Settings, appearance, look |
+| Find anything with Ctrl K | Ctrl K or Cmd K anywhere |
+| Start a 25 minute focus | Home, focus widget, or the button in an open card |
+| Open a card in the panel and change its column | Any card on the board |
+| Try the list and the filters | Board, switch to list, pick a category |
+| Look at the insights | Insights in the menu |
+| Track time on a card | The play button on a card |
+| Browse the stack | A column with more than three cards |
 
 ## 🖥️ Tech Stack
 
@@ -76,6 +101,9 @@ committed.
 On shared hosting the database usually runs on its own host, so `localhost` will not connect.
 Take the host from the hosting panel's connection details.
 
+An existing database is brought up to date with the files in `api/migrations/`, run once each in
+date order.
+
 Deploy the Angular build and the `api/` folder to the same domain. `spa.htaccess` belongs in the
 web root as `.htaccess`: it leaves `/api/` alone and routes everything else to `index.html`, so
 deep links survive a reload.
@@ -95,7 +123,7 @@ j0in/
     │   ├── core/           # Auth, HTTP, error handling
     │   ├── data/           # State and domain logic, knows nothing about screens
     │   ├── ui/             # Reusable building blocks
-    │   ├── layout/         # Navbar and sidebar
+    │   ├── layout/         # Sidebar, top bar, focus pill, command palette, dialogs
     │   └── pages/          # One screen per route
     └── styles/
         └── _tokens.scss    # Every colour, spacing, radius and font
@@ -123,8 +151,9 @@ production code.
 Every colour, spacing, radius, shadow and font is a CSS Custom Property in `styles/_tokens.scss`
 and used as `var(--j0in-...)` everywhere else. No component stylesheet carries a hex value.
 
-That is what makes switching the theme a swap of values rather than a rewrite, and it is the
-groundwork for the configurable colours and fonts planned later.
+That is what makes switching the theme a swap of values rather than a rewrite. The glass look is
+built the same way: it only redefines tokens under `[data-look="glass"]`, so every component comes
+out flat or as glass without knowing which look is on.
 
 ## 📄 License
 
