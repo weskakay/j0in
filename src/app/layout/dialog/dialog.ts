@@ -1,4 +1,4 @@
-import { Component, ElementRef, effect, inject, input, output, viewChild } from '@angular/core';
+import { Component, ElementRef, type OnDestroy, effect, inject, input, output, viewChild } from '@angular/core';
 import { LanguageService } from '../../core/language.service';
 
 const FOCUSABLE =
@@ -15,7 +15,7 @@ const FOCUSABLE =
   styleUrl: './dialog.scss',
   host: { '(document:keydown.escape)': 'onEscape($event)' },
 })
-export class Dialog {
+export class Dialog implements OnDestroy {
   private readonly language = inject(LanguageService);
   private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
 
@@ -36,10 +36,20 @@ export class Dialog {
 
   private readonly panel = viewChild<ElementRef<HTMLElement>>('panel');
 
+  /** The control that opened the dialog, which gets focus back when it closes. */
+  private readonly opener = document.activeElement as HTMLElement | null;
+
   /** Moves focus into the panel as soon as it is on screen. */
   private readonly focusPanel = effect(() => {
     this.panel()?.nativeElement.focus();
   });
+
+  /** Hands focus back to the control that opened the dialog, if it is still there. */
+  ngOnDestroy(): void {
+    if (this.opener?.isConnected) {
+      this.opener.focus();
+    }
+  }
 
   /** Tab keeps focus inside the dialog. */
   protected onKeydown(event: KeyboardEvent): void {
