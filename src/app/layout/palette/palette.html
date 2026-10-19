@@ -1,0 +1,57 @@
+<div class="palette__scrim" aria-hidden="true" (click)="close()"></div>
+
+<div class="palette" role="dialog" aria-modal="true" [attr.aria-label]="t().palette.label">
+  <div class="palette__head">
+    <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
+      <circle cx="11" cy="11" r="7" fill="none" stroke="currentColor" stroke-width="2" />
+      <path d="m20 20-3.5-3.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+    </svg>
+    <input
+      #field
+      class="palette__field"
+      type="text"
+      role="combobox"
+      aria-autocomplete="list"
+      aria-expanded="true"
+      aria-controls="palette-list"
+      autocomplete="off"
+      spellcheck="false"
+      [attr.aria-label]="t().palette.label"
+      [attr.aria-activedescendant]="activeId()"
+      [placeholder]="t().palette.placeholder"
+      [value]="term()"
+      (input)="onInput($event)"
+    />
+    <button class="palette__esc" type="button" [attr.aria-label]="t().common.close" (click)="close()">esc</button>
+  </div>
+
+  <div class="palette__body" id="palette-list" role="listbox" [attr.aria-label]="t().palette.label">
+    @for (block of groups(); track block.group) {
+      <div class="palette__group" role="group" [attr.aria-label]="t().palette[block.group]">
+        <p class="palette__heading" aria-hidden="true">{{ t().palette[block.group] }}</p>
+        @for (entry of block.entries; track entry.id) {
+          <div
+            class="palette__row"
+            role="option"
+            tabindex="-1"
+            [id]="entry.id"
+            [class.palette__row--on]="indexOf(entry) === active()"
+            [attr.aria-selected]="indexOf(entry) === active()"
+            (pointermove)="active.set(indexOf(entry))"
+            (click)="run(entry)"
+            (keydown.enter)="run(entry)"
+          >
+            @if (entry.color) {
+              <span class="palette__dot" [style.background]="entry.color" aria-hidden="true"></span>
+            }
+            <span class="palette__label">{{ entry.label }}</span>
+          </div>
+        }
+      </div>
+    } @empty {
+      <p class="palette__empty">{{ t().palette.empty }}</p>
+    }
+  </div>
+
+  <p class="palette__hint">{{ t().palette.hint }}</p>
+</div>

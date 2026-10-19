@@ -1,5 +1,6 @@
 @use "styles/tokens";
 @use "styles/auth";
+@use "styles/ui";
 
 *,
 *::before,
@@ -14,7 +15,9 @@ body {
 }
 
 body {
-  background: var(--j0in-bg);
+  min-height: 100%;
+  background: var(--j0in-page-bg);
+  background-attachment: fixed;
   color: var(--j0in-text);
   font-family: var(--j0in-font);
   font-size: var(--j0in-fs-body);
@@ -43,6 +46,7 @@ button,
 input,
 select,
 textarea {
+  border: unset;
   font: inherit;
   color: inherit;
 }
@@ -58,7 +62,7 @@ svg {
 }
 
 a {
-  color: var(--j0in-accent);
+  color: var(--j0in-accent-ink);
 }
 
 /* Impressum and privacy, side by side wherever they appear. */
@@ -70,7 +74,32 @@ a {
   font-size: var(--j0in-fs-sm);
 }
 
+::placeholder {
+  color: var(--j0in-text-muted);
+  opacity: 1;
+}
+
 :focus-visible {
-  outline: 2px solid var(--j0in-accent);
+  outline: 2px solid var(--j0in-accent-ink);
   outline-offset: 2px;
+}
+
+/* A soft light that follows the pointer across a surface, set by appSheen.
+   Only the glass look switches it on, through --j0in-sheen. */
+.sheen {
+  position: relative;
+}
+
+.sheen::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: radial-gradient(
+    22rem circle at var(--mx, 50%) var(--my, -20%),
+    rgb(255 255 255 / 9%),
+    transparent 60%
+  );
+  opacity: var(--j0in-sheen);
+  pointer-events: none;
 }

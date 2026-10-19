@@ -1,0 +1,20 @@
+<ul class="looks">
+  @for (choice of choices(); track choice.value) {
+    <li>
+      <button
+        class="look"
+        type="button"
+        [class.look--on]="look() === choice.value"
+        [attr.aria-pressed]="look() === choice.value"
+        (click)="pick(choice.value)"
+      >
+        <span class="look__preview look__preview--{{ choice.value }}" aria-hidden="true">
+          <span class="look__side"></span>
+          <span class="look__pane"></span>
+        </span>
+        <span class="look__label">{{ choice.label }}</span>
+        <span class="look__note">{{ choice.note }}</span>
+      </button>
+    </li>
+  }
+</ul>

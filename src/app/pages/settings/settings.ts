@@ -1,5 +1,4 @@
 import { Component, computed, inject, signal } from '@angular/core';
-import { Router } from '@angular/router';
 import { AuthService } from '../../core/auth.service';
 import { BoardStore } from '../../core/board.store';
 import { AccessService } from '../../core/access.service';
@@ -7,6 +6,7 @@ import { CalendarService } from '../../core/calendar.service';
 import { LanguageService } from '../../core/language.service';
 import { FeaturesService } from '../../core/features.service';
 import { ThemeService, type Theme } from '../../core/theme.service';
+import { LookPicker } from './look-picker/look-picker';
 import type { AccessRequest, Category, TimePhase } from '../../data/models';
 import type { Dictionary } from '../../data/i18n';
 import { ColorPicker } from '../../layout/color-picker/color-picker';
@@ -45,7 +45,7 @@ interface DoneMessage {
 /** Appearance, the board's name, and what belongs to the account. */
 @Component({
   selector: 'app-settings',
-  imports: [ColorPicker, CategoryManager, PhaseManager, AccessList],
+  imports: [ColorPicker, CategoryManager, PhaseManager, AccessList, LookPicker],
   templateUrl: './settings.html',
   styleUrl: './settings.scss',
 })
@@ -53,7 +53,6 @@ export class Settings {
   private readonly themes = inject(ThemeService);
   private readonly store = inject(BoardStore);
   private readonly auth = inject(AuthService);
-  private readonly router = inject(Router);
   private readonly access = inject(AccessService);
   private readonly calendar = inject(CalendarService);
   private readonly language = inject(LanguageService);
@@ -292,8 +291,7 @@ export class Settings {
 
   /** Ends the session and returns to the sign-in screen. */
   protected signOut(): void {
-    this.store.clear();
-    this.auth.signOut().subscribe(() => void this.router.navigate(['/login']));
+    this.auth.leave();
   }
 
   /** Clears the busy state and says what happened. */

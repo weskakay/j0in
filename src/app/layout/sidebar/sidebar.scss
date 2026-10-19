@@ -1,0 +1,344 @@
+@use "glass" as *;
+
+/* Phone: a bar along the bottom, within thumb reach. Sticky, otherwise a
+   long board pushes it out of reach. Below the menus and dialogs. */
+:host {
+  position: sticky;
+  bottom: 0;
+  z-index: 10;
+  padding: 0 var(--j0in-shell-gap) var(--j0in-shell-gap);
+}
+
+.side {
+  @include surface;
+  display: flex;
+  border-radius: var(--j0in-bar-radius);
+}
+
+.side__top,
+.side__group,
+.side__account {
+  display: none;
+}
+
+.side__list {
+  display: flex;
+  flex: 1;
+  min-width: 0;
+  padding: var(--j0in-space-xs);
+  gap: 2px;
+}
+
+.side__item {
+  flex: 1;
+  min-width: 0;
+}
+
+.side__link {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  min-width: 0;
+  min-height: var(--j0in-tap-target);
+  padding: var(--j0in-space-xs) 2px;
+  border-radius: var(--j0in-radius-sm);
+  color: var(--j0in-text-muted);
+  text-decoration: none;
+  transition:
+    color var(--j0in-transition),
+    background var(--j0in-transition) var(--j0in-spring);
+
+  &:hover {
+    color: var(--j0in-text);
+  }
+}
+
+.side__text {
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.side__icon {
+  flex: 0 0 auto;
+}
+
+.side__link--active {
+  @include lens;
+  color: var(--j0in-accent-ink);
+  font-weight: var(--j0in-fw-bold);
+}
+
+.side__count {
+  position: absolute;
+  top: 0;
+  left: calc(50% + 9px);
+  min-width: 22px;
+  padding: 0 6px;
+  border-radius: var(--j0in-radius-pill);
+  background: var(--j0in-fill);
+  color: var(--j0in-text);
+  font-size: var(--j0in-fs-sm);
+  line-height: 22px;
+  text-align: center;
+}
+
+.side__hidden {
+  @include hidden-label;
+}
+
+.side__count--alert {
+  background: var(--j0in-danger);
+  color: var(--j0in-text-on-color);
+}
+
+@media (min-width: 900px) {
+  :host {
+    top: var(--j0in-shell-gap);
+    bottom: auto;
+    align-self: start;
+    height: calc(100dvh - 2 * var(--j0in-shell-gap));
+    padding: 0;
+  }
+
+  .side {
+    flex-direction: column;
+    height: 100%;
+    padding: var(--j0in-space-md) var(--j0in-space-sm);
+  }
+
+  .side__top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--j0in-space-xs);
+    padding: 0 var(--j0in-space-xs) var(--j0in-space-md);
+  }
+
+  .side__brand {
+    display: flex;
+    align-items: center;
+    min-height: var(--j0in-tap-target);
+    gap: var(--j0in-space-sm);
+    color: inherit;
+    text-decoration: none;
+  }
+
+  .side__logo {
+    display: grid;
+    flex: 0 0 auto;
+    place-items: center;
+    width: 40px;
+    height: 40px;
+    border-radius: var(--j0in-radius-md);
+    background: linear-gradient(140deg, var(--j0in-accent), var(--j0in-accent-hover));
+    box-shadow: var(--j0in-glow);
+    color: var(--j0in-text-on-color);
+    font-weight: var(--j0in-fw-bold);
+  }
+
+  .side__name {
+    font-size: var(--j0in-fs-lg);
+    font-weight: var(--j0in-fw-bold);
+    letter-spacing: 2px;
+  }
+
+  .side__zero {
+    color: var(--j0in-accent-ink);
+  }
+
+  .side__fold {
+    display: grid;
+    place-items: center;
+    width: var(--j0in-tap-target);
+    height: var(--j0in-tap-target);
+    border: 0;
+    border-radius: var(--j0in-radius-pill);
+    background: transparent;
+    color: var(--j0in-text-muted);
+
+    &:hover {
+      background: var(--j0in-fill);
+      color: var(--j0in-text);
+    }
+  }
+
+  .side__list {
+    flex-direction: column;
+    flex: 0 0 auto;
+    padding: 0;
+  }
+
+  .side__item {
+    flex: 0 0 auto;
+  }
+
+  .side__link {
+    flex-direction: row;
+    justify-content: flex-start;
+    gap: var(--j0in-space-sm);
+    padding: 0 var(--j0in-space-md);
+    border-radius: var(--j0in-radius-md);
+
+    &:hover {
+      background: var(--j0in-fill);
+    }
+  }
+
+  .side__count {
+    position: static;
+    margin-left: auto;
+  }
+
+  .side__account {
+    position: relative;
+    display: block;
+    margin-top: auto;
+  }
+
+  .side__menu {
+    position: absolute;
+    bottom: calc(100% + var(--j0in-space-sm));
+    left: 0;
+    z-index: 20;
+  }
+
+  .side__user {
+    display: flex;
+    width: 100%;
+    border: 0;
+    text-align: left;
+    align-items: center;
+    gap: var(--j0in-space-sm);
+    min-height: var(--j0in-tap-target);
+    padding: var(--j0in-space-sm);
+    border-radius: var(--j0in-radius-md);
+    background: var(--j0in-fill);
+    color: inherit;
+    text-decoration: none;
+  }
+
+  .side__avatar {
+    display: grid;
+    flex: 0 0 auto;
+    place-items: center;
+    width: 40px;
+    height: 40px;
+    border-radius: var(--j0in-radius-pill);
+    background: var(--j0in-accent-strong);
+    color: var(--j0in-text-on-color);
+    font-weight: var(--j0in-fw-bold);
+  }
+
+  .side__who {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    min-width: 0;
+  }
+
+  .side__chevron {
+    flex: 0 0 auto;
+    color: var(--j0in-text-muted);
+  }
+
+  /* Category shortcuts, part of the floating glass frame only. */
+  :host-context([data-look="glass"]) .side__group {
+    display: block;
+    padding: var(--j0in-space-md) var(--j0in-space-xs) var(--j0in-space-sm);
+  }
+
+  .side__group-title {
+    padding: 0 var(--j0in-space-sm) var(--j0in-space-xs);
+    color: var(--j0in-text-muted);
+    font-weight: var(--j0in-fw-bold);
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+
+  .side__shortcut {
+    display: flex;
+    align-items: center;
+    gap: var(--j0in-space-sm);
+    min-height: var(--j0in-tap-target);
+    padding: 0 var(--j0in-space-sm);
+    border-radius: var(--j0in-radius-md);
+    color: inherit;
+    text-decoration: none;
+
+    &:hover {
+      background: var(--j0in-fill);
+    }
+  }
+
+  .side__dot {
+    flex: 0 0 auto;
+    width: 10px;
+    height: 10px;
+    border-radius: var(--j0in-radius-pill);
+  }
+
+  .side__user-name {
+    font-weight: var(--j0in-fw-bold);
+  }
+
+  .side__user-mail {
+    overflow: hidden;
+    color: var(--j0in-text-muted);
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  /* Folded away, the marks alone carry the navigation. */
+  .side--folded {
+    align-items: center;
+    padding-inline: var(--j0in-space-xs);
+
+    .side__top {
+      flex-direction: column;
+      padding-inline: 0;
+    }
+
+    .side__name,
+    .side__text,
+    .side__who,
+    .side__chevron,
+    .side__group {
+      display: none;
+    }
+
+    .side__link {
+      justify-content: center;
+      padding: 0;
+      width: var(--j0in-tap-target);
+    }
+
+    .side__count {
+      position: absolute;
+      top: -4px;
+      right: -8px;
+      left: auto;
+    }
+
+    .side__user {
+      padding: 2px;
+      background: transparent;
+    }
+  }
+}
+
+/* Phone held sideways: the bar keeps the marks only, so the page keeps its
+   height. The words stay for screen readers. */
+@media (max-height: 500px) and (orientation: landscape) and (max-width: 899px) {
+  .side__text {
+    @include hidden-label;
+  }
+
+  .side__count {
+    top: -2px;
+  }
+}

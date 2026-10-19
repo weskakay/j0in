@@ -1,0 +1,36 @@
+:host {
+  display: block;
+  width: 136px;
+  flex: 0 0 auto;
+}
+
+.rings {
+  width: 100%;
+  height: auto;
+  transform: rotate(-90deg);
+}
+
+.rings__track,
+.rings__arc {
+  fill: none;
+  stroke-width: 11;
+}
+
+.rings__track {
+  opacity: 0.18;
+}
+
+.rings__arc--empty {
+  visibility: hidden;
+}
+
+.rings__arc {
+  stroke-linecap: round;
+  transition: stroke-dasharray 1.1s var(--j0in-ease);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rings__arc {
+    transition: none;
+  }
+}

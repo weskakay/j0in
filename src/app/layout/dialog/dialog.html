@@ -1,4 +1,4 @@
-<div class="dialog">
+<div class="dialog" [class.dialog--side]="side()">
   <button class="dialog__backdrop" type="button" [attr.aria-label]="t().common.close" (click)="close()">
   </button>
 

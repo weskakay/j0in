@@ -1,0 +1,12 @@
+<header class="widget__head">
+  <div class="widget__titles">
+    <h2 class="widget__title">{{ heading() }}</h2>
+    @if (note()) {
+      <p class="widget__note">{{ note() }}</p>
+    }
+  </div>
+  @if (link(); as path) {
+    <a class="widget__link" [routerLink]="path">{{ linkText() }}</a>
+  }
+</header>
+<ng-content />

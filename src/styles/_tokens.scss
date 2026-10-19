@@ -20,15 +20,27 @@
 
   // Accents
   --j0in-accent: #29abe2;
-  --j0in-accent-hover: #1d8fc0;
+  // A deeper shade under white text, and for its hover state, so white
+  // labels on accent buttons stay readable whatever accent is picked.
+  --j0in-accent-strong: color-mix(in srgb, var(--j0in-accent) 72%, black);
+  --j0in-accent-hover: color-mix(in srgb, var(--j0in-accent) 62%, black);
   --j0in-success: #7ae582;
   --j0in-warning: #ffa800;
   --j0in-danger: #ff3d00;
+  --j0in-purple: #9b7bff;
 
   // Priorities
   --j0in-prio-urgent: #ff3d00;
   --j0in-prio-medium: #ffa800;
   --j0in-prio-low: #7ae582;
+
+  // Colours used as text. On dark they are the colours themselves; the
+  // light theme darkens them until they reach 4.5:1.
+  --j0in-accent-ink: var(--j0in-accent);
+  --j0in-danger-ink: var(--j0in-danger);
+  --j0in-prio-urgent-ink: var(--j0in-prio-urgent);
+  --j0in-prio-medium-ink: var(--j0in-prio-medium);
+  --j0in-prio-low-ink: var(--j0in-prio-low);
 
   // Spacing
   --j0in-space-xs: 4px;
@@ -48,18 +60,77 @@
 
   // Type
   --j0in-font: "Inter", system-ui, -apple-system, sans-serif;
-  --j0in-fs-sm: 14px;
+  --j0in-fs-sm: 16px;
   --j0in-fs-body: 16px;
   --j0in-fs-lg: 20px;
+  --j0in-fs-kpi: 26px;
+  --j0in-fs-big: 32px;
   --j0in-fs-title: clamp(28px, 4vw, 44px);
   --j0in-fw-regular: 400;
   --j0in-fw-bold: 700;
+  --j0in-fw-black: 800;
   --j0in-lh-body: 1.5;
 
   // Layout
   --j0in-tap-target: 44px;
   --j0in-column-width: 280px;
-  --j0in-transition: 200ms;
+  --j0in-transition: 120ms;
+
+  // Surfaces: what sidebar, top bar, widgets and dialogs are made of. The J0IN
+  // look keeps them flat; the glass look below swaps in see-through surfaces.
+  --j0in-page-bg: var(--j0in-bg);
+  --j0in-panel-bg: var(--j0in-surface);
+  --j0in-panel-bg-thick: var(--j0in-surface-raised);
+  --j0in-panel-solid: var(--j0in-surface-raised);
+  --j0in-panel-border: 1px solid var(--j0in-border);
+  --j0in-panel-blur: none;
+  --j0in-panel-blur-thick: none;
+  --j0in-panel-shadow: none;
+  --j0in-panel-radius: var(--j0in-radius-md);
+  // Sidebar and top bar: flush with the edge in the J0IN look.
+  --j0in-bar-radius: 0px;
+  --j0in-card-bg: var(--j0in-surface-raised);
+  --j0in-column-bg: transparent;
+  --j0in-column-pad: 0px;
+  --j0in-column-border: 0 solid transparent;
+  --j0in-fill: var(--j0in-surface-raised);
+  --j0in-fill-hover: var(--j0in-border);
+  --j0in-lens: var(--j0in-surface-raised);
+  --j0in-lens-shadow: none;
+  // The soft light under a primary button; none in the J0IN look.
+  --j0in-glow: none;
+  --j0in-shell-gap: 0px;
+  // Room kept free on the right of a page title for the floating tools.
+  --j0in-head-room: 0px;
+  --j0in-sheen: 0;
+  --j0in-scrim: rgb(0 0 0 / 55%);
+  --j0in-dialog-bg: var(--j0in-surface);
+  --j0in-radius-lg: 24px;
+  --j0in-radius-xl: 30px;
+
+  // Motion
+  --j0in-ease: ease;
+  --j0in-spring: ease;
+
+  // The focus pill stays black in every look, so it reads the same on any background.
+  --j0in-pill-bg: #000000;
+  --j0in-pill-text: #ffffff;
+  --j0in-pill-track: rgb(255 255 255 / 18%);
+  --j0in-pill-shadow: 0 10px 30px -8px rgb(0 0 0 / 55%);
+
+  // The small glass sketch in the look picker, the same in every theme.
+  --j0in-sketch-surface: rgb(255 255 255 / 22%);
+  --j0in-sketch-edge: rgb(255 255 255 / 40%);
+  --j0in-sketch-light: inset 0 1px 0 rgb(255 255 255 / 50%);
+
+  // The card hanging on the pointer while it is dragged.
+  --j0in-ghost-shadow: drop-shadow(0 12px 24px rgb(0 0 0 / 35%));
+
+  // Rings on the home screen
+  --j0in-ring-tasks: var(--j0in-accent);
+  --j0in-ring-focus: var(--j0in-success);
+  --j0in-ring-meet: var(--j0in-warning);
+  --j0in-ring-track: var(--j0in-border);
 }
 
 // Light theme: only the values change, no component notices.
@@ -74,6 +145,11 @@
   --j0in-text: #0d1620;
   --j0in-text-muted: #5a6b7c;
   --j0in-text-inverse: #ffffff;
+  --j0in-accent-ink: color-mix(in srgb, var(--j0in-accent) 58%, black);
+  --j0in-danger-ink: color-mix(in srgb, var(--j0in-danger) 68%, black);
+  --j0in-prio-urgent-ink: color-mix(in srgb, var(--j0in-prio-urgent) 68%, black);
+  --j0in-prio-medium-ink: color-mix(in srgb, var(--j0in-prio-medium) 50%, black);
+  --j0in-prio-low-ink: color-mix(in srgb, var(--j0in-prio-low) 46%, black);
 
   --j0in-shadow-sm: 0 2px 6px rgb(0 0 0 / 8%);
   --j0in-shadow-md: 0 8px 24px rgb(0 0 0 / 12%);
@@ -92,14 +168,134 @@
     --j0in-text: #0d1620;
     --j0in-text-muted: #5a6b7c;
     --j0in-text-inverse: #ffffff;
+    --j0in-accent-ink: color-mix(in srgb, var(--j0in-accent) 58%, black);
+    --j0in-danger-ink: color-mix(in srgb, var(--j0in-danger) 68%, black);
+    --j0in-prio-urgent-ink: color-mix(in srgb, var(--j0in-prio-urgent) 68%, black);
+    --j0in-prio-medium-ink: color-mix(in srgb, var(--j0in-prio-medium) 50%, black);
+    --j0in-prio-low-ink: color-mix(in srgb, var(--j0in-prio-low) 46%, black);
 
     --j0in-shadow-sm: 0 2px 6px rgb(0 0 0 / 8%);
     --j0in-shadow-md: 0 8px 24px rgb(0 0 0 / 12%);
   }
 }
 
+// Glass look: the same app on floating, see-through surfaces. Only values
+// change here, no component needs to know which look is on.
+@mixin glass-dark {
+  --j0in-bg: #0b0b0e;
+  --j0in-surface: rgb(255 255 255 / 5%);
+  --j0in-surface-raised: rgb(30 30 36 / 92%);
+  --j0in-border: rgb(255 255 255 / 10%);
+  --j0in-text-muted: #a9a9b6;
+  --j0in-page-bg:
+    radial-gradient(56rem 38rem at 6% -8%, rgb(41 171 226 / 20%), transparent 62%),
+    radial-gradient(48rem 34rem at 100% 4%, rgb(140 92 255 / 15%), transparent 60%),
+    radial-gradient(44rem 30rem at 55% 110%, rgb(31 215 193 / 10%), transparent 60%),
+    #0b0b0e;
+  --j0in-panel-bg: rgb(30 30 38 / 44%);
+  --j0in-panel-bg-thick: rgb(24 24 30 / 82%);
+  --j0in-panel-solid: #1c1c22;
+  --j0in-panel-border: 1px solid rgb(255 255 255 / 8%);
+  --j0in-panel-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 12%),
+    inset 0 0 0 1px rgb(255 255 255 / 4%),
+    0 24px 48px -22px rgb(0 0 0 / 75%);
+  --j0in-card-bg: rgb(30 30 36 / 70%);
+  --j0in-fill: rgb(150 150 175 / 16%);
+  --j0in-fill-hover: rgb(150 150 175 / 26%);
+  --j0in-lens: linear-gradient(180deg, rgb(255 255 255 / 16%), rgb(255 255 255 / 6%));
+  --j0in-lens-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 22%),
+    0 8px 20px -6px rgb(0 0 0 / 60%);
+  --j0in-glow: 0 8px 22px -6px rgb(41 171 226 / 65%);
+  --j0in-ring-track: rgb(255 255 255 / 9%);
+}
+
+@mixin glass-light {
+  --j0in-bg: #e6eaf2;
+  --j0in-surface: rgb(255 255 255 / 50%);
+  --j0in-surface-raised: rgb(255 255 255 / 94%);
+  --j0in-border: rgb(20 24 40 / 11%);
+  --j0in-text-muted: #4f5566;
+  --j0in-page-bg:
+    radial-gradient(56rem 38rem at 6% -8%, rgb(41 171 226 / 18%), transparent 62%),
+    radial-gradient(48rem 34rem at 100% 4%, rgb(140 92 255 / 12%), transparent 60%),
+    radial-gradient(44rem 30rem at 55% 110%, rgb(31 215 193 / 12%), transparent 60%),
+    #e6eaf2;
+  --j0in-panel-bg: rgb(255 255 255 / 42%);
+  --j0in-panel-bg-thick: rgb(250 252 255 / 82%);
+  --j0in-panel-solid: #f3f5fa;
+  --j0in-panel-border: 1px solid rgb(255 255 255 / 70%);
+  --j0in-panel-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 90%),
+    inset 0 0 0 1px rgb(255 255 255 / 30%),
+    0 22px 44px -22px rgb(16 30 90 / 30%);
+  --j0in-card-bg: rgb(255 255 255 / 72%);
+  --j0in-fill: rgb(118 118 140 / 13%);
+  --j0in-fill-hover: rgb(118 118 140 / 20%);
+  --j0in-lens: linear-gradient(180deg, rgb(255 255 255 / 98%), rgb(255 255 255 / 70%));
+  --j0in-lens-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 100%),
+    0 6px 16px -8px rgb(16 30 90 / 30%);
+  --j0in-glow: 0 8px 22px -8px rgb(41 171 226 / 60%);
+  --j0in-ring-track: rgb(20 24 40 / 8%);
+}
+
+:root[data-look="glass"] {
+  @include glass-dark;
+  --j0in-radius-sm: 10px;
+  --j0in-radius-md: 16px;
+  --j0in-panel-blur: blur(18px) saturate(170%);
+  --j0in-panel-blur-thick: blur(30px) saturate(180%);
+  --j0in-panel-radius: 26px;
+  --j0in-bar-radius: 26px;
+  --j0in-dialog-bg: var(--j0in-panel-bg-thick);
+  --j0in-shell-gap: 16px;
+  --j0in-column-bg: var(--j0in-panel-bg);
+  --j0in-column-pad: 12px;
+  --j0in-column-border: var(--j0in-panel-border);
+  --j0in-sheen: 1;
+  --j0in-ease: cubic-bezier(0.22, 0.8, 0.24, 1);
+  --j0in-spring: cubic-bezier(0.34, 1.45, 0.55, 1);
+}
+
+:root[data-look="glass"][data-theme="light"] {
+  @include glass-light;
+}
+
+@media (prefers-color-scheme: light) {
+  :root[data-look="glass"]:not([data-theme="dark"]) {
+    @include glass-light;
+  }
+}
+
+// The floating tools at the top right of the glass look need room beside the
+// page title: a narrow pill first, a wide one once the search shows its text.
+@media (min-width: 900px) {
+  :root[data-look="glass"] {
+    --j0in-head-room: 240px;
+  }
+}
+
+@media (min-width: 1100px) {
+  :root[data-look="glass"] {
+    --j0in-head-room: 470px;
+  }
+}
+
+// Without backdrop blur the surfaces would only be see-through, so they turn solid.
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  :root[data-look="glass"] {
+    --j0in-panel-bg: var(--j0in-panel-solid);
+    --j0in-panel-bg-thick: var(--j0in-panel-solid);
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
-  :root {
+  :root,
+  :root[data-look="glass"] {
     --j0in-transition: 0ms;
+    --j0in-spring: ease;
+    --j0in-sheen: 0;
   }
 }

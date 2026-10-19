@@ -12,6 +12,10 @@
   <h2 class="conf__heading">{{ t().settings.appearance }}</h2>
   <p class="conf__note">{{ t().settings.appearanceNote }}</p>
 
+  <h3 class="conf__label">{{ t().look.title }}</h3>
+  <p class="conf__note">{{ t().look.note }}</p>
+  <app-look-picker />
+
   <app-color-picker
     [caption]="t().settings.accent"
     [value]="accent()"

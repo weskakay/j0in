@@ -45,7 +45,7 @@
 }
 
 .phases__icon--danger:hover {
-  color: var(--j0in-danger);
+  color: var(--j0in-danger-ink);
 }
 
 .phases__form {
@@ -91,7 +91,7 @@
   transition: border-color var(--j0in-transition);
 
   &:hover {
-    border-color: var(--j0in-accent);
+    border-color: var(--j0in-accent-ink);
   }
 
   &:disabled {
@@ -106,8 +106,8 @@
 }
 
 .phases__btn--primary {
-  border-color: var(--j0in-accent);
-  background: var(--j0in-accent);
+  border-color: var(--j0in-accent-ink);
+  background: var(--j0in-accent-strong);
   color: var(--j0in-text-on-color);
 
   &:hover {

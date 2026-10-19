@@ -13,15 +13,23 @@ const FOCUSABLE =
   imports: [],
   templateUrl: './dialog.html',
   styleUrl: './dialog.scss',
+  host: { '(document:keydown.escape)': 'onEscape($event)' },
 })
 export class Dialog {
   private readonly language = inject(LanguageService);
+  private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
 
   /** Every piece of text, in the language currently on screen. */
   protected readonly t = this.language.dict;
 
   /** Heading of the dialog, read out as its accessible name. */
   readonly heading = input.required<string>();
+
+  /**
+   * True for a panel that slides in from the right edge on wide screens and
+   * runs the full height, used for reading a task beside the board.
+   */
+  readonly side = input(false);
 
   /** Fires when the visitor closes the dialog. */
   readonly closed = output<void>();
@@ -33,14 +41,22 @@ export class Dialog {
     this.panel()?.nativeElement.focus();
   });
 
-  /** Escape leaves the dialog, Tab keeps focus inside it. */
+  /** Tab keeps focus inside the dialog. */
   protected onKeydown(event: KeyboardEvent): void {
-    if (event.key === 'Escape') {
-      this.close();
-      return;
-    }
     if (event.key === 'Tab') {
       this.trapFocus(event);
+    }
+  }
+
+  /**
+   * Escape leaves the dialog wherever focus happens to be, but only the one
+   * on top: with the form open over a task, the task stays.
+   */
+  protected onEscape(event: Event): void {
+    const open = document.querySelectorAll('app-dialog');
+    if (!event.defaultPrevented && open[open.length - 1] === this.host.nativeElement) {
+      event.preventDefault();
+      this.close();
     }
   }
 

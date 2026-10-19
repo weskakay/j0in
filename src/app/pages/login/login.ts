@@ -63,7 +63,7 @@ export class Login {
     this.busy.set(true);
     this.error.set('');
     request.subscribe({
-      next: () => void this.router.navigate(['/summary']),
+      next: () => void this.router.navigate(['/home']),
       error: (e: Error) => this.showError(e),
     });
   }

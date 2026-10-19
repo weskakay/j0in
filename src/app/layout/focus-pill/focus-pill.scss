@@ -1,0 +1,164 @@
+@use "glass" as *;
+
+/* Phone: floats above the bottom navigation, out of the crowded top bar. */
+:host {
+  position: fixed;
+  bottom: calc(80px + 2 * var(--j0in-shell-gap));
+  left: 50%;
+  z-index: 30;
+  max-width: calc(100% - 2 * var(--j0in-space-md));
+  transform: translateX(-50%);
+}
+
+.pill__live {
+  @include hidden-label;
+}
+
+.pill {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  min-width: 160px;
+  max-width: 100%;
+  border-radius: var(--j0in-radius-lg);
+  background: var(--j0in-pill-bg);
+  box-shadow: var(--j0in-pill-shadow);
+  color: var(--j0in-pill-text);
+  transition:
+    min-width 400ms var(--j0in-spring),
+    border-radius 400ms var(--j0in-spring);
+  animation: pill-in 450ms var(--j0in-spring);
+}
+
+.pill--open {
+  min-width: 280px;
+}
+
+.pill--toast {
+  flex-direction: row;
+  align-items: center;
+  gap: var(--j0in-space-sm);
+  min-width: 240px;
+  min-height: var(--j0in-tap-target);
+  padding: 0 var(--j0in-space-lg) 0 var(--j0in-space-md);
+}
+
+.pill__check {
+  flex: 0 0 auto;
+  color: var(--j0in-success);
+}
+
+.pill__text {
+  font-weight: var(--j0in-fw-bold);
+}
+
+.pill__pill {
+  display: flex;
+  align-items: center;
+  gap: var(--j0in-space-sm);
+  min-height: var(--j0in-tap-target);
+  padding: 0 var(--j0in-space-md) 0 var(--j0in-space-sm);
+  border: 0;
+  border-radius: inherit;
+  background: transparent;
+  color: inherit;
+}
+
+.pill__ring {
+  flex: 0 0 auto;
+  transform: rotate(-90deg);
+}
+
+.pill__track,
+.pill__arc {
+  fill: none;
+  stroke-width: 3;
+}
+
+.pill__track {
+  stroke: var(--j0in-pill-track);
+}
+
+.pill__arc {
+  stroke: var(--j0in-accent);
+  stroke-linecap: round;
+  transition: stroke-dasharray 1s linear;
+}
+
+.pill__clock {
+  margin-left: auto;
+  font-variant-numeric: tabular-nums;
+  font-weight: var(--j0in-fw-bold);
+}
+
+.pill__more {
+  display: flex;
+  align-items: center;
+  gap: var(--j0in-space-sm);
+  padding: 0 var(--j0in-space-sm) var(--j0in-space-sm) var(--j0in-space-md);
+}
+
+.pill__task {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  color: inherit;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.pill__stop {
+  min-height: var(--j0in-tap-target);
+  padding: 0 var(--j0in-space-md);
+  border: 0;
+  border-radius: var(--j0in-radius-pill);
+  background: var(--j0in-danger);
+  color: var(--j0in-text-on-color);
+  font-weight: var(--j0in-fw-bold);
+}
+
+.pill :focus-visible {
+  outline-color: var(--j0in-pill-text);
+}
+
+@keyframes pill-in {
+  from {
+    opacity: 0;
+    transform: scale(0.6);
+  }
+}
+
+/* Wide screens: sits in the middle of the top bar. The pill hangs from a
+   fixed spot, so growing never pushes the buttons around. */
+@media (min-width: 900px) {
+  :host {
+    position: relative;
+    bottom: auto;
+    left: auto;
+    width: 160px;
+    height: var(--j0in-tap-target);
+    transform: none;
+  }
+
+  /* Nothing to show: the spot gives its room back to the bar. */
+  :host(.idle) {
+    width: 0;
+  }
+
+  .pill {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    max-width: 420px;
+    translate: -50% 0;
+    white-space: nowrap;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pill,
+  .pill__arc {
+    transition: none;
+    animation: none;
+  }
+}

@@ -1,0 +1,16 @@
+<p class="menu__name">{{ user()?.name }}</p>
+<p class="menu__mail">{{ user()?.email }}</p>
+<div class="menu__lang" role="group" [attr.aria-label]="t().common.language">
+  @for (code of langs; track code) {
+    <button
+      class="menu__lang-btn"
+      type="button"
+      [class.menu__lang-btn--on]="lang() === code"
+      [attr.aria-pressed]="lang() === code"
+      (click)="setLang(code)"
+    >
+      {{ code.toUpperCase() }}
+    </button>
+  }
+</div>
+<button class="menu__item" type="button" (click)="signOut()">{{ t().nav.logout }}</button>

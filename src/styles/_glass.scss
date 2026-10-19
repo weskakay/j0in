@@ -1,0 +1,33 @@
+// Shorthands for the surfaces. They only read tokens, so the same component
+// comes out flat in the J0IN look and as glass in the glass look.
+
+@mixin surface {
+  background: var(--j0in-panel-bg);
+  -webkit-backdrop-filter: var(--j0in-panel-blur);
+  backdrop-filter: var(--j0in-panel-blur);
+  border: var(--j0in-panel-border);
+  border-radius: var(--j0in-panel-radius);
+  box-shadow: var(--j0in-panel-shadow);
+}
+
+@mixin surface-thick {
+  @include surface;
+  background: var(--j0in-panel-bg-thick);
+  -webkit-backdrop-filter: var(--j0in-panel-blur-thick);
+  backdrop-filter: var(--j0in-panel-blur-thick);
+}
+
+@mixin lens {
+  background: var(--j0in-lens);
+  box-shadow: var(--j0in-lens-shadow);
+}
+
+// Visually hidden, still read out by screen readers.
+@mixin hidden-label {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}

@@ -1,0 +1,14 @@
+<svg class="rings" viewBox="0 0 120 120" aria-hidden="true">
+  @for (ring of rings(); track ring.label; let i = $index) {
+    <circle class="rings__track" cx="60" cy="60" [attr.r]="radius(i)" [style.stroke]="ring.color" />
+    <circle
+      class="rings__arc"
+      cx="60"
+      cy="60"
+      [attr.r]="radius(i)"
+      [style.stroke]="ring.color"
+      [attr.stroke-dasharray]="dash(i, ring.value)"
+      [class.rings__arc--empty]="ring.value <= 0"
+    />
+  }
+</svg>

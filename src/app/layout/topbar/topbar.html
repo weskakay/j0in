@@ -1,0 +1,76 @@
+<header class="top">
+  <a class="top__brand" routerLink="/home">J<span class="top__zero">0</span>IN</a>
+
+  <button class="top__search" type="button" [attr.aria-label]="t().topbar.search" (click)="openPalette()">
+    <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
+      <circle cx="11" cy="11" r="7" fill="none" stroke="currentColor" stroke-width="2" />
+      <path d="m20 20-3.5-3.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+    </svg>
+    <span class="top__search-text">{{ t().topbar.search }}</span>
+    <kbd class="top__kbd">{{ shortcut() }}</kbd>
+  </button>
+
+  <app-focus-pill class="top__pill" />
+
+  <div class="top__actions">
+    <button class="top__btn top__btn--primary" type="button" [attr.aria-label]="t().topbar.newTask" (click)="newTask()">
+      <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
+        <path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" />
+      </svg>
+    </button>
+
+    <button
+      class="top__btn"
+      type="button"
+      [attr.aria-label]="dark() ? t().topbar.toLight : t().topbar.toDark"
+      (click)="toggleTheme()"
+    >
+      @if (dark()) {
+        <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
+          <circle cx="12" cy="12" r="4" fill="none" stroke="currentColor" stroke-width="2" />
+          <path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"
+            stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+        </svg>
+      } @else {
+        <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
+          <path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z" fill="none" stroke="currentColor"
+            stroke-width="2" stroke-linejoin="round" />
+        </svg>
+      }
+    </button>
+
+    @if (owner()) {
+      <a
+        class="top__btn top__bell"
+        routerLink="/settings"
+        [attr.aria-label]="pending() > 0 ? pending() + ' ' + t().topbar.requests : t().topbar.noRequests"
+      >
+        <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
+          <path d="M6 16V11a6 6 0 1 1 12 0v5l2 2H4zM10 21h4" fill="none" stroke="currentColor"
+            stroke-width="2" stroke-linejoin="round" stroke-linecap="round" />
+        </svg>
+        @if (pending() > 0) {
+          <span class="top__dot" aria-hidden="true"></span>
+        }
+      </a>
+    }
+
+    <div class="top__account" #menu (focusout)="onMenuLeave($event, menu)">
+      <button
+        #toggle
+        class="top__avatar"
+        type="button"
+        aria-controls="top-account-menu"
+        [attr.aria-expanded]="menuOpen()"
+        [attr.aria-label]="t().nav.account"
+        (click)="toggleMenu()"
+      >
+        {{ initials() }}
+      </button>
+
+      @if (menuOpen()) {
+        <app-account-menu class="top__menu" id="top-account-menu" />
+      }
+    </div>
+  </div>
+</header>

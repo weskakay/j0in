@@ -69,16 +69,16 @@
 }
 
 .auth__input:focus-visible {
-  border-color: var(--j0in-accent);
+  border-color: var(--j0in-accent-ink);
 }
 
 .auth__input--error {
-  border-color: var(--j0in-danger);
+  border-color: var(--j0in-danger-ink);
 }
 
 .auth__hint {
   font-size: var(--j0in-fs-sm);
-  color: var(--j0in-danger);
+  color: var(--j0in-danger-ink);
 }
 
 .auth__check {
@@ -110,13 +110,13 @@
 }
 
 .auth__btn:hover:not([disabled]) {
-  border-color: var(--j0in-accent);
+  border-color: var(--j0in-accent-ink);
 }
 
 .auth__btn--primary {
-  border-color: var(--j0in-accent);
-  background: var(--j0in-accent);
-  color: var(--j0in-text-inverse);
+  border-color: var(--j0in-accent-ink);
+  background: var(--j0in-accent-strong);
+  color: var(--j0in-text-on-color);
 }
 
 .auth__btn--primary:hover:not([disabled]) {

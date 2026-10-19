@@ -1,0 +1,140 @@
+@use "glass" as *;
+
+:host {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 12dvh var(--j0in-space-md) var(--j0in-space-md);
+}
+
+.palette__scrim {
+  position: absolute;
+  inset: 0;
+  background: var(--j0in-scrim);
+  animation: fade-in 200ms ease;
+}
+
+.palette {
+  @include surface-thick;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 640px;
+  max-height: 70dvh;
+  box-shadow: var(--j0in-panel-shadow), var(--j0in-shadow-md);
+  animation: drop-in 350ms var(--j0in-spring);
+}
+
+.palette__head {
+  display: flex;
+  align-items: center;
+  gap: var(--j0in-space-sm);
+  padding: var(--j0in-space-sm) var(--j0in-space-sm) var(--j0in-space-sm) var(--j0in-space-md);
+  border-bottom: 1px solid var(--j0in-border);
+  color: var(--j0in-text-muted);
+}
+
+.palette__field {
+  flex: 1;
+  min-width: 0;
+  min-height: var(--j0in-tap-target);
+  border: 0;
+  background: transparent;
+  color: var(--j0in-text);
+  font-size: var(--j0in-fs-lg);
+
+  &:focus-visible {
+    outline: none;
+  }
+}
+
+.palette__esc {
+  min-width: var(--j0in-tap-target);
+  min-height: var(--j0in-tap-target);
+  border: 1px solid var(--j0in-border);
+  border-radius: var(--j0in-radius-sm);
+  background: var(--j0in-fill);
+  color: var(--j0in-text-muted);
+}
+
+/* The list scrolls on its own, so the field stays in view. */
+.palette__body {
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: var(--j0in-space-sm);
+}
+
+.palette__heading {
+  padding: var(--j0in-space-sm) var(--j0in-space-sm) var(--j0in-space-xs);
+  color: var(--j0in-text-muted);
+  font-weight: var(--j0in-fw-bold);
+}
+
+.palette__row {
+  display: flex;
+  align-items: center;
+  gap: var(--j0in-space-sm);
+  min-height: var(--j0in-tap-target);
+  padding: 0 var(--j0in-space-md);
+  border-radius: var(--j0in-radius-sm);
+  cursor: pointer;
+}
+
+.palette__row--on {
+  background: var(--j0in-accent-strong);
+  color: var(--j0in-text-on-color);
+}
+
+.palette__dot {
+  flex: 0 0 auto;
+  width: 12px;
+  height: 12px;
+  border-radius: var(--j0in-radius-pill);
+}
+
+.palette__label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.palette__empty,
+.palette__hint {
+  padding: var(--j0in-space-md);
+  color: var(--j0in-text-muted);
+}
+
+.palette__hint {
+  display: none;
+  border-top: 1px solid var(--j0in-border);
+}
+
+@media (min-width: 600px) {
+  .palette__hint {
+    display: block;
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes drop-in {
+  from {
+    opacity: 0;
+    transform: translateY(-12px) scale(0.97);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .palette,
+  .palette__scrim {
+    animation: none;
+  }
+}

@@ -1,0 +1,248 @@
+@use "glass" as *;
+
+/* Stays at the top while the page runs underneath, so on glass the content
+   shows blurred through it. Above the cards, below menus and dialogs. */
+:host {
+  position: sticky;
+  top: 0;
+  z-index: 15;
+  padding: var(--j0in-shell-gap) var(--j0in-shell-gap) 0;
+}
+
+.top {
+  @include surface;
+  display: flex;
+  align-items: center;
+  gap: var(--j0in-space-sm);
+  min-height: 60px;
+  padding: var(--j0in-space-sm) var(--j0in-space-md);
+  border-radius: var(--j0in-bar-radius);
+}
+
+.top__brand {
+  display: flex;
+  align-items: center;
+  min-height: var(--j0in-tap-target);
+  margin-right: auto;
+  color: inherit;
+  font-size: var(--j0in-fs-lg);
+  font-weight: var(--j0in-fw-bold);
+  letter-spacing: 2px;
+  text-decoration: none;
+}
+
+.top__zero {
+  color: var(--j0in-accent-ink);
+}
+
+.top__search {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  gap: var(--j0in-space-sm);
+  min-width: var(--j0in-tap-target);
+  height: var(--j0in-tap-target);
+  padding: 0 var(--j0in-space-sm);
+  border: 1px solid var(--j0in-border);
+  border-radius: var(--j0in-radius-pill);
+  background: var(--j0in-fill);
+  color: var(--j0in-text-muted);
+  transition: border-color var(--j0in-transition);
+
+  &:hover {
+    border-color: var(--j0in-accent-ink);
+    color: var(--j0in-text);
+  }
+}
+
+.top__search-text,
+.top__kbd {
+  display: none;
+}
+
+.top__kbd {
+  margin-left: auto;
+  padding: 0 var(--j0in-space-sm);
+  border-radius: var(--j0in-radius-sm);
+  background: var(--j0in-fill);
+  font-family: inherit;
+  font-size: var(--j0in-fs-sm);
+  white-space: nowrap;
+}
+
+.top__actions {
+  display: flex;
+  align-items: center;
+  gap: var(--j0in-space-sm);
+}
+
+.top__btn,
+.top__avatar {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: var(--j0in-tap-target);
+  height: var(--j0in-tap-target);
+  border: 1px solid var(--j0in-border);
+  border-radius: var(--j0in-radius-pill);
+  background: var(--j0in-fill);
+  color: var(--j0in-text);
+  font-weight: var(--j0in-fw-bold);
+  transition:
+    background var(--j0in-transition),
+    transform var(--j0in-transition) var(--j0in-spring);
+
+  &:hover {
+    background: var(--j0in-fill-hover);
+  }
+
+  &:active {
+    transform: scale(0.94);
+  }
+}
+
+.top__btn--primary {
+  border-color: var(--j0in-accent-ink);
+  background: var(--j0in-accent-strong);
+  box-shadow: var(--j0in-glow);
+  color: var(--j0in-text-on-color);
+
+  &:hover {
+    background: var(--j0in-accent-hover);
+  }
+}
+
+/* The owner's bell. Below a small phone width the badge on the settings
+   entry is enough, and the room goes to the other buttons. */
+.top__bell {
+  display: none;
+}
+
+.top__dot {
+  position: absolute;
+  top: 8px;
+  right: 9px;
+  width: 9px;
+  height: 9px;
+  border-radius: var(--j0in-radius-pill);
+  background: var(--j0in-danger);
+}
+
+.top__account {
+  position: relative;
+}
+
+.top__menu {
+  position: absolute;
+  top: calc(var(--j0in-tap-target) + var(--j0in-space-sm));
+  right: 0;
+  z-index: 20;
+}
+
+@media (min-width: 600px) {
+  .top__bell {
+    display: grid;
+  }
+}
+
+@media (min-width: 900px) {
+  :host {
+    top: var(--j0in-shell-gap);
+    padding: 0;
+  }
+
+  .top {
+    min-height: 68px;
+    padding-inline: var(--j0in-space-lg) var(--j0in-space-md);
+  }
+
+  .top__brand {
+    display: none;
+  }
+
+  .top__search {
+    flex: 0 1 340px;
+    justify-content: flex-start;
+    padding: 0 var(--j0in-space-xs) 0 var(--j0in-space-md);
+  }
+
+  .top__search-text {
+    display: inline;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .top__kbd {
+    display: inline;
+  }
+
+  .top__pill {
+    margin-inline: auto;
+  }
+
+  .top__actions {
+    margin-left: auto;
+  }
+}
+
+/* Glass look on wide screens: no bar, only a floating pill at the top right.
+   The page title takes the room on the left, and the account moves to the
+   card at the bottom of the sidebar. */
+@media (min-width: 900px) {
+  :host-context([data-look="glass"]) {
+    position: fixed;
+    top: var(--j0in-shell-gap);
+    right: var(--j0in-shell-gap);
+    min-height: 0;
+
+    .top {
+      gap: var(--j0in-space-xs);
+      min-height: 60px;
+      padding: var(--j0in-space-xs) var(--j0in-space-xs) var(--j0in-space-xs) var(--j0in-space-sm);
+      border-radius: var(--j0in-radius-pill);
+    }
+
+    .top__search {
+      flex: 0 0 auto;
+      width: var(--j0in-tap-target);
+      justify-content: center;
+      padding: 0;
+    }
+
+    .top__search-text,
+    .top__kbd,
+    .top__account {
+      display: none;
+    }
+
+    .top__actions {
+      margin-left: 0;
+    }
+
+    .top__pill {
+      margin-inline: 0;
+    }
+  }
+}
+
+@media (min-width: 1100px) {
+  :host-context([data-look="glass"]) .top__search {
+    width: 270px;
+    justify-content: flex-start;
+    padding: 0 var(--j0in-space-xs) 0 var(--j0in-space-md);
+
+    .top__search-text,
+    .top__kbd {
+      display: inline;
+    }
+  }
+}
+
+/* Phone held sideways: little height, so the bar scrolls away with the page. */
+@media (max-height: 500px) and (orientation: landscape) and (max-width: 899px) {
+  :host {
+    position: static;
+  }
+}

@@ -1,315 +1,59 @@
+/* Phone: top bar, page, navigation along the bottom. */
 .shell {
   display: grid;
   grid-template-areas:
-    "brand header"
-    "main main"
-    "nav nav";
-  grid-template-columns: auto 1fr;
+    "top"
+    "main"
+    "side";
+  grid-template-columns: minmax(0, 1fr);
   grid-template-rows: auto 1fr auto;
   min-height: 100dvh;
 }
 
-.shell__header {
-  grid-area: header;
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  gap: var(--j0in-space-md);
-  padding: var(--j0in-space-sm) var(--j0in-space-md);
-  background: var(--j0in-surface);
-  border-bottom: 1px solid var(--j0in-border);
+.shell__top {
+  grid-area: top;
 }
 
-.shell__brand {
-  grid-area: brand;
-  display: flex;
-  align-items: center;
-  padding: var(--j0in-space-sm) var(--j0in-space-md);
-  background: var(--j0in-surface);
-  border-bottom: 1px solid var(--j0in-border);
-  color: inherit;
-  text-decoration: none;
-}
-
-.shell__brand-mark {
-  font-size: var(--j0in-fs-lg);
-  font-weight: var(--j0in-fw-bold);
-  letter-spacing: 2px;
-}
-
-.shell__brand-zero {
-  color: var(--j0in-accent);
-}
-
-.shell__account {
-  position: relative;
-}
-
-.shell__lang {
-  display: flex;
-  gap: var(--j0in-space-xs);
-}
-
-.shell__lang-btn {
-  min-width: var(--j0in-tap-target);
-  height: var(--j0in-tap-target);
-  border: 1px solid var(--j0in-border);
-  border-radius: var(--j0in-radius-sm);
-  background: transparent;
-  color: var(--j0in-text-muted);
-  font-size: var(--j0in-fs-sm);
-  font-weight: var(--j0in-fw-bold);
-  transition: background var(--j0in-transition);
-
-  &:hover {
-    color: var(--j0in-text);
-  }
-}
-
-.shell__lang-btn--on {
-  background: var(--j0in-accent);
-  border-color: var(--j0in-accent);
-  color: var(--j0in-text-on-color);
-}
-
-.shell__avatar {
-  width: var(--j0in-tap-target);
-  height: var(--j0in-tap-target);
-  border: 1px solid var(--j0in-border);
-  border-radius: var(--j0in-radius-pill);
-  background: var(--j0in-surface-raised);
-  color: var(--j0in-text);
-  font-size: var(--j0in-fs-sm);
-  font-weight: var(--j0in-fw-bold);
-  transition: background var(--j0in-transition);
-
-  &:hover {
-    background: var(--j0in-accent);
-    color: var(--j0in-text-inverse);
-  }
-}
-
-.shell__menu {
-  position: absolute;
-  top: calc(var(--j0in-tap-target) + var(--j0in-space-xs));
-  right: 0;
-  z-index: 20;
-  min-width: 200px;
-  padding: var(--j0in-space-sm);
-  background: var(--j0in-surface-raised);
-  border: 1px solid var(--j0in-border);
-  border-radius: var(--j0in-radius-md);
-  box-shadow: var(--j0in-shadow-md);
-}
-
-.shell__menu-name {
-  font-weight: var(--j0in-fw-bold);
-}
-
-.shell__menu-mail {
-  margin-bottom: var(--j0in-space-sm);
-  color: var(--j0in-text-muted);
-  font-size: var(--j0in-fs-sm);
-  overflow-wrap: anywhere;
-}
-
-.shell__menu-item {
-  width: 100%;
-  min-height: var(--j0in-tap-target);
-  padding: 0 var(--j0in-space-sm);
-  border: 0;
-  border-radius: var(--j0in-radius-sm);
-  background: transparent;
-  text-align: left;
-  transition: background var(--j0in-transition);
-
-  &:hover {
-    background: var(--j0in-surface);
-  }
+.shell__side {
+  grid-area: side;
 }
 
 .shell__main {
   grid-area: main;
+  justify-self: center;
+  width: 100%;
   min-width: 0;
+  /* Content stops growing here; the surfaces around it may run wider. */
+  max-width: 1440px;
   padding: var(--j0in-space-md);
 }
 
-/* Phone: navigation stays along the bottom edge, within thumb reach. Sticky,
-   otherwise a long board pushes it out of reach. Below the menu and dialogs. */
-.shell__nav {
-  grid-area: nav;
-  position: sticky;
-  bottom: 0;
-  z-index: 10;
-  background: var(--j0in-surface);
-  border-top: 1px solid var(--j0in-border);
-}
-
-.shell__nav-list {
-  display: flex;
-  margin: 0;
-}
-
-.shell__nav-link {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  min-height: var(--j0in-tap-target);
-  padding: var(--j0in-space-sm) var(--j0in-space-xs);
-  color: var(--j0in-text-muted);
-  font-size: var(--j0in-fs-sm);
-  text-align: center;
-  text-decoration: none;
-  transition: color var(--j0in-transition);
-
-  &:hover {
-    color: var(--j0in-text);
-  }
-}
-
-.shell__nav-list > li {
-  flex: 1;
-}
-
-/* Phone: the mark sits above the word, so four entries fit side by side. */
-.shell__nav-link {
-  flex-direction: column;
-  gap: 2px;
-}
-
-.shell__fold {
-  display: none;
-}
-
-/* Sits next to the label, so an open request is visible from every screen. */
-.shell__badge {
-  display: grid;
-  place-items: center;
-  min-width: 20px;
-  height: 20px;
-  margin-left: var(--j0in-space-xs);
-  padding: 0 6px;
-  border-radius: var(--j0in-radius-pill);
-  background: var(--j0in-danger);
-  color: var(--j0in-text-on-color);
-  font-size: 12px;
-  font-weight: var(--j0in-fw-bold);
-}
-
-.shell__nav-link--active {
-  color: var(--j0in-accent);
-  font-weight: var(--j0in-fw-bold);
-}
-
+/* Wide screens: the navigation runs down the side. In the glass look the
+   surfaces keep a gap to the edge and to each other, so they float. */
 @media (min-width: 900px) {
   .shell {
     grid-template-areas:
-      "brand header"
-      "nav main";
-    grid-template-columns: 232px 1fr;
+      "side top"
+      "side main";
+    grid-template-columns: 256px minmax(0, 1fr);
     grid-template-rows: auto 1fr;
+    column-gap: var(--j0in-shell-gap);
+    padding: var(--j0in-shell-gap);
   }
 
-  .shell__header {
-    padding: var(--j0in-space-md) var(--j0in-space-lg);
-  }
-
-  .shell__brand {
-    padding: var(--j0in-space-md) var(--j0in-space-lg);
-  }
-
-  .shell__nav {
-    position: static;
-    border-top: 0;
-    border-right: 1px solid var(--j0in-border);
-  }
-
-  .shell__nav-list {
-    flex-direction: column;
-    justify-content: flex-start;
-    padding: var(--j0in-space-md) var(--j0in-space-sm);
-    gap: var(--j0in-space-xs);
-  }
-
-  .shell__nav-list > li {
-    flex: 0 0 auto;
-  }
-
-  .shell__nav-link {
-    flex-direction: row;
-    justify-content: flex-start;
-    gap: var(--j0in-space-sm);
-    padding: 0 var(--j0in-space-md);
-    border-radius: var(--j0in-radius-sm);
-    font-size: var(--j0in-fs-body);
-    text-align: left;
-
-    &:hover {
-      background: var(--j0in-surface-raised);
-    }
-  }
-
-  .shell__nav-icon {
-    flex: 0 0 auto;
-  }
-
-  /* Folded away, the marks alone carry the navigation. */
   .shell--folded {
-    grid-template-columns: 72px 1fr;
-  }
-
-  /* The brand shares that column, so only its padding gives way. The wording
-     stays whole: a half-cut mark reads as a fault, not as a narrow menu. */
-  .shell--folded .shell__brand {
-    justify-content: center;
-    padding-right: var(--j0in-space-xs);
-    padding-left: var(--j0in-space-xs);
-  }
-
-  .shell__nav--folded {
-    .shell__nav-link {
-      justify-content: center;
-      padding: 0;
-    }
-
-    .shell__nav-text {
-      display: none;
-    }
-
-    .shell__badge {
-      position: absolute;
-      transform: translate(14px, -12px);
-    }
-  }
-
-  .shell__fold {
-    display: flex;
-    align-items: center;
-    justify-content: flex-end;
-    width: 100%;
-    min-height: var(--j0in-tap-target);
-    padding: 0 var(--j0in-space-md);
-    border: 0;
-    border-bottom: 1px solid var(--j0in-border);
-    background: transparent;
-    color: var(--j0in-text-muted);
-
-    &:hover {
-      color: var(--j0in-text);
-    }
-  }
-
-  .shell__nav {
-    display: flex;
-    flex-direction: column;
-  }
-
-  .shell__nav-link--active {
-    background: var(--j0in-surface-raised);
+    grid-template-columns: 76px minmax(0, 1fr);
   }
 
   .shell__main {
-    grid-area: main;
-    padding: var(--j0in-space-lg);
+    padding: var(--j0in-space-lg) var(--j0in-space-lg) var(--j0in-space-xl);
+  }
+}
+
+/* Glass look: the tools float at the top right, so the page title moves up
+   beside them instead of sitting below a bar. */
+@media (min-width: 900px) {
+  :host-context([data-look="glass"]) .shell__main {
+    padding-top: var(--j0in-space-md);
   }
 }

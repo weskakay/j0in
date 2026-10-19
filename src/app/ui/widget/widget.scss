@@ -1,0 +1,36 @@
+@use "glass" as *;
+
+:host {
+  @include surface;
+  display: flex;
+  flex-direction: column;
+  gap: var(--j0in-space-md);
+  min-width: 0;
+  padding: var(--j0in-space-lg);
+}
+
+.widget__head {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--j0in-space-sm);
+}
+
+.widget__title {
+  font-size: var(--j0in-fs-lg);
+}
+
+.widget__note {
+  color: var(--j0in-text-muted);
+}
+
+.widget__link {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--j0in-tap-target);
+  color: var(--j0in-accent-ink);
+  font-weight: var(--j0in-fw-bold);
+  text-decoration: none;
+  white-space: nowrap;
+}

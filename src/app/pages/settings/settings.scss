@@ -1,5 +1,6 @@
 .conf__title {
   margin-bottom: var(--j0in-space-lg);
+  padding-right: var(--j0in-head-room);
   font-size: var(--j0in-fs-title);
 }
 
@@ -13,7 +14,7 @@
 
 .conf__error {
   background: var(--j0in-surface-raised);
-  color: var(--j0in-danger);
+  color: var(--j0in-danger-ink);
 }
 
 .conf__done {
@@ -43,7 +44,7 @@
 
 .conf__warning {
   margin-bottom: var(--j0in-space-md);
-  color: var(--j0in-danger);
+  color: var(--j0in-danger-ink);
   font-size: var(--j0in-fs-sm);
 }
 
@@ -69,12 +70,12 @@
     background var(--j0in-transition);
 
   &:hover {
-    border-color: var(--j0in-accent);
+    border-color: var(--j0in-accent-ink);
   }
 }
 
 .choice--on {
-  border-color: var(--j0in-accent);
+  border-color: var(--j0in-accent-ink);
   background: var(--j0in-surface-raised);
 }
 
@@ -134,7 +135,7 @@
   transition: border-color var(--j0in-transition);
 
   &:hover {
-    border-color: var(--j0in-accent);
+    border-color: var(--j0in-accent-ink);
   }
 
   &:disabled {
@@ -177,7 +178,7 @@
 
   &:hover,
   &:focus-visible {
-    border-color: var(--j0in-accent);
+    border-color: var(--j0in-accent-ink);
   }
 }
 

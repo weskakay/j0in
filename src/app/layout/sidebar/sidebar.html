@@ -1,0 +1,90 @@
+<nav class="side" appSheen [class.side--folded]="folded()" [attr.aria-label]="t().nav.label">
+  <div class="side__top">
+    <a class="side__brand" routerLink="/home">
+      <span class="side__logo" aria-hidden="true">J0</span>
+      <span class="side__name">J<span class="side__zero">0</span>IN</span>
+    </a>
+    <button
+      class="side__fold"
+      type="button"
+      [attr.aria-label]="folded() ? t().nav.unfold : t().nav.fold"
+      [attr.aria-pressed]="folded()"
+      (click)="toggle()"
+    >
+      <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
+        <path [attr.d]="folded() ? 'M9 6l6 6-6 6' : 'M15 6l-6 6 6 6'" stroke="currentColor"
+          stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" />
+      </svg>
+    </button>
+  </div>
+
+  <ul class="side__list">
+    @for (item of items; track item.path) {
+      <li class="side__item">
+        <a
+          class="side__link"
+          [routerLink]="item.path"
+          routerLinkActive="side__link--active"
+          [attr.aria-label]="folded() ? t().nav[item.key] : null"
+          [attr.title]="folded() ? t().nav[item.key] : null"
+        >
+          <svg class="side__icon" viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
+            <path [attr.d]="item.icon" stroke="currentColor" stroke-width="2" fill="none"
+              stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+          <span class="side__text">{{ t().nav[item.key] }}</span>
+          @if (countFor(item) > 0) {
+            <span class="side__count" [class.side__count--alert]="item.key === 'settings'">
+              {{ countFor(item) }}
+              @if (item.key === 'settings') {
+                <span class="side__hidden">{{ t().nav.pending }}</span>
+              }
+            </span>
+          }
+        </a>
+      </li>
+    }
+  </ul>
+
+  @if (categories().length > 0) {
+    <div class="side__group">
+      <p class="side__group-title">{{ t().nav.categories }}</p>
+      <ul class="side__shortcuts">
+        @for (category of categories(); track category.id) {
+          <li>
+            <a class="side__shortcut" routerLink="/board" [queryParams]="{ category: category.id }">
+              <span class="side__dot" [style.background]="category.color" aria-hidden="true"></span>
+              <span class="side__text">{{ category.name }}</span>
+            </a>
+          </li>
+        }
+      </ul>
+    </div>
+  }
+
+  @if (user(); as me) {
+    <div class="side__account" #box (focusout)="onMenuLeave($event, box)">
+      @if (menuOpen()) {
+        <app-account-menu class="side__menu" id="side-account-menu" />
+      }
+      <button
+        #toggle
+        class="side__user"
+        type="button"
+        aria-controls="side-account-menu"
+        [attr.aria-expanded]="menuOpen()"
+        [attr.aria-label]="t().nav.account"
+        (click)="toggleMenu()"
+      >
+        <span class="side__avatar" aria-hidden="true">{{ initials() }}</span>
+        <span class="side__who">
+          <span class="side__user-name">{{ me.name }}</span>
+          <span class="side__user-mail">{{ me.email }}</span>
+        </span>
+        <svg class="side__chevron" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+          <path d="m6 15 6-6 6 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+        </svg>
+      </button>
+    </div>
+  }
+</nav>

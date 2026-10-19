@@ -1,0 +1,160 @@
+// Small building blocks several screens share: the segmented switch and the
+// figure pills. Global on purpose, so board, list and home look the same.
+@use "glass" as *;
+
+.segment {
+  display: inline-flex;
+  gap: 2px;
+  padding: 3px;
+  border: var(--j0in-panel-border);
+  border-radius: var(--j0in-radius-pill);
+  background: var(--j0in-fill);
+}
+
+.segment__btn {
+  min-height: var(--j0in-tap-target);
+  min-width: var(--j0in-tap-target);
+  padding: 0 var(--j0in-space-md);
+  border: 0;
+  border-radius: var(--j0in-radius-pill);
+  background: transparent;
+  color: var(--j0in-text-muted);
+  white-space: nowrap;
+  transition:
+    background var(--j0in-transition) var(--j0in-spring),
+    color var(--j0in-transition);
+
+  &:hover {
+    color: var(--j0in-text);
+  }
+}
+
+.segment__btn--on {
+  @include lens;
+  color: var(--j0in-text);
+  font-weight: var(--j0in-fw-bold);
+}
+
+.kpis {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(96px, 1fr));
+  gap: var(--j0in-space-sm);
+}
+
+.kpi {
+  @include surface;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-width: 0;
+  padding: var(--j0in-space-sm) var(--j0in-space-md);
+  border-radius: var(--j0in-radius-lg);
+}
+
+.kpi__label {
+  color: var(--j0in-text-muted);
+  font-weight: var(--j0in-fw-bold);
+  line-height: 1.25;
+}
+
+.kpi__value {
+  font-size: var(--j0in-fs-kpi);
+  font-weight: var(--j0in-fw-black);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.02em;
+  line-height: 1.15;
+}
+
+.kpi__unit {
+  color: var(--j0in-text-muted);
+  font-size: var(--j0in-fs-body);
+  font-weight: var(--j0in-fw-bold);
+  letter-spacing: 0;
+}
+
+.kpi--alert .kpi__value {
+  color: var(--j0in-danger-ink);
+}
+
+/* Page heads: title on top, figures and actions below. The first row keeps
+   room on the right for the floating tools of the glass look. */
+.page-head {
+  display: grid;
+  grid-template-areas:
+    "lead"
+    "stats"
+    "actions";
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--j0in-space-md);
+  margin-bottom: var(--j0in-space-lg);
+}
+
+.page-head__lead {
+  grid-area: lead;
+  min-width: 0;
+  min-height: 60px;
+  padding-right: var(--j0in-head-room);
+}
+
+.page-head__title {
+  font-size: var(--j0in-fs-title);
+  font-weight: var(--j0in-fw-black);
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+  overflow-wrap: anywhere;
+}
+
+.page-head__sub {
+  color: var(--j0in-text-muted);
+}
+
+.page-head__stats {
+  grid-area: stats;
+}
+
+.page-head__actions {
+  grid-area: actions;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--j0in-space-sm);
+}
+
+/* Phone: the buttons share the row evenly. */
+.page-head__actions > * {
+  flex: 1 1 auto;
+  justify-content: center;
+}
+
+@media (min-width: 700px) {
+  .page-head__actions > * {
+    flex: 0 0 auto;
+  }
+
+  .kpis {
+    display: flex;
+    flex-wrap: wrap;
+  }
+
+  .kpi {
+    min-width: 120px;
+  }
+
+  .kpi__label {
+    white-space: nowrap;
+  }
+}
+
+@media (min-width: 1100px) {
+  .page-head {
+    grid-template-areas:
+      "lead lead"
+      "stats actions";
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: end;
+  }
+
+  .page-head__actions {
+    justify-content: flex-end;
+  }
+}

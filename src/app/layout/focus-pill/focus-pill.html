@@ -1,0 +1,35 @@
+<p class="pill__live" aria-live="polite">{{ toast()?.text }}</p>
+
+@if (toast(); as message) {
+  <div class="pill pill--toast" aria-hidden="true">
+    <svg class="pill__check" viewBox="0 0 24 24" width="20" height="20">
+      <path d="m5 12.5 4.5 4.5L19 7.5" fill="none" stroke="currentColor" stroke-width="2.4"
+        stroke-linecap="round" stroke-linejoin="round" />
+    </svg>
+    <span class="pill__text">{{ message.text }}</span>
+  </div>
+} @else if (running(); as run) {
+  <div class="pill" [class.pill--open]="expanded()">
+    <button
+      class="pill__pill"
+      type="button"
+      [attr.aria-expanded]="expanded()"
+      [attr.aria-label]="(focus() ? t().pill.focus : t().pill.timer) + ' ' + clock() + ', ' + title()"
+      (click)="toggle()"
+    >
+      <svg class="pill__ring" viewBox="0 0 24 24" width="24" height="24" aria-hidden="true">
+        <circle cx="12" cy="12" r="9" class="pill__track" />
+        <circle cx="12" cy="12" r="9" class="pill__arc" [attr.stroke-dasharray]="dash()" />
+      </svg>
+      <span class="pill__label">{{ focus() ? t().pill.focus : t().pill.timer }}</span>
+      <span class="pill__clock">{{ clock() }}</span>
+    </button>
+
+    @if (expanded()) {
+      <div class="pill__more">
+        <a class="pill__task" [routerLink]="['/board', run.taskId]" (click)="toggle()">{{ title() }}</a>
+        <button class="pill__stop" type="button" (click)="stop()">{{ t().pill.stop }}</button>
+      </div>
+    }
+  </div>
+}

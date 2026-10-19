@@ -25,7 +25,7 @@
 }
 
 .cform__hint {
-  color: var(--j0in-danger);
+  color: var(--j0in-danger-ink);
   font-size: var(--j0in-fs-sm);
 }
 
@@ -46,8 +46,8 @@
 }
 
 .cform__btn--primary {
-  border-color: var(--j0in-accent);
-  background: var(--j0in-accent);
+  border-color: var(--j0in-accent-ink);
+  background: var(--j0in-accent-strong);
   color: var(--j0in-text-on-color);
 
   &:hover {

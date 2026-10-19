@@ -5,6 +5,7 @@
   justify-content: space-between;
   gap: var(--j0in-space-md);
   margin-bottom: var(--j0in-space-lg);
+  padding-right: var(--j0in-head-room);
 }
 
 .people__title {
@@ -19,7 +20,7 @@
   padding: 0 var(--j0in-space-md);
   border: 1px solid var(--j0in-accent);
   border-radius: var(--j0in-radius-pill);
-  background: var(--j0in-accent);
+  background: var(--j0in-accent-strong);
   color: var(--j0in-text-on-color);
   transition: background var(--j0in-transition);
 
@@ -34,7 +35,7 @@
   align-items: center;
   gap: var(--j0in-space-sm);
   margin-bottom: var(--j0in-space-md);
-  color: var(--j0in-danger);
+  color: var(--j0in-danger-ink);
 }
 
 .people__retry {
@@ -177,13 +178,13 @@
 }
 
 .detail__btn--danger:hover {
-  border-color: var(--j0in-danger);
-  color: var(--j0in-danger);
+  border-color: var(--j0in-danger-ink);
+  color: var(--j0in-danger-ink);
 }
 
 .detail__btn--primary {
-  border-color: var(--j0in-accent);
-  background: var(--j0in-accent);
+  border-color: var(--j0in-accent-ink);
+  background: var(--j0in-accent-strong);
   color: var(--j0in-text-on-color);
 
   &:hover {
@@ -193,7 +194,7 @@
 }
 
 .detail__btn--wipe {
-  border-color: var(--j0in-danger);
+  border-color: var(--j0in-danger-ink);
   background: var(--j0in-danger);
   color: var(--j0in-text-on-color);
 
