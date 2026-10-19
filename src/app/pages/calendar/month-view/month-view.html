@@ -1,0 +1,56 @@
+<div class="month">
+  <div class="month__row month__names" aria-hidden="true">
+    @for (name of data.weekdayNames(); track $index) {
+      <span class="month__name">{{ name }}</span>
+    }
+  </div>
+  <div class="month__days">
+    @for (cell of data.cells(); track cell.day) {
+      @let entries = data.entries(cell.day);
+      <div
+        class="day"
+        [class.day--other]="!cell.inMonth"
+        [class.day--today]="cell.day === data.today"
+      >
+        <button class="day__number" type="button" [attr.aria-label]="data.label(cell.day)" (click)="openWeek(cell.day)">
+          {{ dayNumber(cell.day) }}
+        </button>
+        <ul class="day__entries">
+          @for (entry of entries.slice(0, shown); track entry.id) {
+            <li class="entry entry--{{ entry.kind }}" [style.--entry]="entry.color">
+              @if (entry.taskId) {
+                <a class="entry__text" [routerLink]="['/board', entry.taskId]" [attr.title]="entry.title">{{ entry.title }}</a>
+              } @else {
+                <span class="entry__text" [attr.title]="entry.title">{{ entry.title }}</span>
+              }
+            </li>
+          }
+        </ul>
+        @if (entries.length > shown) {
+          <span class="day__more">+{{ entries.length - shown }} {{ t().calendar.more }}</span>
+        }
+      </div>
+    }
+  </div>
+</div>
+
+<ul class="list" [attr.aria-label]="data.heading()">
+  @for (cell of busyDays(); track cell.day) {
+    <li class="list__day" [class.list__day--today]="cell.day === data.today">
+      <button class="list__date" type="button" (click)="openWeek(cell.day)">{{ data.label(cell.day) }}</button>
+      <ul class="list__entries">
+        @for (entry of data.entries(cell.day); track entry.id) {
+          <li class="entry entry--{{ entry.kind }}" [style.--entry]="entry.color">
+            @if (entry.taskId) {
+              <a class="entry__text" [routerLink]="['/board', entry.taskId]" [attr.title]="entry.title">{{ entry.title }}</a>
+            } @else {
+              <span class="entry__text" [attr.title]="entry.title">{{ entry.title }}</span>
+            }
+          </li>
+        }
+      </ul>
+    </li>
+  } @empty {
+    <li class="list__empty">{{ t().calendar.agendaEmpty }}</li>
+  }
+</ul>
