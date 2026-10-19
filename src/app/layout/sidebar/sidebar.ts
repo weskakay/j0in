@@ -8,18 +8,23 @@ import { initialsOf } from '../../data/format';
 import type { Dictionary } from '../../data/i18n';
 import { SheenDirective } from '../../ui/sheen.directive';
 import { AccountMenu } from '../account-menu/account-menu';
+import { MoreMenu } from '../more-menu/more-menu';
 
 /** One entry in the main navigation; the wording comes from the dictionary. */
-interface NavItem {
+export interface NavItem {
   path: string;
   key: keyof Dictionary['nav'];
   icon: string;
+  /** True for the entries the phone bar shows; the rest sit behind "more". */
+  phone?: boolean;
 }
 
 /** The screens reachable from the navigation, each with its own mark. */
 const ITEMS: NavItem[] = [
-  { path: '/home', key: 'home', icon: 'M4 11l8-7 8 7v9H4zM10 20v-6h4v6' },
-  { path: '/board', key: 'board', icon: 'M4 5h5v14H4zM15 5h5v9h-5z' },
+  { path: '/home', key: 'home', icon: 'M4 11l8-7 8 7v9H4zM10 20v-6h4v6', phone: true },
+  { path: '/board', key: 'board', icon: 'M4 5h5v14H4zM15 5h5v9h-5z', phone: true },
+  { path: '/projects', key: 'projects', icon: 'M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z', phone: true },
+  { path: '/calendar', key: 'calendar', icon: 'M4 6h16v14H4zM4 10h16M8 3v4M16 3v4', phone: true },
   { path: '/insights', key: 'insights', icon: 'M4 19h16M7 16V9M12 16V5M17 16v-4' },
   { path: '/contacts', key: 'contacts', icon: 'M12 12a4 4 0 100-8 4 4 0 000 8zM4 20c0-4 4-6 8-6s8 2 8 6' },
   { path: '/settings', key: 'settings', icon: 'M12 15a3 3 0 100-6 3 3 0 000 6zM4 12h2M18 12h2M12 4v2M12 18v2M6.3 6.3l1.4 1.4M16.3 16.3l1.4 1.4M17.7 6.3l-1.4 1.4M7.7 16.3l-1.4 1.4' },
@@ -34,7 +39,7 @@ const SHORTCUTS = 5;
  */
 @Component({
   selector: 'app-sidebar',
-  imports: [RouterLink, RouterLinkActive, SheenDirective, AccountMenu],
+  imports: [RouterLink, RouterLinkActive, SheenDirective, AccountMenu, MoreMenu],
   templateUrl: './sidebar.html',
   styleUrl: './sidebar.scss',
   host: { '(keydown.escape)': 'closeMenu()', '(document:pointerdown)': 'onOutside($event)' },
@@ -51,7 +56,10 @@ export class Sidebar {
   protected readonly t = this.language.dict;
 
   /** True while the side navigation shows icons only. */
-  protected readonly folded = this.layout.navFolded;
+  protected readonly folded = this.layout.folded;
+
+  /** True when the glass look folds the navigation on its own, which hides the fold button. */
+  protected readonly autoFolded = this.layout.autoFolded;
 
   /** The signed-in user, for the card at the bottom. */
   protected readonly user = this.auth.user;
@@ -59,8 +67,13 @@ export class Sidebar {
   /** The entries, in the order they are listed. */
   protected readonly items = ITEMS;
 
-  /** The categories, listed as shortcuts to the board narrowed to each. */
-  protected readonly categories = computed(() => this.store.categories().slice(0, SHORTCUTS));
+  /** The pinned projects, listed as shortcuts to the board narrowed to each. */
+  protected readonly pinned = computed(() =>
+    this.store.categories().filter((project) => project.pinned).slice(0, SHORTCUTS),
+  );
+
+  /** The entries the phone bar keeps behind "more". */
+  protected readonly extra = ITEMS.filter((item) => !item.phone);
 
   /** Whether the account menu above the user card is open. */
   protected readonly menuOpen = signal(false);

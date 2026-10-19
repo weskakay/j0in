@@ -73,6 +73,14 @@
   font-weight: var(--j0in-fw-bold);
 }
 
+.side__item--extra {
+  display: none;
+}
+
+.side__item--more {
+  position: relative;
+}
+
 .side__count {
   position: absolute;
   top: 0;
@@ -122,6 +130,7 @@
   .side__brand {
     display: flex;
     align-items: center;
+    min-width: var(--j0in-tap-target);
     min-height: var(--j0in-tap-target);
     gap: var(--j0in-space-sm);
     color: inherit;
@@ -175,6 +184,14 @@
 
   .side__item {
     flex: 0 0 auto;
+  }
+
+  .side__item--extra {
+    display: list-item;
+  }
+
+  .side__item--more {
+    display: none;
   }
 
   .side__link {
@@ -328,6 +345,13 @@
       padding: 2px;
       background: transparent;
     }
+  }
+}
+
+/* A narrow phone keeps the marks only, the names stay for screen readers. */
+@media (max-width: 399px) {
+  .side__text {
+    @include hidden-label;
   }
 }
 

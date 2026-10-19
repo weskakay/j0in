@@ -1,0 +1,44 @@
+<button
+  #button
+  class="more"
+  type="button"
+  aria-controls="more-list"
+  [class.more--active]="here()"
+  [attr.aria-expanded]="open()"
+  (click)="open.set(!open())"
+>
+  <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
+    <path d="M5 12h.01M12 12h.01M19 12h.01" stroke="currentColor" stroke-width="3" stroke-linecap="round" />
+  </svg>
+  <span class="more__text">{{ t().nav.more }}</span>
+  @if (pending() > 0) {
+    <span class="more__count">
+      {{ pending() }}
+      <span class="more__hidden">{{ t().nav.pending }}</span>
+    </span>
+  }
+</button>
+@if (open()) {
+  <ul class="more__list" id="more-list">
+    @for (item of items(); track item.path) {
+      <li>
+        <a
+          class="more__link"
+          [routerLink]="item.path"
+          routerLinkActive="more__link--active"
+          ariaCurrentWhenActive="page"
+          (click)="open.set(false)"
+        >
+          <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
+            <path [attr.d]="item.icon" stroke="currentColor" stroke-width="2" fill="none"
+              stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+          {{ t().nav[item.key] }}
+          @if (item.key === 'settings' && pending() > 0) {
+            <span class="more__count more__count--inline">{{ pending() }}</span>
+          }
+        </a>
+      </li>
+    }
+  </ul>
+}

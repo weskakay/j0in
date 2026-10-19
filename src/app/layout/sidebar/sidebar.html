@@ -4,23 +4,25 @@
       <span class="side__logo" aria-hidden="true">J0</span>
       <span class="side__name">J<span class="side__zero">0</span>IN</span>
     </a>
-    <button
-      class="side__fold"
-      type="button"
-      [attr.aria-label]="folded() ? t().nav.unfold : t().nav.fold"
-      [attr.aria-pressed]="folded()"
-      (click)="toggle()"
-    >
-      <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
-        <path [attr.d]="folded() ? 'M9 6l6 6-6 6' : 'M15 6l-6 6 6 6'" stroke="currentColor"
-          stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" />
-      </svg>
-    </button>
+    @if (!autoFolded()) {
+      <button
+        class="side__fold"
+        type="button"
+        [attr.aria-label]="folded() ? t().nav.unfold : t().nav.fold"
+        [attr.aria-pressed]="folded()"
+        (click)="toggle()"
+      >
+        <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
+          <path [attr.d]="folded() ? 'M9 6l6 6-6 6' : 'M15 6l-6 6 6 6'" stroke="currentColor"
+            stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" />
+        </svg>
+      </button>
+    }
   </div>
 
   <ul class="side__list">
     @for (item of items; track item.path) {
-      <li class="side__item">
+      <li class="side__item" [class.side__item--extra]="!item.phone">
         <a
           class="side__link"
           [routerLink]="item.path"
@@ -44,13 +46,16 @@
         </a>
       </li>
     }
+    <li class="side__item side__item--more">
+      <app-more-menu [items]="extra" [pending]="pending()" />
+    </li>
   </ul>
 
-  @if (categories().length > 0) {
+  @if (pinned().length > 0) {
     <div class="side__group">
-      <p class="side__group-title">{{ t().nav.categories }}</p>
+      <p class="side__group-title">{{ t().projects.pinned }}</p>
       <ul class="side__shortcuts">
-        @for (category of categories(); track category.id) {
+        @for (category of pinned(); track category.id) {
           <li>
             <a class="side__shortcut" routerLink="/board" [queryParams]="{ category: category.id }">
               <span class="side__dot" [style.background]="category.color" aria-hidden="true"></span>

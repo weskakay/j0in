@@ -29,6 +29,14 @@ export const routes: Routes = [
         loadComponent: () => import('./pages/home/home').then((m) => m.Home),
       },
       {
+        path: 'projects',
+        loadComponent: () => import('./pages/projects/projects').then((m) => m.Projects),
+      },
+      {
+        path: 'calendar',
+        loadComponent: () => import('./pages/calendar/calendar').then((m) => m.Calendar),
+      },
+      {
         path: 'insights',
         loadComponent: () => import('./pages/insights/insights').then((m) => m.Insights),
       },

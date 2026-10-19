@@ -1,0 +1,105 @@
+@use "glass" as *;
+
+:host {
+  position: relative;
+  display: block;
+}
+
+.more {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  width: 100%;
+  min-height: var(--j0in-tap-target);
+  padding: var(--j0in-space-xs) 2px;
+  border-radius: var(--j0in-radius-sm);
+  background: transparent;
+  color: var(--j0in-text-muted);
+}
+
+.more--active {
+  @include lens;
+  color: var(--j0in-accent-ink);
+  font-weight: var(--j0in-fw-bold);
+}
+
+.more__count {
+  position: absolute;
+  top: 0;
+  left: calc(50% + 9px);
+  min-width: 22px;
+  padding: 0 var(--j0in-space-xs);
+  border-radius: var(--j0in-radius-pill);
+  background: var(--j0in-danger);
+  color: var(--j0in-text-on-color);
+  line-height: 22px;
+  text-align: center;
+}
+
+.more__count--inline {
+  position: static;
+  margin-left: auto;
+}
+
+.more__hidden {
+  @include hidden-label;
+}
+
+.more__text {
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Opens upwards out of the phone bar. */
+.more__list {
+  @include surface-thick;
+  position: absolute;
+  right: 0;
+  bottom: calc(100% + var(--j0in-space-sm));
+  z-index: 20;
+  min-width: 220px;
+  padding: var(--j0in-space-xs);
+  border-radius: var(--j0in-radius-md);
+  /* Inside the bar, which already blurs, a second blur does not take hold. */
+  background: var(--j0in-panel-solid);
+  box-shadow: var(--j0in-panel-shadow), var(--j0in-shadow-md);
+}
+
+.more__link {
+  display: flex;
+  align-items: center;
+  gap: var(--j0in-space-sm);
+  min-height: var(--j0in-tap-target);
+  padding: 0 var(--j0in-space-sm);
+  border-radius: var(--j0in-radius-sm);
+  color: inherit;
+  text-decoration: none;
+
+  &:hover {
+    background: var(--j0in-fill);
+  }
+}
+
+.more__link--active {
+  color: var(--j0in-accent-ink);
+  font-weight: var(--j0in-fw-bold);
+}
+
+/* A narrow phone keeps the marks only, the names stay for screen readers. */
+@media (max-width: 399px) {
+  .more__text {
+    @include hidden-label;
+  }
+}
+
+/* Phone held sideways: the bar keeps the marks only. */
+@media (max-height: 500px) and (orientation: landscape) {
+  .more__text {
+    @include hidden-label;
+  }
+}
