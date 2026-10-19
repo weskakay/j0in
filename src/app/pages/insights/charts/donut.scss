@@ -6,9 +6,8 @@
 .ring {
   height: 100%;
   padding: var(--j0in-space-lg);
-  border: 1px solid var(--j0in-border);
   border-radius: var(--j0in-radius-md);
-  background: var(--j0in-surface);
+  background: var(--j0in-fill);
 }
 
 .ring__caption {
@@ -55,7 +54,7 @@
 }
 
 .ring__total {
-  font-size: 34px;
+  font-size: var(--j0in-fs-big);
   font-weight: var(--j0in-fw-bold);
   line-height: 1;
 }

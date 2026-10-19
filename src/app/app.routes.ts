@@ -8,7 +8,7 @@ import { guestGuard } from './core/guest.guard';
  * The wildcard entry must stay last.
  */
 export const routes: Routes = [
-  { path: '', pathMatch: 'full', redirectTo: 'summary' },
+  { path: '', pathMatch: 'full', redirectTo: 'home' },
   {
     path: 'login',
     canActivate: [guestGuard],
@@ -25,12 +25,20 @@ export const routes: Routes = [
     loadComponent: () => import('./layout/shell/shell').then((m) => m.Shell),
     children: [
       {
-        path: 'summary',
-        loadComponent: () => import('./pages/summary/summary').then((m) => m.Summary),
+        path: 'home',
+        loadComponent: () => import('./pages/home/home').then((m) => m.Home),
       },
+      {
+        path: 'insights',
+        loadComponent: () => import('./pages/insights/insights').then((m) => m.Insights),
+      },
+      // The old start page lives on as a redirect, so saved links still land.
+      { path: 'summary', redirectTo: 'home' },
       {
         path: 'board',
         loadComponent: () => import('./pages/board/board').then((m) => m.Board),
+        // A card open in the panel; the board reads the id and draws the panel itself.
+        children: [{ path: ':taskId', children: [] }],
       },
       {
         path: 'contacts',
@@ -42,5 +50,5 @@ export const routes: Routes = [
       },
     ],
   },
-  { path: '**', redirectTo: 'summary' },
+  { path: '**', redirectTo: 'home' },
 ];

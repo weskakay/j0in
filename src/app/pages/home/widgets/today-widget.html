@@ -1,0 +1,14 @@
+<app-widget [heading]="t().home.rings" [note]="t().home.ringsNote">
+  <div class="today">
+    <app-rings class="today__rings" [rings]="rings()" />
+    <ul class="legend">
+      @for (row of legend(); track row.label) {
+        <li class="legend__row">
+          <span class="legend__bar" [style.background]="row.color" aria-hidden="true"></span>
+          <span class="legend__label">{{ row.label }}</span>
+          <span class="legend__value">{{ row.value }} <span class="legend__unit">{{ row.unit }}</span></span>
+        </li>
+      }
+    </ul>
+  </div>
+</app-widget>

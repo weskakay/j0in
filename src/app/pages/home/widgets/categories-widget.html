@@ -1,0 +1,29 @@
+<app-widget [heading]="t().home.categories" link="/settings" [linkText]="t().home.seeAll">
+  <ul class="projects">
+    @for (row of rows(); track row.category.id) {
+      <li>
+        <a class="project" routerLink="/board" [queryParams]="{ category: row.category.id }" [style.--chip]="row.category.color">
+          <span class="project__tile" aria-hidden="true">{{ row.category.name.charAt(0) }}</span>
+          <span class="project__name">
+            <span class="project__title">{{ row.category.name }}</span>
+            <span class="project__sub">{{ summary(row) }}</span>
+          </span>
+          <span class="project__track" aria-hidden="true">
+            <span class="project__fill" [style.width.%]="row.percent"></span>
+          </span>
+          <span class="project__percent">{{ row.percent }} %</span>
+          <span class="avatars project__faces">
+            @for (person of facesOf(row); track person.id) {
+              <span class="avatar" [style.background]="person.color" [title]="person.name" role="img" [attr.aria-label]="person.name">{{ initials(person) }}</span>
+            }
+            @if (moreOf(row) > 0) {
+              <span class="avatar avatar--more">+{{ moreOf(row) }}</span>
+            }
+          </span>
+        </a>
+      </li>
+    } @empty {
+      <li class="empty">{{ t().home.categoriesEmpty }}</li>
+    }
+  </ul>
+</app-widget>

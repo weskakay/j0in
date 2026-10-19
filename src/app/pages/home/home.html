@@ -1,0 +1,58 @@
+<header class="page-head">
+  <div class="page-head__lead">
+    <h1 class="page-head__title">{{ hello() }}</h1>
+    <p class="page-head__sub">{{ dayLine() }}</p>
+  </div>
+
+  <ul class="kpis page-head__stats">
+    <li class="kpi">
+      <span class="kpi__label">{{ t().home.doneToday }}</span>
+      <span class="kpi__value">{{ done().part }}<span class="kpi__unit"> / {{ done().whole }}</span></span>
+    </li>
+    <li class="kpi">
+      <span class="kpi__label">{{ t().home.focusToday }}</span>
+      <span class="kpi__value">{{ focusHours() }}<span class="kpi__unit"> h</span></span>
+    </li>
+    <li class="kpi" [class.kpi--alert]="data.overdue().length > 0">
+      <span class="kpi__label">{{ t().home.overdue }}</span>
+      <span class="kpi__value">{{ data.overdue().length }}</span>
+    </li>
+  </ul>
+
+  <div class="page-head__actions">
+    <a class="home__btn" routerLink="/board" [queryParams]="{ new: 1 }">
+      <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
+        <path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" />
+      </svg>
+      {{ t().topbar.newTask }}
+    </a>
+    @if (next(); as up) {
+      <a class="home__btn home__btn--primary" [routerLink]="up.link">
+        {{ up.label }}
+      </a>
+    }
+  </div>
+</header>
+
+@if (error(); as message) {
+  <p class="home__error" role="alert">
+    {{ message }}
+    <button class="home__retry" type="button" (click)="retry()">{{ t().common.retry }}</button>
+  </p>
+}
+
+@if (loading() && !ready()) {
+  <app-loader [label]="t().common.loading" />
+}
+
+@if (ready()) {
+  <div class="home__grid">
+    <app-today-widget class="home__third" />
+    <app-next-widget class="home__third" />
+    <app-focus-widget class="home__third" />
+    <app-mine-widget class="home__narrow" />
+    <app-week-widget class="home__wide" />
+    <app-categories-widget class="home__wide" />
+    <app-now-widget class="home__narrow" />
+  </div>
+}

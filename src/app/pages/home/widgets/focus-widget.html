@@ -1,0 +1,51 @@
+<app-widget [heading]="t().home.focusTitle" [note]="t().home.focusNote">
+  @if (!enabled()) {
+    <p class="empty">{{ t().home.focusOff }}</p>
+  } @else {
+    <div class="focus">
+      <div class="focus__dial">
+        <app-rings class="focus__ring" [rings]="ring()" />
+        <span class="focus__face">
+          <span class="focus__clock">{{ clock() }}</span>
+          <span class="focus__state">{{ running() ? t().pill.focus : t().home.ready }}</span>
+        </span>
+      </div>
+
+      <div class="focus__controls">
+        @if (running()) {
+          <button class="action action--stop" type="button" [disabled]="busy()" (click)="stop()">
+            {{ t().pill.stop }}
+          </button>
+        } @else {
+          <div class="segment focus__lengths" role="group" [attr.aria-label]="t().home.focusTitle">
+            @for (minutes of lengths; track minutes) {
+              <button
+                class="segment__btn"
+                type="button"
+                [class.segment__btn--on]="length() === minutes"
+                [attr.aria-pressed]="length() === minutes"
+                (click)="length.set(minutes)"
+              >
+                {{ minutes }} {{ t().home.minutes }}
+              </button>
+            }
+          </div>
+          <label class="focus__pick">
+            <span class="focus__label">{{ t().home.focusTask }}</span>
+            <select class="focus__select" (change)="pick($event)">
+              @for (task of open(); track task.id) {
+                <option [value]="task.id" [selected]="taskId() === task.id">{{ task.title }}</option>
+              }
+            </select>
+          </label>
+          <button class="action" type="button" [disabled]="taskId() === '' || busy()" (click)="start()">
+            <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+              <path d="M8 5.5v13l10.5-6.5z" fill="currentColor" />
+            </svg>
+            {{ t().home.focusStart }}
+          </button>
+        }
+      </div>
+    </div>
+  }
+</app-widget>

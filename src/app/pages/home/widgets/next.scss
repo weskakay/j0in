@@ -1,0 +1,52 @@
+@use "base";
+
+/* Spotlight: the first entry of "up next" in a card of its own */
+.spot {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: var(--j0in-space-md);
+  border: 1px solid color-mix(in srgb, var(--j0in-accent) 30%, transparent);
+  border-radius: var(--j0in-radius-lg);
+  background: color-mix(in srgb, var(--j0in-accent) 14%, transparent);
+}
+
+.spot__when {
+  color: var(--j0in-accent-ink);
+  font-weight: var(--j0in-fw-bold);
+}
+
+.spot__when--late {
+  color: var(--j0in-danger-ink);
+}
+
+.spot__title {
+  font-size: var(--j0in-fs-lg);
+  font-weight: var(--j0in-fw-bold);
+  overflow-wrap: anywhere;
+}
+
+.spot__meta {
+  color: var(--j0in-text-muted);
+}
+
+.spot__foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--j0in-space-sm);
+  margin-top: var(--j0in-space-sm);
+}
+
+.spot__open {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--j0in-tap-target);
+  padding: 0 var(--j0in-space-md);
+  border-radius: var(--j0in-radius-pill);
+  background: var(--j0in-accent-strong);
+  box-shadow: var(--j0in-glow);
+  color: var(--j0in-text-on-color);
+  font-weight: var(--j0in-fw-bold);
+  text-decoration: none;
+}

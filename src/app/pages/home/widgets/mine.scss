@@ -1,0 +1,56 @@
+@use "base";
+
+/* My tasks */
+.tasks {
+  display: flex;
+  flex-direction: column;
+}
+
+.task {
+  display: flex;
+  align-items: center;
+  gap: var(--j0in-space-sm);
+  padding: var(--j0in-space-xs) 0;
+  border-top: 1px solid var(--j0in-border);
+
+  &:first-child {
+    border-top: 0;
+  }
+}
+
+.task__body {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.task__title {
+  overflow: hidden;
+  color: inherit;
+  font-weight: var(--j0in-fw-bold);
+  text-decoration: none;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+
+  &:hover {
+    color: var(--j0in-accent-ink);
+  }
+}
+
+.task__meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--j0in-space-sm);
+}
+
+.task__due {
+  color: var(--j0in-text-muted);
+}
+
+.task__due--late {
+  color: var(--j0in-danger-ink);
+  font-weight: var(--j0in-fw-bold);
+}

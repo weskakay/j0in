@@ -1,0 +1,99 @@
+@use "base";
+
+/* Focus */
+.focus {
+  display: flex;
+  flex: 1;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: var(--j0in-space-lg);
+}
+
+.focus__dial {
+  position: relative;
+  display: grid;
+  place-items: center;
+}
+
+.focus__ring {
+  width: 140px;
+}
+
+.focus__face {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.focus__clock {
+  font-size: var(--j0in-fs-kpi);
+  font-weight: var(--j0in-fw-black);
+  font-variant-numeric: tabular-nums;
+  line-height: 1.1;
+}
+
+.focus__state {
+  color: var(--j0in-text-muted);
+}
+
+.focus__controls {
+  display: flex;
+  flex: 1 1 180px;
+  flex-direction: column;
+  gap: var(--j0in-space-sm);
+  min-width: 0;
+}
+
+.focus__lengths {
+  align-self: flex-start;
+}
+
+.focus__pick {
+  display: flex;
+  flex-direction: column;
+  gap: var(--j0in-space-xs);
+}
+
+.focus__label {
+  color: var(--j0in-text-muted);
+}
+
+.focus__select {
+  width: 100%;
+  min-height: var(--j0in-tap-target);
+  padding: 0 var(--j0in-space-md);
+  border: 0;
+  border-radius: var(--j0in-radius-pill);
+  background: var(--j0in-fill);
+}
+
+.focus__select option {
+  background: var(--j0in-panel-solid);
+}
+
+.action {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--j0in-space-sm);
+  width: 100%;
+  min-height: var(--j0in-tap-target);
+  border: 0;
+  border-radius: var(--j0in-radius-pill);
+  background: var(--j0in-accent-strong);
+  box-shadow: var(--j0in-glow);
+  color: var(--j0in-text-on-color);
+  font-weight: var(--j0in-fw-bold);
+
+  &:disabled {
+    opacity: 0.45;
+    cursor: default;
+    box-shadow: none;
+  }
+}
+
+.action--stop {
+  background: var(--j0in-danger);
+}

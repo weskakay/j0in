@@ -16,7 +16,7 @@
     </div>
 
     <ul class="strip__legend">
-      @for (row of rows(); track row.label) {
+      @for (row of rows(); track $index) {
         <li class="strip__item" [class.strip__item--none]="row.count === 0">
           <span class="strip__dot" [style.background]="row.color" aria-hidden="true"></span>
           <span class="strip__label">{{ row.label }}</span>

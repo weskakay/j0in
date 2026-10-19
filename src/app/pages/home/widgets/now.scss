@@ -1,0 +1,66 @@
+@use "base";
+
+/* Right now */
+.now__switch {
+  align-self: flex-start;
+}
+
+.people {
+  display: flex;
+  flex-direction: column;
+}
+
+.person {
+  display: flex;
+  align-items: center;
+  gap: var(--j0in-space-md);
+  min-height: 56px;
+}
+
+.person__avatar {
+  position: relative;
+  display: grid;
+  flex: 0 0 auto;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border-radius: var(--j0in-radius-pill);
+  color: var(--j0in-text-on-color);
+  font-weight: var(--j0in-fw-bold);
+}
+
+.person__dot {
+  position: absolute;
+  right: -2px;
+  bottom: -2px;
+  width: 13px;
+  height: 13px;
+  border: 2px solid var(--j0in-panel-solid);
+  border-radius: var(--j0in-radius-pill);
+  background: var(--j0in-success);
+}
+
+.person__dot--focus {
+  background: var(--j0in-purple);
+}
+
+.person__dot--busy {
+  background: var(--j0in-warning);
+}
+
+.person__text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.person__name {
+  font-weight: var(--j0in-fw-bold);
+}
+
+.person__status {
+  overflow: hidden;
+  color: var(--j0in-text-muted);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}

@@ -1,0 +1,53 @@
+<app-widget [heading]="withCalendar() ? t().home.upNext : t().home.upNextDue" link="/board" [linkText]="t().home.toBoard">
+  @if (withCalendar()) {
+    @if (next(); as event) {
+      <div class="spot">
+        <p class="spot__when">{{ countdown() }}</p>
+        <p class="spot__title">{{ event.title }}</p>
+        <p class="spot__meta">{{ span(event) }}</p>
+        @if (event.taskId) {
+          <a class="spot__open" [routerLink]="['/board', event.taskId]">{{ t().home.open }}</a>
+        }
+      </div>
+      <ul class="lines">
+        @for (one of later(); track one.id) {
+          <li class="lines__row">
+            <span class="lines__mark" aria-hidden="true"></span>
+            <span class="lines__text">{{ one.title }}</span>
+            <span class="lines__meta">{{ time(one.start) }}</span>
+          </li>
+        }
+      </ul>
+    } @else {
+      <p class="empty">{{ t().home.upNextEmpty }}</p>
+    }
+  } @else {
+    @for (card of cards(); track card.id; let first = $first) {
+      @if (first) {
+        <div class="spot">
+          <p class="spot__when" [class.spot__when--late]="isLate(card)">{{ due(card) }}</p>
+          <p class="spot__title">{{ card.title }}</p>
+          @if (categoryName(card)) {
+            <p class="spot__meta">{{ categoryName(card) }}</p>
+          }
+          <div class="spot__foot">
+            <span class="avatars">
+              @for (person of peopleOf(card); track person.id) {
+                <span class="avatar" [style.background]="person.color" [title]="person.name" role="img" [attr.aria-label]="person.name">{{ initials(person) }}</span>
+              }
+            </span>
+            <a class="spot__open" [routerLink]="['/board', card.id]">{{ t().home.open }}</a>
+          </div>
+        </div>
+      } @else {
+        <a class="lines__row lines__link" [routerLink]="['/board', card.id]">
+          <span class="lines__mark" [style.background]="colorOf(card)" aria-hidden="true"></span>
+          <span class="lines__text">{{ card.title }}</span>
+          <span class="lines__meta">{{ due(card) }}</span>
+        </a>
+      }
+    } @empty {
+      <p class="empty">{{ t().home.upNextEmpty }}</p>
+    }
+  }
+</app-widget>

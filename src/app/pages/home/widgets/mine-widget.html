@@ -1,0 +1,40 @@
+<app-widget [heading]="t().home.mine" [note]="t().home.mineNote" link="/board" [linkText]="t().home.allTasks">
+  <ul class="tasks">
+    @for (card of cards(); track card.id) {
+      <li class="task">
+        <button
+          class="tick"
+          type="button"
+          role="checkbox"
+          aria-checked="false"
+          [attr.aria-label]="t().list.markDone + ' ' + card.title"
+          (click)="finish(card)"
+        ></button>
+        <span class="task__body">
+          <a class="task__title" [routerLink]="['/board', card.id]">{{ card.title }}</a>
+          <span class="task__meta">
+            @if (categoryOf(card); as category) {
+              <span class="chip" [style.--chip]="category.color">
+                <span class="chip__dot" aria-hidden="true"></span>{{ category.name }}
+              </span>
+            }
+            <span class="task__due" [class.task__due--late]="(card.dueDate ?? '') < day()">{{ due(card) }}</span>
+          </span>
+        </span>
+        @if (card.priority !== 'low') {
+          <span class="prio prio--{{ card.priority }}">
+            @if (card.priority === 'urgent') {
+              <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true">
+                <path d="M5 21V4h11l-1.5 4L16 12H5" fill="none" stroke="currentColor" stroke-width="2"
+                  stroke-linejoin="round" />
+              </svg>
+            }
+            {{ t().task[card.priority] }}
+          </span>
+        }
+      </li>
+    } @empty {
+      <li class="empty">{{ t().home.mineEmpty }}</li>
+    }
+  </ul>
+</app-widget>

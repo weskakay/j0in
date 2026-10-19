@@ -1,0 +1,43 @@
+<app-widget [heading]="t().home.rightNow">
+  <div class="segment now__switch" role="group" [attr.aria-label]="t().home.rightNow">
+    <button class="segment__btn" type="button" [class.segment__btn--on]="view() === 'team'"
+      [attr.aria-pressed]="view() === 'team'" (click)="view.set('team')">{{ t().home.team }}</button>
+    <button class="segment__btn" type="button" [class.segment__btn--on]="view() === 'time'"
+      [attr.aria-pressed]="view() === 'time'" (click)="view.set('time')">{{ t().home.time }}</button>
+  </div>
+
+  @if (view() === 'team') {
+    <ul class="people">
+      @for (entry of people(); track entry.contact.id) {
+        <li class="person">
+          <span class="person__avatar" [style.background]="entry.contact.color" aria-hidden="true">
+            {{ initials(entry.contact) }}
+            <span class="person__dot person__dot--{{ entry.state }}"></span>
+          </span>
+          <span class="person__text">
+            <span class="person__name">{{ entry.contact.name }}</span>
+            <span class="person__status">{{ status(entry) }}</span>
+          </span>
+        </li>
+      } @empty {
+        <li class="empty">{{ t().home.noContacts }}</li>
+      }
+    </ul>
+  } @else {
+    <ul class="lines">
+      @for (row of phases(); track row.id) {
+        <li class="progress">
+          <span class="progress__head">
+            <span class="lines__text">{{ row.name }}</span>
+            <span class="lines__meta">{{ row.text }}</span>
+          </span>
+          <span class="progress__track" aria-hidden="true">
+            <span class="progress__fill" [style.width.%]="row.percent"></span>
+          </span>
+        </li>
+      } @empty {
+        <li class="empty">{{ t().home.phasesEmpty }}</li>
+      }
+    </ul>
+  }
+</app-widget>

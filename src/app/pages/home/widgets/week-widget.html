@@ -1,0 +1,22 @@
+<app-widget [heading]="t().home.week" [note]="t().home.weekNote">
+  <p class="week__sum">
+    <span class="big">{{ total() }}</span>
+    <span class="week__so-far">{{ t().home.finishedSoFar }}</span>
+    @let delta = change();
+    @if (delta !== null) {
+      <span class="week__change" [class.week__change--down]="delta < 0">
+        {{ delta > 0 ? '+' : '' }}{{ delta }} % {{ t().home.vsLastWeek }}
+      </span>
+    }
+  </p>
+  <ul class="week">
+    @for (bar of bars(); track bar.day) {
+      <li class="week__day" [class.week__day--today]="bar.today">
+        <span class="week__track" [title]="bar.count + ''">
+          <span class="week__bar" [style.height.%]="bar.height"></span>
+        </span>
+        <span class="week__name">{{ bar.name }} <span class="week__count">{{ bar.count }}</span></span>
+      </li>
+    }
+  </ul>
+</app-widget>

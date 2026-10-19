@@ -5,7 +5,7 @@
     <p class="bars__empty">{{ t().summary.nothing }}</p>
   } @else {
     <ul class="bars__list">
-      @for (row of rows(); track row.label) {
+      @for (row of rows(); track $index) {
         <li class="bars__row">
           <span class="bars__head">
             <span class="bars__label">{{ row.label }}</span>

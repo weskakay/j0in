@@ -27,7 +27,7 @@
     </div>
 
     <ul class="ring__legend">
-      @for (row of rows(); track row.label) {
+      @for (row of rows(); track $index) {
         <li class="ring__item">
           <span class="ring__dot" [style.background]="row.color" aria-hidden="true"></span>
           <span class="ring__label">{{ row.label }}</span>

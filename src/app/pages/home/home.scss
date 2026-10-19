@@ -1,0 +1,92 @@
+.home__btn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--j0in-space-sm);
+  min-height: var(--j0in-tap-target);
+  padding: 0 var(--j0in-space-md);
+  border: var(--j0in-panel-border);
+  border-radius: var(--j0in-radius-pill);
+  background: var(--j0in-panel-bg);
+  -webkit-backdrop-filter: var(--j0in-panel-blur);
+  backdrop-filter: var(--j0in-panel-blur);
+  color: var(--j0in-text);
+  font-weight: var(--j0in-fw-bold);
+  text-decoration: none;
+  white-space: nowrap;
+
+  &:hover {
+    border-color: var(--j0in-accent-ink);
+  }
+}
+
+.home__btn--primary {
+  display: inline-block;
+  max-width: 320px;
+  overflow: hidden;
+  line-height: var(--j0in-tap-target);
+  text-overflow: ellipsis;
+  border-color: var(--j0in-accent-ink);
+  background: var(--j0in-accent-strong);
+  box-shadow: var(--j0in-glow);
+  color: var(--j0in-text-on-color);
+
+  &:hover {
+    background: var(--j0in-accent-hover);
+  }
+}
+
+.home__error {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--j0in-space-sm);
+  margin-bottom: var(--j0in-space-md);
+  color: var(--j0in-danger-ink);
+}
+
+.home__retry {
+  min-height: var(--j0in-tap-target);
+  padding: 0 var(--j0in-space-md);
+  border: 1px solid var(--j0in-border);
+  border-radius: var(--j0in-radius-pill);
+  background: var(--j0in-fill);
+}
+
+/* Phone: one column. Tablet: two, the wide widgets across. Desktop: twelve
+   columns, three widgets in the first row, then narrow next to wide. */
+.home__grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--j0in-space-md);
+}
+
+@media (min-width: 700px) {
+  .home__grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .home__narrow,
+  .home__wide,
+  .home__third:nth-child(3) {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (min-width: 1100px) {
+  .home__grid {
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+  }
+
+  .home__third,
+  .home__third:nth-child(3) {
+    grid-column: span 4;
+  }
+
+  .home__narrow {
+    grid-column: span 5;
+  }
+
+  .home__wide {
+    grid-column: span 7;
+  }
+}

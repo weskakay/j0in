@@ -6,9 +6,8 @@
 .bars {
   height: 100%;
   padding: var(--j0in-space-lg);
-  border: 1px solid var(--j0in-border);
   border-radius: var(--j0in-radius-md);
-  background: var(--j0in-surface);
+  background: var(--j0in-fill);
 }
 
 .bars__caption {
@@ -60,7 +59,7 @@
   display: block;
   height: 10px;
   border-radius: var(--j0in-radius-pill);
-  background: var(--j0in-bg);
+  background: var(--j0in-fill-hover);
 }
 
 .bars__fill {

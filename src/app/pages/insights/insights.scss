@@ -1,0 +1,30 @@
+:host {
+  display: block;
+  min-width: 0;
+}
+
+.insights__head {
+  margin-bottom: var(--j0in-space-lg);
+  padding-right: var(--j0in-head-room);
+}
+
+.insights__title {
+  font-size: var(--j0in-fs-title);
+  line-height: 1.15;
+}
+
+.insights__sub {
+  color: var(--j0in-text-muted);
+}
+
+.charts {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr));
+  gap: var(--j0in-space-md);
+  align-items: stretch;
+}
+
+/* The deadlines run across the whole width, they are one single strip. */
+.charts__wide {
+  grid-column: 1 / -1;
+}
