@@ -19,10 +19,12 @@
   width: 100%;
   max-width: 420px;
   padding: var(--j0in-space-xl);
-  border: 1px solid var(--j0in-border);
-  border-radius: var(--j0in-radius-md);
-  background: var(--j0in-surface);
-  box-shadow: var(--j0in-shadow-md);
+  border: var(--j0in-panel-border);
+  border-radius: var(--j0in-panel-radius);
+  background: var(--j0in-dialog-bg);
+  -webkit-backdrop-filter: var(--j0in-panel-blur-thick);
+  backdrop-filter: var(--j0in-panel-blur-thick);
+  box-shadow: var(--j0in-panel-shadow), var(--j0in-shadow-md);
 }
 
 .auth__brand {
@@ -38,9 +40,10 @@
 .auth__error {
   padding: var(--j0in-space-sm) var(--j0in-space-md);
   border-radius: var(--j0in-radius-sm);
-  background: var(--j0in-danger);
-  color: var(--j0in-text-inverse);
+  background: color-mix(in srgb, var(--j0in-danger) 14%, transparent);
+  color: var(--j0in-danger-ink);
   font-size: var(--j0in-fs-sm);
+  font-weight: var(--j0in-fw-bold);
 }
 
 .auth__form {
@@ -61,6 +64,7 @@
 }
 
 .auth__input {
+  min-height: var(--j0in-tap-target);
   padding: var(--j0in-space-sm) var(--j0in-space-md);
   border: 1px solid var(--j0in-border);
   border-radius: var(--j0in-radius-sm);
@@ -83,6 +87,7 @@
 
 .auth__check {
   display: flex;
+  min-height: var(--j0in-tap-target);
   align-items: center;
   gap: var(--j0in-space-sm);
   font-size: var(--j0in-fs-sm);

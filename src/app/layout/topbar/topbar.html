@@ -1,6 +1,10 @@
 <header class="top">
   <a class="top__brand" routerLink="/home">J<span class="top__zero">0</span>IN</a>
 
+  @if (scrolled() && pageTitle()) {
+    <span class="top__title" aria-hidden="true">{{ pageTitle() }}</span>
+  }
+
   <button class="top__search" type="button" [attr.aria-label]="t().topbar.search" (click)="openPalette()">
     <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
       <circle cx="11" cy="11" r="7" fill="none" stroke="currentColor" stroke-width="2" />
@@ -40,19 +44,7 @@
     </button>
 
     @if (owner()) {
-      <a
-        class="top__btn top__bell"
-        routerLink="/settings"
-        [attr.aria-label]="pending() > 0 ? pending() + ' ' + t().topbar.requests : t().topbar.noRequests"
-      >
-        <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
-          <path d="M6 16V11a6 6 0 1 1 12 0v5l2 2H4zM10 21h4" fill="none" stroke="currentColor"
-            stroke-width="2" stroke-linejoin="round" stroke-linecap="round" />
-        </svg>
-        @if (pending() > 0) {
-          <span class="top__dot" aria-hidden="true"></span>
-        }
-      </a>
+      <app-notices />
     }
 
     <div class="top__account" #menu (focusout)="onMenuLeave($event, menu)">

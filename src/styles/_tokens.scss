@@ -50,6 +50,7 @@
   --j0in-space-xl: 40px;
 
   // Radii
+  --j0in-radius-xs: 6px;
   --j0in-radius-sm: 8px;
   --j0in-radius-md: 12px;
   --j0in-radius-pill: 999px;
@@ -102,6 +103,9 @@
   --j0in-shell-gap: 0px;
   // Room kept free on the right of a page title for the floating tools.
   --j0in-head-room: 0px;
+  --j0in-top-height: 68px;
+  // Rows a mouse aims at may sit closer than the 44 px a finger needs.
+  --j0in-target-fine: 28px;
   --j0in-sheen: 0;
   --j0in-scrim: rgb(0 0 0 / 55%);
   --j0in-dialog-bg: var(--j0in-surface);
@@ -280,6 +284,17 @@
 @media (min-width: 1100px) {
   :root[data-look="glass"] {
     --j0in-head-room: 470px;
+  }
+}
+
+// Someone who asked the system for less transparency gets solid surfaces.
+@media (prefers-reduced-transparency: reduce) {
+  :root[data-look="glass"] {
+    --j0in-panel-bg: var(--j0in-panel-solid);
+    --j0in-panel-bg-thick: var(--j0in-panel-solid);
+    --j0in-panel-blur: none;
+    --j0in-panel-blur-thick: none;
+    --j0in-sheen: 0;
   }
 }
 

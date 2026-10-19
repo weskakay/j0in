@@ -2,9 +2,9 @@
 .auth__btn--guest {
   flex: 1 0 100%;
   order: 1;
-  border-color: var(--j0in-accent-ink);
-  background: var(--j0in-accent);
-  color: var(--j0in-text-inverse);
+  border-color: var(--j0in-accent-strong);
+  background: var(--j0in-accent-strong);
+  color: var(--j0in-text-on-color);
   animation: guest-glow 2.4s ease-in-out infinite;
 }
 

@@ -35,6 +35,22 @@
   color: var(--j0in-accent-ink);
 }
 
+.top__title {
+  display: none;
+  padding: 0 var(--j0in-space-sm) 0 var(--j0in-space-md);
+  font-size: var(--j0in-fs-lg);
+  font-weight: var(--j0in-fw-bold);
+  white-space: nowrap;
+  animation: title-in 300ms var(--j0in-spring);
+}
+
+@keyframes title-in {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+}
+
 .top__search {
   display: flex;
   flex: 0 0 auto;
@@ -113,22 +129,6 @@
   }
 }
 
-/* The owner's bell. Below a small phone width the badge on the settings
-   entry is enough, and the room goes to the other buttons. */
-.top__bell {
-  display: none;
-}
-
-.top__dot {
-  position: absolute;
-  top: 8px;
-  right: 9px;
-  width: 9px;
-  height: 9px;
-  border-radius: var(--j0in-radius-pill);
-  background: var(--j0in-danger);
-}
-
 .top__account {
   position: relative;
 }
@@ -140,12 +140,6 @@
   z-index: 20;
 }
 
-@media (min-width: 600px) {
-  .top__bell {
-    display: grid;
-  }
-}
-
 @media (min-width: 900px) {
   :host {
     top: var(--j0in-shell-gap);
@@ -153,7 +147,7 @@
   }
 
   .top {
-    min-height: 68px;
+    min-height: var(--j0in-top-height);
     padding-inline: var(--j0in-space-lg) var(--j0in-space-md);
   }
 
@@ -224,6 +218,10 @@
     .top__pill {
       margin-inline: 0;
     }
+
+    .top__title {
+      display: block;
+    }
   }
 }
 
@@ -244,5 +242,11 @@
 @media (max-height: 500px) and (orientation: landscape) and (max-width: 899px) {
   :host {
     position: static;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .top__title {
+    animation: none;
   }
 }

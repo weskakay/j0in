@@ -1,5 +1,8 @@
 import { Component, ElementRef, computed, inject, signal, viewChild } from '@angular/core';
-import { Router, RouterLink } from '@angular/router';
+import { NavigationEnd, Router, RouterLink } from '@angular/router';
+import { toSignal } from '@angular/core/rxjs-interop';
+import { filter, map } from 'rxjs';
+import type { Dictionary } from '../../data/i18n';
 import { AuthService } from '../../core/auth.service';
 import { LanguageService } from '../../core/language.service';
 import { PaletteService } from '../../core/palette.service';
@@ -7,6 +10,7 @@ import { ThemeService } from '../../core/theme.service';
 import { initialsOf } from '../../data/format';
 import { AccountMenu } from '../account-menu/account-menu';
 import { FocusPill } from '../focus-pill/focus-pill';
+import { Notices } from '../notices/notices';
 
 /**
  * The tools along the top: the way into the command palette, a new task,
@@ -15,10 +19,14 @@ import { FocusPill } from '../focus-pill/focus-pill';
  */
 @Component({
   selector: 'app-topbar',
-  imports: [RouterLink, FocusPill, AccountMenu],
+  imports: [RouterLink, FocusPill, AccountMenu, Notices],
   templateUrl: './topbar.html',
   styleUrl: './topbar.scss',
-  host: { '(keydown.escape)': 'closeMenu()', '(document:pointerdown)': 'onOutside($event)' },
+  host: {
+    '(keydown.escape)': 'closeMenu()',
+    '(document:pointerdown)': 'onOutside($event)',
+    '(window:scroll)': 'onScroll()',
+  },
 })
 export class Topbar {
   private readonly auth = inject(AuthService);
@@ -31,6 +39,24 @@ export class Topbar {
   /** Every piece of text, in the language currently on screen. */
   protected readonly t = inject(LanguageService).dict;
 
+  /** The page address, kept current. */
+  private readonly url = toSignal(
+    this.router.events.pipe(
+      filter((event) => event instanceof NavigationEnd),
+      map((event) => event.urlAfterRedirects),
+    ),
+    { initialValue: this.router.url },
+  );
+
+  /** True once the page has scrolled past its title. */
+  protected readonly scrolled = signal(false);
+
+  /** The name of the page on screen, for the title in the bar once the page scrolls. */
+  protected readonly pageTitle = computed(() => {
+    const key = this.url().split(/[/?]/)[1] as keyof Dictionary['nav'];
+    return PAGES.includes(key) ? this.t().nav[key] : '';
+  });
+
   /** The signed-in user. */
   protected readonly user = this.auth.user;
 
@@ -40,14 +66,16 @@ export class Topbar {
   /** Whether the account menu is open. */
   protected readonly menuOpen = signal(false);
 
-  /** Open access requests; only the owner ever gets a number here. */
-  protected readonly pending = computed(() => this.user()?.pending ?? 0);
-
   /** Whether the owner's bell shows at all. */
   protected readonly owner = computed(() => this.user()?.role === 'owner');
 
   /** Whether the screen is dark right now, whatever the choice behind it. */
   protected readonly dark = computed(() => this.themes.isDark());
+
+  /** Shows the page title in the bar once the page has scrolled past it. */
+  protected onScroll(): void {
+    this.scrolled.set(window.scrollY > SCROLLED);
+  }
 
   /** Opens the command palette. */
   protected openPalette(): void {
@@ -100,6 +128,12 @@ export class Topbar {
     }
   }
 }
+
+/** How far the page scrolls before its title shows in the bar. */
+const SCROLLED = 96;
+
+/** The pages whose name the bar can show. */
+const PAGES: (keyof Dictionary['nav'])[] = ['home', 'board', 'projects', 'calendar', 'contacts', 'insights', 'settings'];
 
 /** Whether this is an Apple keyboard, which opens the palette with the command key. */
 function onMac(): boolean {

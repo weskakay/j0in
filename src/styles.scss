@@ -72,6 +72,12 @@ a {
   gap: var(--j0in-space-lg);
   padding: var(--j0in-space-md) 0;
   font-size: var(--j0in-fs-sm);
+
+  a {
+    display: inline-flex;
+    align-items: center;
+    min-height: var(--j0in-tap-target);
+  }
 }
 
 ::placeholder {
