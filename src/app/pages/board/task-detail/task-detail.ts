@@ -2,7 +2,6 @@ import { Component, computed, inject, input, output } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import type { Category, Column, Contact, Subtask, Task } from '../../../data/models';
 import { assigneesOf, dateIn, doneCount, durationText, initialsOf, today } from '../../../data/format';
-import { DEFAULT_FOCUS } from '../../../data/focus';
 import { LanguageService } from '../../../core/language.service';
 import { TimeTracker } from '../../../core/time-tracker.service';
 import { TimeLog } from '../time-log/time-log';
@@ -88,6 +87,9 @@ export class TaskDetail {
   /** Ticked subtasks out of all, such as 2/3. */
   protected readonly progress = computed(() => `${doneCount(this.task())}/${this.task().subtasks.length}`);
 
+  /** The length a focus run starts with, as the board is set. */
+  protected readonly focusLength = this.tracker.defaultLength;
+
   /** Whether the timer runs on this task right now. */
   protected readonly running = computed(() => this.tracker.runsOn(this.task()));
 
@@ -115,6 +117,6 @@ export class TaskDetail {
 
   /** Starts a focus run of the standard length on this task. */
   protected startFocus(): void {
-    this.tracker.startFocus(this.task().id, DEFAULT_FOCUS);
+    this.tracker.startFocus(this.task().id, this.focusLength());
   }
 }

@@ -1,9 +1,9 @@
-<app-widget [heading]="t().home.categories" link="/settings" [linkText]="t().home.seeAll">
+<app-widget [heading]="t().home.categories" link="/projects" [linkText]="t().home.seeAll">
   <ul class="projects">
     @for (row of rows(); track row.category.id) {
       <li>
         <a class="project" routerLink="/board" [queryParams]="{ category: row.category.id }" [style.--chip]="row.category.color">
-          <span class="project__tile" aria-hidden="true">{{ row.category.name.charAt(0) }}</span>
+          <app-project-icon class="project__tile" [icon]="row.category.icon" [color]="row.category.color" [name]="row.category.name" />
           <span class="project__name">
             <span class="project__title">{{ row.category.name }}</span>
             <span class="project__sub">{{ summary(row) }}</span>

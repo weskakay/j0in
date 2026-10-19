@@ -29,7 +29,14 @@ export interface PaletteSource {
   categories: Category[];
   contacts: Contact[];
   tracking: boolean;
+  /** The length a focus run starts with, for the label. */
+  focusMinutes: number;
 }
+
+/** The screens the palette can jump to, in the order of the navigation. */
+type PageKey = 'home' | 'board' | 'projects' | 'calendar' | 'contacts' | 'insights' | 'settings';
+
+const PAGES: PageKey[] = ['home', 'board', 'projects', 'calendar', 'contacts', 'insights', 'settings'];
 
 /** How many hits each searched group shows at most. */
 const PER_GROUP = 6;
@@ -60,13 +67,13 @@ function labelOf(entry: PaletteEntry): string {
 
 /** The screens of the navigation. */
 function pages(t: Dictionary): PaletteEntry[] {
-  const page = (key: 'home' | 'board' | 'insights' | 'contacts' | 'settings'): PaletteEntry => ({
+  const page = (key: PageKey): PaletteEntry => ({
     id: `page-${key}`,
     group: 'pages',
     label: t.nav[key],
     command: { kind: 'go', path: [`/${key}`] },
   });
-  return [page('home'), page('board'), page('insights'), page('contacts'), page('settings')];
+  return PAGES.map(page);
 }
 
 /** Things to do rather than places to go. */
@@ -87,7 +94,7 @@ function focusFor(source: PaletteSource, term: string): PaletteEntry[] {
   return bestMatches(source.tasks, term, (task) => task.title, 2).map((task) => ({
     id: `focus-${task.id}`,
     group: 'actions',
-    label: `${source.t.palette.focus}: ${task.title}`,
+    label: `${source.t.palette.focus} ${source.focusMinutes} ${source.t.home.minutes}: ${task.title}`,
     command: { kind: 'focus', taskId: task.id },
   }));
 }

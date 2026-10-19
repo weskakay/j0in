@@ -10,9 +10,9 @@
 @if (ready()) {
   <app-widget [heading]="t().insights.charts">
     <div class="charts">
-      <app-donut [caption]="t().summary.byPriority" [unit]="t().summary.tasksUnit" [rows]="byPriority()" />
-      <app-bars [caption]="t().summary.byColumn" [rows]="byColumn()" />
-      <app-segments class="charts__wide" [caption]="t().summary.byDeadline" [rows]="byDeadline()" />
+      <app-donut [caption]="t().charts.byPriority" [unit]="t().charts.tasksUnit" [rows]="byPriority()" />
+      <app-bars [caption]="t().charts.byColumn" [rows]="byColumn()" />
+      <app-segments class="charts__wide" [caption]="t().charts.byDeadline" [rows]="byDeadline()" />
     </div>
   </app-widget>
 }

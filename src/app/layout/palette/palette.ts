@@ -7,7 +7,6 @@ import { LookService } from '../../core/look.service';
 import { PaletteService } from '../../core/palette.service';
 import { ThemeService } from '../../core/theme.service';
 import { TimeTracker } from '../../core/time-tracker.service';
-import { DEFAULT_FOCUS } from '../../data/focus';
 import { paletteEntries, type PaletteCommand, type PaletteEntry, type PaletteGroup } from './palette-entries';
 
 /** The groups in the order they are listed, for the headings. */
@@ -54,6 +53,7 @@ export class Palette {
         categories: this.store.categories(),
         contacts: this.store.contacts(),
         tracking: this.tracker.enabled(),
+        focusMinutes: this.tracker.defaultLength(),
       },
       this.term(),
     ),
@@ -126,7 +126,7 @@ export class Palette {
     } else if (command.kind === 'look') {
       this.looks.next();
     } else if (command.kind === 'focus') {
-      this.tracker.startFocus(command.taskId, DEFAULT_FOCUS);
+      this.tracker.startFocus(command.taskId, this.tracker.defaultLength());
     } else {
       this.auth.leave();
     }

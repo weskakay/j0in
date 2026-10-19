@@ -53,7 +53,7 @@ export class Insights {
   /** How near the due dates are, from overdue to no date at all. */
   protected readonly byDeadline = computed<ChartRow[]>(() => {
     const buckets = deadlineBuckets(this.store.tasks(), today(), this.store.columns().at(-1)?.id ?? null);
-    const words = this.t().summary;
+    const words = this.t().charts;
     return [
       { label: words.overdue, count: buckets.overdue, color: 'var(--j0in-prio-urgent)' },
       { label: words.today, count: buckets.today, color: 'var(--j0in-warning)' },

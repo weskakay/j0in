@@ -1,3 +1,4 @@
+import type { PageTexts } from './pages';
 import type { ScreenTexts } from './screens';
 
 /** The two languages the interface is offered in. */
@@ -21,7 +22,15 @@ export type ErrorCode =
   | 'calendar.not_configured'
   | 'calendar.not_connected'
   | 'calendar.google_refused'
+  | 'board.bad_preference'
   | 'board.name_required'
+  | 'category.bad_date'
+  | 'category.bad_icon'
+  | 'category.bad_color'
+  | 'category.name_too_long'
+  | 'category.bad_pin'
+  | 'category.bad_status'
+  | 'category.description_too_long'
   | 'category.name_required'
   | 'category.not_found'
   | 'column.has_tasks'
@@ -52,7 +61,7 @@ export type ErrorCode =
   | 'network.unknown';
 
 /** Every piece of text the interface shows, in one shape per language. */
-export interface Dictionary extends ScreenTexts {
+export interface Dictionary extends ScreenTexts, PageTexts {
   common: {
     save: string;
     cancel: string;
@@ -66,8 +75,10 @@ export interface Dictionary extends ScreenTexts {
   nav: {
     label: string;
     home: string;
+    projects: string;
+    calendar: string;
+    more: string;
     insights: string;
-    categories: string;
     board: string;
     contacts: string;
     settings: string;
@@ -154,10 +165,7 @@ export interface Dictionary extends ScreenTexts {
     create: string;
     saving: string;
   };
-  summary: {
-    morning: string;
-    day: string;
-    evening: string;
+  charts: {
     byColumn: string;
     byPriority: string;
     byDeadline: string;
@@ -254,8 +262,6 @@ export interface Dictionary extends ScreenTexts {
     email: string;
     emailInvalid: string;
     phone: string;
-    notGiven: string;
-    assigned: string;
     taskOne: string;
     taskMany: string;
     confirmPrefix: string;
@@ -307,7 +313,6 @@ export interface Dictionary extends ScreenTexts {
     durationMissing: string;
     note: string;
     notePlaceholder: string;
-    noteTooLong: string;
     runningNote: string;
     empty: string;
     editOne: string;

@@ -48,6 +48,9 @@ export interface ScreenTexts {
     hint: string;
   };
   home: {
+    morning: string;
+    day: string;
+    evening: string;
     dueToday: string;
     dueTodayOne: string;
     eventsToday: string;

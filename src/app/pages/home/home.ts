@@ -64,7 +64,7 @@ export class Home {
   /** Time of day plus the first name. */
   protected readonly hello = computed(() => {
     const first = (this.auth.user()?.name ?? '').split(' ')[0];
-    const greeting = this.t().summary[partOfDay(new Date(this.data.now()).getHours())];
+    const greeting = this.t().home[partOfDay(new Date(this.data.now()).getHours())];
     return first ? `${greeting}, ${first}` : greeting;
   });
 

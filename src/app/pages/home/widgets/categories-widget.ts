@@ -6,6 +6,7 @@ import { initialsOf } from '../../../data/format';
 import { categoryRows, type CategoryRow } from '../../../data/home';
 import type { Contact } from '../../../data/models';
 import { Widget } from '../../../ui/widget/widget';
+import { ProjectIcon } from '../../../ui/project-icon/project-icon';
 import { whenLabel } from '../due-label';
 import { HomeData } from '../home-data.service';
 
@@ -18,7 +19,7 @@ const FACES = 3;
  */
 @Component({
   selector: 'app-categories-widget',
-  imports: [Widget, RouterLink],
+  imports: [Widget, RouterLink, ProjectIcon],
   templateUrl: './categories-widget.html',
   styleUrl: './categories.scss',
 })

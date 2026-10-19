@@ -5,7 +5,7 @@ import { share } from '../../../data/home';
 import { hoursIn } from '../../../data/format';
 import { Rings, type Ring } from '../../../ui/rings/rings';
 import { Widget } from '../../../ui/widget/widget';
-import { FOCUS_GOAL, HomeData } from '../home-data.service';
+import { HomeData } from '../home-data.service';
 
 /** One line of the legend beside the rings: a big figure and what it is out of. */
 interface LegendRow {
@@ -59,7 +59,7 @@ export class TodayWidget {
     const third = this.data.withCalendar() ? words.ringEvents : words.ringSubtasks;
     return [
       { label: words.ringTasks, value: `${this.tasks().part}`, unit: `/ ${this.tasks().whole}`, color: 'var(--j0in-ring-tasks)' },
-      { label: words.ringFocus, value: `${hours(this.data.focusSeconds())} h`, unit: `/ ${hours(FOCUS_GOAL)} h`, color: 'var(--j0in-ring-focus)' },
+      { label: words.ringFocus, value: `${hours(this.data.focusSeconds())} h`, unit: `/ ${hours(this.data.focusGoal())} h`, color: 'var(--j0in-ring-focus)' },
       { label: third, value: `${this.third().part}`, unit: `/ ${this.third().whole}`, color: 'var(--j0in-ring-meet)' },
     ];
   });
@@ -69,7 +69,7 @@ export class TodayWidget {
     const [tasks, focus, third] = this.legend();
     return [
       { label: tasks.label, value: share(this.tasks().part, this.tasks().whole), color: tasks.color },
-      { label: focus.label, value: share(this.data.focusSeconds(), FOCUS_GOAL), color: focus.color },
+      { label: focus.label, value: share(this.data.focusSeconds(), this.data.focusGoal()), color: focus.color },
       { label: third.label, value: share(this.third().part, this.third().whole), color: third.color },
     ];
   });

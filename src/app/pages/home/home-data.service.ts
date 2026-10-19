@@ -6,9 +6,6 @@ import { TimeTracker } from '../../core/time-tracker.service';
 import { shift } from '../../data/board-filter';
 import { doneOn, dueNext, dueOn, mineFor, overdue, secondsOn } from '../../data/home';
 
-/** The focus a day aims for, in seconds: two hours. */
-export const FOCUS_GOAL = 2 * 60 * 60;
-
 /**
  * The figures of the home screen, worked out once and shared by the widgets.
  * Everything comes from the board in memory; the calendar adds the day's
@@ -44,6 +41,9 @@ export class HomeData {
   readonly nextCard = computed(
     () => this.mine()[0] ?? dueNext(this.store.tasks(), this.day(), this.lastId(), 1)[0] ?? null,
   );
+
+  /** The focus a day aims for, in seconds, as the board is set. */
+  readonly focusGoal = computed(() => this.store.preferences().focusGoal * 60);
 
   /** Seconds booked today, the running timer included. */
   readonly focusSeconds = computed(() => secondsOn(this.store.tasks(), this.day(), this.tracker.sinceRead()));

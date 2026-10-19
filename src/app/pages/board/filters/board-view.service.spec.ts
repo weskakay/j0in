@@ -18,6 +18,7 @@ function card(id: string, parts: Partial<Task> = {}): Task {
 const BOARD: BoardData = {
   name: 'Board',
   timeTracking: false,
+  preferences: { weekCapacity: 32, focusGoal: 120, focusDefault: 25 },
   columns: [{ id: 'c1', name: 'ToDo', position: 1 }],
   categories: [],
   phases: [],

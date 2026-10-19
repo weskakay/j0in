@@ -24,7 +24,7 @@
                 type="button"
                 [class.segment__btn--on]="length() === minutes"
                 [attr.aria-pressed]="length() === minutes"
-                (click)="length.set(minutes)"
+                (click)="pickLength(minutes)"
               >
                 {{ minutes }} {{ t().home.minutes }}
               </button>

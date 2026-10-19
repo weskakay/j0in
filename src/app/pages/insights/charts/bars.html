@@ -2,7 +2,7 @@
   <h3 class="bars__caption">{{ caption() }}</h3>
 
   @if (total() === 0) {
-    <p class="bars__empty">{{ t().summary.nothing }}</p>
+    <p class="bars__empty">{{ t().charts.nothing }}</p>
   } @else {
     <ul class="bars__list">
       @for (row of rows(); track $index) {

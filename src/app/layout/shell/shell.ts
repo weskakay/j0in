@@ -22,7 +22,7 @@ export class Shell {
   private readonly palette = inject(PaletteService);
 
   /** True while the side navigation shows icons only. */
-  protected readonly navFolded = this.layout.navFolded;
+  protected readonly navFolded = this.layout.folded;
 
   /** Whether the command palette is on screen. */
   protected readonly paletteOpen = this.palette.open;

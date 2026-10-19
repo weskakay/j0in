@@ -93,7 +93,7 @@ export class TaskCard {
 
   /** The due date, or the word for today when it is today. */
   protected readonly dueText = computed(() =>
-    this.dueState() === 'today' ? this.t().summary.today : dateIn(this.task().dueDate, this.language.lang()),
+    this.dueState() === 'today' ? this.t().home.today : dateIn(this.task().dueDate, this.language.lang()),
   );
 
   /** Letters for one assignee's avatar. */

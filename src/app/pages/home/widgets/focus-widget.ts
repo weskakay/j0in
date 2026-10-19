@@ -2,7 +2,7 @@ import { Component, computed, inject, signal } from '@angular/core';
 import { BoardStore } from '../../../core/board.store';
 import { LanguageService } from '../../../core/language.service';
 import { TimeTracker } from '../../../core/time-tracker.service';
-import { DEFAULT_FOCUS, FOCUS_LENGTHS, type FocusLength } from '../../../data/focus';
+import { FOCUS_LENGTHS, type FocusLength } from '../../../data/focus';
 import { clockText, entrySeconds } from '../../../data/format';
 import { Rings, type Ring } from '../../../ui/rings/rings';
 import { Widget } from '../../../ui/widget/widget';
@@ -33,8 +33,11 @@ export class FocusWidget {
   /** The lengths on offer. */
   protected readonly lengths = FOCUS_LENGTHS;
 
-  /** The length picked. */
-  protected readonly length = signal<FocusLength>(DEFAULT_FOCUS);
+  /** The length picked by hand, null until one is. */
+  private readonly chosen = signal<FocusLength | null>(null);
+
+  /** The length picked, else the board's default. */
+  protected readonly length = computed(() => this.chosen() ?? this.tracker.defaultLength());
 
   /** The card picked by hand, empty until one is chosen. */
   private readonly picked = signal('');
@@ -70,6 +73,11 @@ export class FocusWidget {
   protected readonly ring = computed<Ring[]>(() => [
     { label: 'focus', value: this.running() ? this.tracker.share() : 0, color: 'var(--j0in-ring-focus)' },
   ]);
+
+  /** Takes the length picked. */
+  protected pickLength(minutes: FocusLength): void {
+    this.chosen.set(minutes);
+  }
 
   /** Takes the card chosen in the list. */
   protected pick(event: Event): void {
