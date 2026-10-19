@@ -1,0 +1,38 @@
+@let person = member().contact;
+<header class="member__head">
+  <span class="member__avatar" [style.background]="person.color" aria-hidden="true">
+    {{ initials(person) }}
+    <span class="member__dot member__dot--{{ presence().state }}"></span>
+  </span>
+  <span class="member__who">
+    <span class="member__name">{{ person.name }}</span>
+    <span class="member__status">{{ status() }}</span>
+  </span>
+  @if (member().project; as project) {
+    <span class="member__chip" [style.--chip]="project.color">
+      <span class="member__chip-dot" aria-hidden="true"></span>{{ project.name }}
+    </span>
+  }
+</header>
+
+<div class="member__load">
+  <span class="member__load-head">
+    <span>{{ t().team.load }}</span>
+    <span class="member__hours">{{ member().hours }} h {{ t().team.hoursOf }} {{ capacity() }} h</span>
+  </span>
+  <span class="member__track" role="img" [attr.aria-label]="t().team.load + ' ' + member().load + ' %'">
+    <span class="member__fill" [class.member__fill--full]="member().load >= 100" [style.width.%]="member().load"></span>
+  </span>
+</div>
+
+<footer class="member__foot">
+  <span class="member__open">{{ person.email || person.phone }}</span>
+  <button class="member__btn" type="button" [attr.aria-label]="t().team.profile + ' ' + person.name" (click)="profile.emit(person)">{{ t().team.profile }}</button>
+  @if (person.email) {
+    <a class="member__btn member__btn--icon" [href]="'mailto:' + person.email" [attr.aria-label]="t().team.mail + ' ' + person.name">
+      <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
+        <path d="M4 6h16v12H4zM4 7l8 6 8-6" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" />
+      </svg>
+    </a>
+  }
+</footer>
