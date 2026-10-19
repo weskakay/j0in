@@ -5,10 +5,13 @@
 
 const J0IN_EVENTS_URL = 'https://www.googleapis.com/calendar/v3/calendars/%s/events?%s';
 
+/** The longest span one request may ask for: six weeks, a month view. */
+const J0IN_MAX_SPAN_DAYS = 42;
+
 /** Seconds of headroom, so a token does not expire mid-request. */
 const J0IN_TOKEN_MARGIN = 60;
 
-/** Answers with the events of one day, oldest first. */
+/** Answers with the events of one day, or of a span up to `to`, oldest first. */
 function readDay(PDO $pdo, array $user): void
 {
     $account = googleAccount($pdo, $user['id']);
@@ -16,10 +19,21 @@ function readDay(PDO $pdo, array $user): void
         fail(409, 'calendar.not_connected');
     }
     $day = dayOrToday((string) ($_GET['date'] ?? ''));
+    $to = spanEnd($day, (string) ($_GET['to'] ?? ''));
     $zone = zoneOrUtc((string) ($_GET['tz'] ?? ''));
     $token = freshAccessToken($pdo, $account);
-    $events = fetchEvents($account, $token, $day, $zone);
-    respond(200, ['date' => $day, 'events' => withTaskIds($pdo, $events)]);
+    $events = fetchEvents($account, $token, [$day, $to], $zone);
+    respond(200, ['date' => $day, 'to' => $to, 'events' => withTaskIds($pdo, $events)]);
+}
+
+/** The last day of a span: the wanted one, if it lies within six weeks after the first. */
+function spanEnd(string $from, string $wanted): string
+{
+    if (preg_match('/^\d{4}-\d{2}-\d{2}$/', $wanted) !== 1) {
+        return $from;
+    }
+    $days = (strtotime($wanted) - strtotime($from)) / 86400;
+    return $days >= 0 && $days <= J0IN_MAX_SPAN_DAYS ? $wanted : $from;
 }
 
 /** The wanted day, or today when nothing usable was asked for. */
@@ -69,18 +83,19 @@ function storeRenewed(PDO $pdo, string $userId, array $token): void
 }
 
 /**
- * The events of one day, as the screen needs them.
+ * The events from the first to the last day of a span, as the screen needs them.
  *
+ * @param array{0: string, 1: string} $span
  * @return list<array<string, mixed>>
  */
-function fetchEvents(array $account, string $token, string $day, DateTimeZone $zone): array
+function fetchEvents(array $account, string $token, array $span, DateTimeZone $zone): array
 {
     $query = http_build_query([
-        'timeMin' => moment($day . ' 00:00:00', $zone),
-        'timeMax' => moment($day . ' 23:59:59', $zone),
+        'timeMin' => moment($span[0] . ' 00:00:00', $zone),
+        'timeMax' => moment($span[1] . ' 23:59:59', $zone),
         'singleEvents' => 'true',
         'orderBy' => 'startTime',
-        'maxResults' => '50',
+        'maxResults' => '250',
     ]);
     $url = sprintf(J0IN_EVENTS_URL, rawurlencode((string) $account['calendar_id']), $query);
     return array_map('plainEvent', itemsOf(getFromGoogle($url, $token)));
