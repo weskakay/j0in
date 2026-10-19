@@ -3,7 +3,12 @@ import { BoardStore } from '../../core/board.store';
 import { LanguageService } from '../../core/language.service';
 import type { Contact, ContactInput } from '../../data/models';
 import type { Dictionary } from '../../data/i18n';
-import { initialsOf } from '../../data/format';
+import { initialsOf, today } from '../../data/format';
+import { presenceOf, type Presence } from '../../data/presence';
+import { averageLoad, membersOf } from '../../data/team';
+import { TimeTracker } from '../../core/time-tracker.service';
+import { Profile } from './profile/profile';
+import { TeamCard } from './team-card/team-card';
 import { Dialog } from '../../layout/dialog/dialog';
 import { Loader } from '../../layout/loader/loader';
 import { ContactForm } from './contact-form/contact-form';
@@ -20,13 +25,14 @@ type DialogMode = 'none' | 'detail' | 'edit' | 'create' | 'wipe';
 /** The address book: everyone a task can be assigned to. */
 @Component({
   selector: 'app-contacts',
-  imports: [Dialog, Loader, ContactForm],
+  imports: [Dialog, Loader, ContactForm, TeamCard, Profile],
   templateUrl: './contacts.html',
   styleUrl: './contacts.scss',
 })
 export class Contacts {
   private readonly store = inject(BoardStore);
   private readonly language = inject(LanguageService);
+  private readonly tracker = inject(TimeTracker);
 
   /** Every piece of text, in the language currently on screen. */
   protected readonly t = this.language.dict;
@@ -42,6 +48,39 @@ export class Contacts {
 
   /** The contacts sorted by name and filed under their first letter. */
   protected readonly groups = computed(() => groupByLetter(this.store.contacts()));
+
+  /** Cards or the alphabetical list. */
+  protected readonly view = signal<'cards' | 'list'>('cards');
+
+  /** The hours of a week, as set in the settings. */
+  protected readonly capacity = computed(() => this.store.preferences().weekCapacity);
+
+  /** Everyone with their open cards, load and main project. */
+  protected readonly members = computed(() =>
+    membersOf(this.store.contacts(), this.store.tasks(), this.store.categories(), {
+      day: today(),
+      lastId: this.lastId(),
+      capacity: this.capacity(),
+    }),
+  );
+
+  private readonly lastId = computed(() => this.store.columns().at(-1)?.id ?? null);
+
+  /** What everyone is up to, looked up by contact. */
+  private readonly presence = computed(() => {
+    const running = this.tracker.running()?.taskId ?? null;
+    const list = presenceOf(this.store.contacts(), this.store.tasks(), running, this.lastId());
+    return new Map(list.map((entry) => [entry.contact.id, entry]));
+  });
+
+  /** How many people are in focus right now. */
+  protected readonly inFocus = computed(() => [...this.presence().values()].filter((one) => one.state === 'focus').length);
+
+  /** The average load of the team. */
+  protected readonly averageLoad = computed(() => averageLoad(this.members()));
+
+  /** The member the profile panel shows. */
+  protected readonly shown = computed(() => this.members().find((one) => one.contact.id === this.current()?.id) ?? null);
 
   /** How many contacts there are in total. */
   protected readonly total = computed(() => this.store.contacts().length);
@@ -71,6 +110,23 @@ export class Contacts {
 
   constructor() {
     this.store.load();
+  }
+
+  /** What one contact is up to; free when the board has not been read yet. */
+  protected presenceFor(contact: Contact): Presence {
+    return this.presence().get(contact.id) ?? { contact, state: 'free', open: 0, focusTitle: null };
+  }
+
+  /** Opens the form for a contact from the profile. */
+  protected editFromProfile(contact: Contact): void {
+    this.current.set(contact);
+    this.mode.set('edit');
+  }
+
+  /** Asks before deleting a contact from the profile. */
+  protected removeFromProfile(contact: Contact): void {
+    this.current.set(contact);
+    this.mode.set('wipe');
   }
 
   /** Letters on a contact's avatar. */
