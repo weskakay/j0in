@@ -297,6 +297,16 @@ const J0IN_DEMO_TASKS = [
         'people' => [0, 1, 2],
         'subtasks' => ['de' => [], 'en' => []],
     ],
+    [
+        'column' => 'ToDo',
+        'category' => 'Design System',
+        'title' => ['de' => 'Glas einstellen und Spalten wischen', 'en' => 'Tune the glass and swipe the columns'],
+        'text' => ['de' => 'Unter Aussehen: Glas von klar bis milchig, Lichtbrechung, eine eigene Akzentfarbe und am Handy die Spalten zum Wischen.', 'en' => 'Under appearance: glass from clear to frosted, light bending, an accent colour of your own and swiped columns on a phone.'],
+        'due' => '+3 days', 'estimate' => 10,
+        'priority' => 'low',
+        'people' => [1],
+        'subtasks' => ['de' => [['Glas-Regler ausprobieren', false], ['Eigene Farbe wählen', false]], 'en' => [['Try the glass slider', false], ['Pick a colour of your own', false]]],
+    ],
 ];
 
 // The projects of the guest board. The first two exist on every new board;
