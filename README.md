@@ -35,20 +35,22 @@ BCRYPT and verified server side, and the browser only ever holds a session cooki
 
 ✅ Sign up, sign in, guest access, sign out
 ✅ Board with freely definable columns, drag and drop on desktop and touch
-✅ Tasks with description, due date, priority, category, assignees and subtasks
+✅ Tasks with description, due date, priority, project, assignees and subtasks
 ✅ Progress bar from the subtasks that are done
 ✅ Search across title and description
-✅ Contacts, grouped alphabetically, assignable to tasks
-✅ Settings for columns, categories and the colour theme
+✅ Projects with colour, icon, status, deadline and a short description, pinned ones in the sidebar
+✅ Team page: everyone on the board with their open cards and a workload from the estimates against a weekly capacity
+✅ Calendar with month and week view for every board; with Google Calendar connected, its events show up and open cards can be dragged into the week
+✅ Settings with their own navigation: look, board and projects, time, focus, calendar, access and account
 ✅ Dark and light, following the system by default
 ✅ Two looks to choose from: the flat J0IN look and a glass look with floating, see-through surfaces
-✅ Home screen: the day as three rings, what comes next, focus, my tasks, the week, categories and who is busy
-✅ Board or list, figures above the board, filters for category and priority that live in the address bar
+✅ Home screen: the day as three rings, what comes next, focus, my tasks, the week, projects and who is busy
+✅ Board or list, figures above the board, filters for project and priority that live in the address bar
 ✅ Every task opens in a side panel under its own address: change the column, add subtasks, start a focus
 ✅ Estimates on tasks, and the moment a task reached the last column is kept for the figures
 ✅ Time tracking per task and phase, with a timer on every card
-✅ Focus runs of 15, 25 or 50 minutes, counted down in a small pill at the top of every page
-✅ Command palette on Ctrl K or Cmd K: pages, actions, tasks, categories and contacts
+✅ Focus runs of 15, 25 or 50 minutes, counted down in a small pill at the top of every page; default length and daily goal are set per board
+✅ Command palette on Ctrl K or Cmd K: pages, actions, tasks, projects and contacts
 ✅ Insights page with priorities, columns and due dates as charts
 ✅ Google Calendar and a day planner for accounts the owner has unlocked
 
@@ -62,8 +64,12 @@ The guest board is reset once a day and every card on it shows one feature:
 | Find anything with Ctrl K | Ctrl K or Cmd K anywhere |
 | Start a 25 minute focus | Home, focus widget, or the button in an open card |
 | Open a card in the panel and change its column | Any card on the board |
-| Try the list and the filters | Board, switch to list, pick a category |
+| Try the list and the filters | Board, switch to list, pick a project |
 | Look at the insights | Insights in the menu |
+| Look at the projects and pin one | Projects in the menu, the star on a card |
+| Open the calendar and look at the week | Calendar, switch between month and week |
+| Look at the team and its workload | Team in the menu, open a profile |
+| Set the focus length and daily goal | Settings, focus and capacity |
 | Track time on a card | The play button on a card |
 | Browse the stack | A column with more than three cards |
 
