@@ -13,6 +13,7 @@ function readBoard(PDO $pdo, string $boardId): void
     respond(200, [
         'name'         => boardName($pdo, $boardId),
         'timeTracking' => tracksTime($pdo, $boardId),
+        'preferences'  => readPreferences($pdo, $boardId),
         'columns'      => readColumns($pdo, $boardId),
         'categories'   => readCategories($pdo, $boardId),
         'phases'       => readPhases($pdo, $boardId),
@@ -102,6 +103,7 @@ function switchDemoLanguage(PDO $pdo, string $boardId, array $user, array $body 
     $pdo->prepare('UPDATE join_boards SET name = ? WHERE id = ?')
         ->execute([boardNameIn($lang), $boardId]);
     rewriteDemoText($pdo, $boardId, $lang);
+    rewriteDemoProjects($pdo, $boardId, $lang);
     translateStartPhases($pdo, $boardId, $lang);
     respond(200, ['ok' => true]);
 }
@@ -131,12 +133,14 @@ function readColumns(PDO $pdo, string $boardId): array
 function readCategories(PDO $pdo, string $boardId): array
 {
     $stmt = $pdo->prepare(
-        'SELECT id, name, color, position FROM join_categories WHERE board_id = ? ORDER BY position'
+        'SELECT id, name, color, position, icon, description, status, due_date, pinned
+         FROM join_categories WHERE board_id = ? ORDER BY position'
     );
     $stmt->execute([$boardId]);
     return array_map(fn($r) => [
-        'id' => $r['id'], 'name' => $r['name'],
-        'color' => $r['color'], 'position' => (int) $r['position'],
+        'id' => $r['id'], 'name' => $r['name'], 'color' => $r['color'], 'position' => (int) $r['position'],
+        'icon' => $r['icon'], 'description' => $r['description'], 'status' => $r['status'],
+        'dueDate' => $r['due_date'], 'pinned' => (bool) $r['pinned'],
     ], $stmt->fetchAll());
 }
 

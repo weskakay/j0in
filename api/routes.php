@@ -21,7 +21,7 @@ function dispatchArea(
     match ($seg[0]) {
         'board'      => routeBoard($pdo, $boardId, $method, $id, $body, $user),
         'columns'    => routeColumns($pdo, $boardId, $method, $id, $body, $user),
-        'categories' => routeCategories($pdo, $boardId, $method, $id, $body),
+        'categories' => routeCategories($pdo, $boardId, $method, $id, $seg[2] ?? '', $body),
         'tasks'      => routeTasks($pdo, $boardId, $method, $id, $seg[2] ?? '', $body, $user),
         'subtasks'   => routeSubtasks($pdo, $boardId, $method, $id, $body),
         'time'       => routeTime($pdo, $boardId, $method, $id, $body),
@@ -46,6 +46,7 @@ function routeBoard(
         $method === 'POST' && $id === 'reset' => resetDemoBoard($pdo, $boardId, $user, $body),
         $method === 'POST' && $id === 'language' => switchDemoLanguage($pdo, $boardId, $user, $body),
         $method === 'PUT' && $id === 'time-tracking' => setTimeTracking($pdo, $boardId, $body),
+        $method === 'PUT' && $id === 'preferences' => savePreferences($pdo, $boardId, $body),
         default => fail(405, 'http.method_not_allowed'),
     };
 }
@@ -67,13 +68,15 @@ function routeColumns(
     };
 }
 
-/** POST, PUT and DELETE on /api/categories */
-function routeCategories(PDO $pdo, string $boardId, string $method, string $id, array $body): void
+/** POST, PUT, PUT .../pin and DELETE on /api/categories */
+function routeCategories(PDO $pdo, string $boardId, string $method, string $id, string $sub, array $body): void
 {
     match (true) {
         $method === 'POST' && $id === ''   => createCategory($pdo, $boardId, $body),
+        $method === 'PUT' && $sub === 'pin' => pinCategory($pdo, $boardId, $id, $body),
+        $sub !== ''                        => fail(404, 'http.not_found'),
         $method === 'PUT' && $id !== ''    => updateCategory($pdo, $boardId, $id, $body),
-        $method === 'DELETE' && $id !== '' => deleteCategory($pdo, $boardId, $id, $body),
+        $method === 'DELETE' && $id !== '' => deleteCategory($pdo, $boardId, $id),
         default => fail(405, 'http.method_not_allowed'),
     };
 }

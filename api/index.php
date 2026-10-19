@@ -17,6 +17,8 @@ require __DIR__ . '/columns.php';
 require __DIR__ . '/tasks.php';
 require __DIR__ . '/time.php';
 require __DIR__ . '/contacts.php';
+require __DIR__ . '/projects.php';
+require __DIR__ . '/preferences.php';
 require __DIR__ . '/access.php';
 require __DIR__ . '/calendar.php';
 require __DIR__ . '/events.php';

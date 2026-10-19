@@ -40,6 +40,11 @@ CREATE TABLE IF NOT EXISTS join_boards (
   name          VARCHAR(120) NOT NULL,
   is_demo       TINYINT(1)   NOT NULL DEFAULT 0,
   time_tracking TINYINT(1)   NOT NULL DEFAULT 1,
+  -- Hours a person has in a week, the daily focus goal in minutes and the
+  -- length a focus run starts with.
+  week_capacity INT          NOT NULL DEFAULT 32,
+  focus_goal    INT          NOT NULL DEFAULT 120,
+  focus_default INT          NOT NULL DEFAULT 25,
   demo_reset_on DATE         NULL,
   created_at    DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
   CONSTRAINT join_fk_board_user FOREIGN KEY (owner_user_id)
@@ -60,12 +65,18 @@ CREATE TABLE IF NOT EXISTS join_columns (
   KEY join_columns_board_idx (board_id, position)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Categories are editable like columns, seeded with the two familiar ones.
+-- Projects (called categories in the database), editable like columns and
+-- seeded with the two familiar ones.
 CREATE TABLE IF NOT EXISTS join_categories (
   id         CHAR(36)    NOT NULL PRIMARY KEY,
   board_id   CHAR(36)    NOT NULL,
   name       VARCHAR(80) NOT NULL,
   color      CHAR(7)     NOT NULL DEFAULT '#1FD7C1',
+  icon       VARCHAR(16) NULL,
+  description VARCHAR(300) NULL,
+  status     VARCHAR(16) NOT NULL DEFAULT 'active',
+  due_date   DATE        NULL,
+  pinned     TINYINT(1)  NOT NULL DEFAULT 0,
   position   INT         NOT NULL,
   created_at DATETIME    NOT NULL DEFAULT CURRENT_TIMESTAMP,
   CONSTRAINT join_fk_category_board FOREIGN KEY (board_id)

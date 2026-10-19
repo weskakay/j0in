@@ -60,46 +60,6 @@ function requireOwnContact(PDO $pdo, string $boardId, string $contactId): void
     }
 }
 
-/** Adds a category to the board. */
-function createCategory(PDO $pdo, string $boardId, array $body): void
-{
-    $name = bodyString($body, 'name');
-    if ($name === '') {
-        fail(422, 'category.name_required');
-    }
-    $id = uuid();
-    $stmt = $pdo->prepare(
-        'INSERT INTO join_categories (id, board_id, name, color, position)
-         VALUES (?, ?, ?, ?, (SELECT COALESCE(MAX(position), 0) + 1 FROM join_categories c WHERE c.board_id = ?))'
-    );
-    $stmt->execute([$id, $boardId, $name, bodyString($body, 'color') ?: '#1FD7C1', $boardId]);
-    respond(201, ['id' => $id]);
-}
-
-/** Renames a category or gives it another colour. */
-function updateCategory(PDO $pdo, string $boardId, string $categoryId, array $body): void
-{
-    requireOwnCategory($pdo, $boardId, $categoryId);
-    $name = bodyString($body, 'name');
-    if ($name === '') {
-        fail(422, 'category.name_required');
-    }
-    $stmt = $pdo->prepare('UPDATE join_categories SET name = ?, color = ? WHERE id = ?');
-    $stmt->execute([$name, bodyString($body, 'color') ?: '#1FD7C1', $categoryId]);
-    respond(200, ['ok' => true]);
-}
-
-/**
- * Deletes a category. Tasks keep existing and simply lose it, which is why
- * the foreign key sets null instead of cascading.
- */
-function deleteCategory(PDO $pdo, string $boardId, string $categoryId): void
-{
-    requireOwnCategory($pdo, $boardId, $categoryId);
-    $pdo->prepare('DELETE FROM join_categories WHERE id = ?')->execute([$categoryId]);
-    respond(200, ['ok' => true]);
-}
-
 /** Ends the request with 404 when the category belongs to another board. */
 function requireOwnCategory(PDO $pdo, string $boardId, string $categoryId): void
 {
