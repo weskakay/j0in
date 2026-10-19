@@ -7,6 +7,7 @@ import { ApiService } from './api.service';
 import { BoardStore } from './board.store';
 import { LanguageService } from './language.service';
 import { ToastService } from './toast.service';
+import { noteInTab } from './tab-notice';
 
 /** How often a running timer is redrawn. */
 const TICK = 1000;
@@ -74,6 +75,7 @@ export class TimeTracker {
       this.finished = running.entry.id;
       this.send(this.api.delete(`/tasks/${running.taskId}/timer`));
       this.toasts.show(this.language.dict().pill.finished);
+      noteInTab(this.language.dict().pill.finished);
     }
   });
 
