@@ -1,0 +1,84 @@
+@use "glass" as *;
+
+:host {
+  @include surface;
+  display: flex;
+  flex-direction: column;
+  gap: var(--j0in-space-sm);
+  min-width: 0;
+  padding: var(--j0in-space-lg);
+}
+
+.agenda__title {
+  font-size: var(--j0in-fs-lg);
+}
+
+.agenda__empty {
+  color: var(--j0in-text-muted);
+}
+
+.agenda__list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--j0in-space-xs);
+}
+
+.item {
+  display: grid;
+  grid-template-columns: 72px 4px minmax(0, 1fr);
+  align-items: center;
+  column-gap: var(--j0in-space-sm);
+  min-height: var(--j0in-tap-target);
+}
+
+.item__time {
+  color: var(--j0in-text-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.item__rail {
+  align-self: stretch;
+  border-radius: var(--j0in-radius-pill);
+  background: var(--entry);
+}
+
+.item__title {
+  min-height: var(--j0in-tap-target);
+  overflow: hidden;
+  line-height: var(--j0in-tap-target);
+  color: inherit;
+  font-weight: var(--j0in-fw-bold);
+  text-decoration: none;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+a.item__title:hover {
+  color: var(--j0in-accent-ink);
+}
+
+.now {
+  display: flex;
+  align-items: center;
+  gap: var(--j0in-space-sm);
+  color: var(--j0in-danger-ink);
+  font-weight: var(--j0in-fw-bold);
+}
+
+.now__line {
+  position: relative;
+  flex: 1;
+  height: 2px;
+  background: var(--j0in-danger);
+
+  &::before {
+    content: "";
+    position: absolute;
+    top: -3px;
+    left: 0;
+    width: 8px;
+    height: 8px;
+    border-radius: var(--j0in-radius-pill);
+    background: var(--j0in-danger);
+  }
+}
