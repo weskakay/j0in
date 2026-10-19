@@ -14,7 +14,7 @@ const J0IN_TOKEN_MARGIN = 60;
 /** Answers with the events of one day, or of a span up to `to`, oldest first. */
 function readDay(PDO $pdo, array $user): void
 {
-    $account = googleAccount($pdo, $user['id']);
+    $account = usableAccount($pdo, $user['id']);
     if ($account === null) {
         fail(409, 'calendar.not_connected');
     }

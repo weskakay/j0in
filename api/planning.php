@@ -8,7 +8,7 @@ function scheduleTask(PDO $pdo, string $boardId, array $user, string $taskId, ar
 {
     requireCalendarUser($user);
     requireOwnTask($pdo, $boardId, $taskId);
-    $account = googleAccount($pdo, $user['id']);
+    $account = usableAccount($pdo, $user['id']);
     if ($account === null) {
         fail(409, 'calendar.not_connected');
     }
@@ -95,7 +95,7 @@ function unscheduleTask(PDO $pdo, string $boardId, array $user, string $taskId):
 {
     requireCalendarUser($user);
     requireOwnTask($pdo, $boardId, $taskId);
-    $account = googleAccount($pdo, $user['id']);
+    $account = usableAccount($pdo, $user['id']);
     $known = knownEvent($pdo, $taskId);
     if ($account !== null && $known !== null) {
         dropEvent($account, freshAccessToken($pdo, $account), $known);
@@ -168,7 +168,7 @@ function eventUrl(array $account, string $eventId): string
 function dropEventsOf(PDO $pdo, array $user, array $taskIds): void
 {
     $events = eventIdsOf($pdo, $taskIds);
-    $account = $events === [] ? null : googleAccount($pdo, $user['id']);
+    $account = $events === [] ? null : usableAccount($pdo, $user['id']);
     if ($account === null) {
         return;
     }

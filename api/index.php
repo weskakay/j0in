@@ -70,15 +70,30 @@ function logoutAndRespond(PDO $pdo): void
  */
 function handleHealth(): void
 {
+    $config = configState();
     respond(200, [
         'ok' => true,
         'php' => PHP_VERSION,
+        'config' => $config,
         'database' => databaseState(),
         'curl' => extension_loaded('curl') ? 'ok' : 'missing',
         'outbound' => reachesGoogle() ? 'ok' : 'blocked',
-        'sealing' => sealingReady() ? 'ok' : 'missing',
-        'calendar' => calendarReady() ? 'ready' : 'off',
+        'sealing' => $config === 'ok' && sealingReady() ? 'ok' : 'missing',
+        'calendar' => $config === 'ok' && calendarReady() ? 'ready' : 'off',
     ]);
+}
+
+/** Whether config.php is there and hands back its settings, without showing any of them. */
+function configState(): string
+{
+    try {
+        readConfig();
+        return 'ok';
+    } catch (TypeError $e) {
+        return 'invalid';
+    } catch (Throwable $e) {
+        return 'missing';
+    }
 }
 
 /** Whether the database answers at all. */

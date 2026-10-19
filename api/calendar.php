@@ -51,13 +51,33 @@ function requireCalendarUser(array $user): void
 /** Answers with the connection state of the signed-in user. */
 function calendarStatus(PDO $pdo, array $user): void
 {
-    $row = googleAccount($pdo, $user['id']);
+    $row = usableAccount($pdo, $user['id']);
     respond(200, [
         'available' => calendarReady(),
         'connected' => $row !== null,
         'email' => $row['email'] ?? null,
         'calendarId' => $row['calendar_id'] ?? null,
     ]);
+}
+
+/**
+ * The connected account of a user, ready to use. Null while the server has no
+ * Google client set up, and forgotten when its tokens no longer open with the
+ * current key, so the settings simply offer to connect again.
+ */
+function usableAccount(PDO $pdo, string $userId): ?array
+{
+    $account = googleAccount($pdo, $userId);
+    if ($account === null || !calendarReady()) {
+        return null;
+    }
+    try {
+        unseal((string) $account['refresh_token']);
+        return $account;
+    } catch (RuntimeException | SodiumException $e) {
+        $pdo->prepare('DELETE FROM join_google_accounts WHERE user_id = ?')->execute([$userId]);
+        return null;
+    }
 }
 
 /** The connected account of a user, or null when there is none. */
