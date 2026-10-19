@@ -3,10 +3,13 @@
 /**
  * Reads the whole board in one request: columns, categories, tasks with their
  * subtasks and assignees, plus contacts. The board screen shows all of it at
- * once, so four separate calls would only mean four waits.
+ * once, so four separate calls would only mean four waits. Focus runs whose
+ * time ran out with nobody watching are closed first, so the board never
+ * shows a timer that should have stopped.
  */
 function readBoard(PDO $pdo, string $boardId): void
 {
+    closeFinishedFocus($pdo, $boardId);
     respond(200, [
         'name'         => boardName($pdo, $boardId),
         'timeTracking' => tracksTime($pdo, $boardId),
@@ -156,7 +159,7 @@ function readTasks(PDO $pdo, string $boardId): array
 {
     $stmt = $pdo->prepare(
         'SELECT t.id, t.column_id, t.category_id, t.title, t.description,
-                t.due_date, t.priority, t.position
+                t.due_date, t.priority, t.position, t.done_at, t.estimate_minutes
          FROM join_tasks t
          JOIN join_columns c ON c.id = t.column_id
          WHERE c.board_id = ? ORDER BY t.position'
@@ -176,19 +179,32 @@ function readTasks(PDO $pdo, string $boardId): array
  */
 function attachDetails(array $rows, array $subtasks, array $contacts, array $time): array
 {
-    return array_map(fn($r) => [
-        'id'          => $r['id'],
-        'columnId'    => $r['column_id'],
-        'categoryId'  => $r['category_id'],
-        'title'       => $r['title'],
-        'description' => $r['description'],
-        'dueDate'     => $r['due_date'],
-        'priority'    => $r['priority'],
-        'position'    => (int) $r['position'],
+    return array_map(fn($r) => taskFields($r) + [
         'subtasks'    => $subtasks[$r['id']] ?? [],
         'contactIds'  => $contacts[$r['id']] ?? [],
         'timeEntries' => $time[$r['id']] ?? [],
     ], $rows);
+}
+
+/**
+ * The plain fields of one task row, in camelCase.
+ *
+ * @return array<string, mixed>
+ */
+function taskFields(array $r): array
+{
+    return [
+        'id'              => $r['id'],
+        'columnId'        => $r['column_id'],
+        'categoryId'      => $r['category_id'],
+        'title'           => $r['title'],
+        'description'     => $r['description'],
+        'dueDate'         => $r['due_date'],
+        'priority'        => $r['priority'],
+        'position'        => (int) $r['position'],
+        'doneAt'          => $r['done_at'],
+        'estimateMinutes' => $r['estimate_minutes'] === null ? null : (int) $r['estimate_minutes'],
+    ];
 }
 
 /**

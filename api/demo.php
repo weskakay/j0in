@@ -1,171 +1,5 @@
 <?php
 
-// The cards a visitor finds on the guest board. Kept here so the demo can be
-// changed without touching the sign-in code.
-const J0IN_DEMO_CONTACTS = [
-    ['Josefin Brandt', 'josefin.brandt@example.org'],
-    ['Nuno Sanchez', 'nuno.sanchez@example.org'],
-    ['Marek Nowak', 'marek.nowak@example.org'],
-];
-
-const J0IN_DEMO_TASKS = [
-    [
-        'column' => 'ToDo',
-        'category' => 'User Story',
-        'title' => ['de' => 'Karte öffnen und abhaken', 'en' => 'Open a card and tick it off'],
-        'text' => ['de' => 'Tippe die Karte an, hake eine Teilaufgabe ab und schließe den Dialog wieder.', 'en' => 'Tap the card, tick a subtask off and close the dialog again.'],
-        'due' => '+2 days',
-        'priority' => 'urgent',
-        'people' => [0, 1],
-        'subtasks' => ['de' => [['Karte öffnen', true], ['Teilaufgabe abhaken', false], ['Dialog schließen', false]], 'en' => [['Open the card', true], ['Tick a subtask', false], ['Close the dialog', false]]],
-    ],
-    [
-        'column' => 'ToDo',
-        'category' => 'Technical Task',
-        'title' => ['de' => 'Eigene Aufgabe anlegen', 'en' => 'Add a task of your own'],
-        'text' => ['de' => 'Das Plus in der Spaltenüberschrift öffnet ein leeres Formular.', 'en' => 'The plus in the column heading opens an empty form.'],
-        'due' => '+6 days',
-        'priority' => 'medium',
-        'people' => [],
-        'subtasks' => ['de' => [], 'en' => []],
-    ],
-    [
-        'column' => 'ToDo',
-        'category' => 'User Story',
-        'title' => ['de' => 'Frist und Priorität setzen', 'en' => 'Set a deadline and a priority'],
-        'text' => ['de' => 'Beides steht im Dialog. Die Priorität färbt den Hinweis unten rechts auf der Karte.', 'en' => 'Both live in the dialog. The priority colours the note at the bottom right of the card.'],
-        'due' => '+9 days',
-        'priority' => 'low',
-        'people' => [2],
-        'subtasks' => ['de' => [['Frist wählen', true], ['Priorität wählen', false]], 'en' => [['Pick a deadline', true], ['Pick a priority', false]]],
-    ],
-    [
-        'column' => 'In Progress',
-        'category' => 'User Story',
-        'title' => ['de' => 'Karte in eine andere Spalte ziehen', 'en' => 'Drag a card into another column'],
-        'text' => ['de' => 'Am Rechner die Karte greifen, am Handy den Anfasser rechts oben benutzen.', 'en' => 'On a desktop grab the card itself, on a phone use the grip at its top right.'],
-        'due' => '+1 day',
-        'priority' => 'urgent',
-        'people' => [0],
-        'subtasks' => ['de' => [['Am Rechner ziehen', true], ['Am Handy ziehen', false]], 'en' => [['Drag on a desktop', true], ['Drag on a phone', false]]],
-        'time' => [[1, 35]],
-    ],
-    [
-        'column' => 'In Progress',
-        'category' => 'Technical Task',
-        'title' => ['de' => 'Spalte anlegen oder umbenennen', 'en' => 'Add or rename a column'],
-        'text' => ['de' => 'Spalten sind frei wählbar. Lege eine an und ziehe sie an die gewünschte Stelle.', 'en' => 'Columns are yours to choose. Add one and drag it where you want it.'],
-        'due' => '+5 days',
-        'priority' => 'medium',
-        'people' => [2],
-        'subtasks' => ['de' => [['Spalte hinzufügen', false], ['Überschrift ändern', false]], 'en' => [['Add a column', false], ['Change the heading', false]]],
-    ],
-    [
-        'column' => 'In Progress',
-        'category' => 'Technical Task',
-        'title' => ['de' => 'Kontakt zuweisen', 'en' => 'Assign a contact'],
-        'text' => ['de' => 'Zugewiesene Personen erscheinen als farbige Kürzel am Fuß der Karte.', 'en' => 'Assigned people show up as coloured initials at the foot of the card.'],
-        'due' => '+8 days',
-        'priority' => 'low',
-        'people' => [1],
-        'subtasks' => ['de' => [], 'en' => []],
-    ],
-    [
-        'column' => 'Awaiting Feedback',
-        'category' => 'Technical Task',
-        'title' => ['de' => 'Suche benutzen', 'en' => 'Use the search'],
-        'text' => ['de' => 'Das Feld oben rechts filtert nach Titel und Beschreibung.', 'en' => 'The field at the top right filters by title and description.'],
-        'due' => '+3 days',
-        'priority' => 'medium',
-        'people' => [1],
-        'subtasks' => ['de' => [], 'en' => []],
-    ],
-    [
-        'column' => 'Awaiting Feedback',
-        'category' => 'User Story',
-        'title' => ['de' => 'Kategorie anlegen und einfärben', 'en' => 'Add a category and colour it'],
-        'text' => ['de' => 'In den Einstellungen bekommt jede Kategorie einen Namen und eine Farbe.', 'en' => 'In the settings every category gets a name and a colour.'],
-        'due' => '+7 days',
-        'priority' => 'low',
-        'people' => [0, 2],
-        'subtasks' => ['de' => [['Kategorie anlegen', true], ['Farbe wählen', false]], 'en' => [['Add a category', true], ['Pick a colour', false]]],
-    ],
-    [
-        'column' => 'Awaiting Feedback',
-        'category' => 'Technical Task',
-        'title' => ['de' => 'Übersicht ansehen', 'en' => 'Look at the overview'],
-        'text' => ['de' => 'Der Ring zeigt den Fortschritt, der Streifen darunter die nächsten Fristen.', 'en' => 'The ring shows the progress, the strip below it the deadlines ahead.'],
-        'due' => '+11 days',
-        'priority' => 'low',
-        'people' => [],
-        'subtasks' => ['de' => [], 'en' => []],
-    ],
-    [
-        'column' => 'Done',
-        'category' => 'Technical Task',
-        'title' => ['de' => 'Board geladen', 'en' => 'Board loaded'],
-        'text' => ['de' => 'Spalten, Karten, Teilaufgaben und Kontakte kommen in einem einzigen Aufruf.', 'en' => 'Columns, cards, subtasks and contacts arrive in one single request.'],
-        'due' => '-1 day',
-        'priority' => 'low',
-        'people' => [0, 2],
-        'subtasks' => ['de' => [['Lesen', true], ['Anzeigen', true]], 'en' => [['Read', true], ['Render', true]]],
-        'time' => [[0, 20], [1, 55], [2, 15]],
-    ],
-    [
-        'column' => 'Done',
-        'category' => 'User Story',
-        'title' => ['de' => 'Erscheinungsbild gewählt', 'en' => 'Appearance chosen'],
-        'text' => ['de' => 'Hell oder dunkel und die Akzentfarbe stehen in den Einstellungen.', 'en' => 'Light or dark and the accent colour live in the settings.'],
-        'due' => '-3 days',
-        'priority' => 'medium',
-        'people' => [1],
-        'subtasks' => ['de' => [['Hell oder dunkel', true], ['Akzentfarbe', true]], 'en' => [['Light or dark', true], ['Accent colour', true]]],
-    ],
-    [
-        'column' => 'Done',
-        'category' => 'Technical Task',
-        'title' => ['de' => 'Kontakte angelegt', 'en' => 'Contacts added'],
-        'text' => ['de' => 'Die Personen aus dem Adressbuch lassen sich jeder Karte zuweisen.', 'en' => 'The people from the address book can be assigned to any card.'],
-        'due' => '-6 days',
-        'priority' => 'low',
-        'people' => [0, 1, 2],
-        'subtasks' => ['de' => [], 'en' => []],
-    ],
-    [
-        'column' => 'ToDo',
-        'category' => 'Technical Task',
-        'title' => ['de' => 'Stapel durchblättern', 'en' => 'Flick through the stack'],
-        'text' => ['de' => 'Ab vier Karten liegt die Spalte als Stapel. Die Pfeile über der Spalte blättern, das Mausrad auch.', 'en' => 'A column with more than three cards is shown as a stack. Use the arrows above it, or the mouse wheel.'],
-        'due' => '+12 days',
-        'priority' => 'medium',
-        'people' => [1],
-        'subtasks' => ['de' => [['Vorblättern', false], ['Alle Karten zeigen', false]], 'en' => [['Flick forward', false], ['Show every card', false]]],
-    ],
-    [
-        'column' => 'ToDo',
-        'category' => 'User Story',
-        'title' => ['de' => 'Stapel abschalten', 'en' => 'Switch the stack off'],
-        'text' => ['de' => 'In den Einstellungen unter Funktionen. Dann steht wieder die volle Liste da.', 'en' => 'In the settings, under features. The full list comes back.'],
-        'due' => '+14 days',
-        'priority' => 'low',
-        'people' => [2],
-        'subtasks' => ['de' => [], 'en' => []],
-    ],
-    // Appended rather than placed on top: demo_index points into this list,
-    // and cards already seeded on the live board must keep their index.
-    [
-        'column' => 'ToDo',
-        'category' => 'User Story',
-        'title' => ['de' => 'Zeit auf der Karte messen', 'en' => 'Track time on a card'],
-        'text' => ['de' => 'Der Knopf mit dem Dreieck startet den Timer. In der Karte lässt sich Zeit für Planen, Umsetzen, Testen und Recherche nachtragen.', 'en' => 'The button with the triangle starts the timer. Inside the card, time for planning, building, testing and research can be added by hand.'],
-        'due' => '+4 days',
-        'priority' => 'medium',
-        'people' => [1],
-        'subtasks' => ['de' => [['Timer starten', false], ['Zeit nachtragen', false]], 'en' => [['Start the timer', false], ['Add time by hand', false]]],
-        'time' => [[0, 10], [3, 25]],
-    ],
-];
-
 /**
  * Fills a fresh demo board, so a visitor lands on something to try out.
  * The wording follows the language the visitor arrived with.
@@ -180,8 +14,19 @@ function fillDemoBoard(PDO $pdo, string $boardId, string $lang = 'de'): void
         $id = insertDemoTask($pdo, inLanguage($task, $lang), $columns, $categories, $contacts, $index);
         if ($id !== null) {
             insertDemoTime($pdo, $id, $phases, $task['time'] ?? []);
+            stampDemoDone($pdo, $id, $task['done'] ?? null);
         }
     }
+}
+
+/** Gives a finished demo card the moment it was finished, spread over the last days. */
+function stampDemoDone(PDO $pdo, string $taskId, ?string $when): void
+{
+    if ($when === null) {
+        return;
+    }
+    $pdo->prepare('UPDATE join_tasks SET done_at = ? WHERE id = ?')
+        ->execute([date('Y-m-d H:i:s', strtotime($when)), $taskId]);
 }
 
 /** Books the demo minutes of a card, each on the phase at the given position. */
@@ -292,7 +137,7 @@ function insertDemoTask(
 /**
  * The fields of a demo card in the shape insertTaskRow expects.
  *
- * @return array<string, string>
+ * @return array<string, mixed>
  */
 function demoTaskFields(array $task, array $categories): array
 {
@@ -302,6 +147,7 @@ function demoTaskFields(array $task, array $categories): array
         'description' => $task['text'],
         'dueDate' => date('Y-m-d', strtotime($task['due'])),
         'priority' => $task['priority'],
+        'estimateMinutes' => $task['estimate'] ?? null,
     ];
 }
 

@@ -11,9 +11,13 @@ CREATE TABLE IF NOT EXISTS join_users (
   email         VARCHAR(190) NOT NULL,
   password_hash VARCHAR(255) NOT NULL,
   role          VARCHAR(16)  NOT NULL DEFAULT 'user',
+  -- A sign-up waits as 'pending' until the owner decides about it.
+  status        VARCHAR(16)  NOT NULL DEFAULT 'approved',
   calendar_enabled TINYINT(1) NOT NULL DEFAULT 0,
   created_at    DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  UNIQUE KEY join_users_email_uq (email)
+  decided_at    DATETIME     NULL DEFAULT NULL,
+  UNIQUE KEY join_users_email_uq (email),
+  KEY join_users_status_idx (status)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Login sessions. Only the hash of the token is stored, never the token.
@@ -80,6 +84,9 @@ CREATE TABLE IF NOT EXISTS join_tasks (
   due_date    DATE         NULL,
   priority    VARCHAR(16)  NOT NULL DEFAULT 'medium',
   position    INT          NOT NULL,
+  -- Set when the card reaches the last column, cleared when it leaves.
+  done_at          DATETIME NULL,
+  estimate_minutes INT      NULL,
   demo_index  INT          NULL DEFAULT NULL,
   created_at  DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at  DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP
@@ -90,7 +97,8 @@ CREATE TABLE IF NOT EXISTS join_tasks (
     REFERENCES join_categories(id) ON DELETE SET NULL,
   KEY join_tasks_column_idx (column_id, position),
   KEY join_tasks_category_idx (category_id),
-  KEY join_tasks_due_idx (due_date)
+  KEY join_tasks_due_idx (due_date),
+  KEY join_tasks_done_idx (done_at)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS join_subtasks (
@@ -125,6 +133,8 @@ CREATE TABLE IF NOT EXISTS join_time_entries (
   started_at DATETIME     NOT NULL,
   ended_at   DATETIME     NULL,
   seconds    INT          NOT NULL DEFAULT 0,
+  -- Focus length in minutes; the run ends on its own once it is reached.
+  target_minutes INT      NULL,
   note       VARCHAR(200) NULL,
   CONSTRAINT join_fk_time_task FOREIGN KEY (task_id)
     REFERENCES join_tasks(id) ON DELETE CASCADE,

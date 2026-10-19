@@ -21,6 +21,7 @@ require __DIR__ . '/access.php';
 require __DIR__ . '/calendar.php';
 require __DIR__ . '/events.php';
 require __DIR__ . '/planning.php';
+require __DIR__ . '/demo-cards.php';
 require __DIR__ . '/demo.php';
 require __DIR__ . '/routes.php';
 

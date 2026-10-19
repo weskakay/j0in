@@ -223,3 +223,17 @@ function taskIdsIn(PDO $pdo, string $columnId): array
     $stmt->execute([$columnId]);
     return array_column($stmt->fetchAll(), 'id');
 }
+
+/**
+ * Every card on a board, whatever column it sits in.
+ *
+ * @return list<string>
+ */
+function allTaskIdsOf(PDO $pdo, string $boardId): array
+{
+    $stmt = $pdo->prepare(
+        'SELECT t.id FROM join_tasks t JOIN join_columns c ON c.id = t.column_id WHERE c.board_id = ?'
+    );
+    $stmt->execute([$boardId]);
+    return array_column($stmt->fetchAll(), 'id');
+}

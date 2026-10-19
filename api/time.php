@@ -9,6 +9,17 @@ const J0IN_START_PHASES = [
 /** The longest entry that can be typed in by hand: one full day. */
 const J0IN_MAX_MINUTES = 1440;
 
+/** The focus lengths a timer can be started with, in minutes. */
+const J0IN_FOCUS_LENGTHS = [15, 25, 50];
+
+/**
+ * What stopping writes: the end and the seconds, both held to the target of
+ * a focus run, so stopping late never books more than was planned.
+ */
+const J0IN_STOP_FIELDS = 'e.ended_at = LEAST(NOW(), COALESCE(e.started_at + INTERVAL e.target_minutes MINUTE, NOW())),
+    e.seconds = LEAST(TIMESTAMPDIFF(SECOND, e.started_at, NOW()),
+                      COALESCE(e.target_minutes * 60, TIMESTAMPDIFF(SECOND, e.started_at, NOW())))';
+
 /** Writes the starting phases of a board in the given language. */
 function insertStartPhases(PDO $pdo, string $boardId, string $lang = 'de'): void
 {
@@ -143,7 +154,7 @@ function timeByTask(PDO $pdo, array $taskIds): array
     }
     $in = implode(',', array_fill(0, count($taskIds), '?'));
     $stmt = $pdo->prepare(
-        "SELECT id, task_id, phase_id, note, started_at, ended_at IS NULL AS running,
+        "SELECT id, task_id, phase_id, note, started_at, target_minutes, ended_at IS NULL AS running,
                 IF(ended_at IS NULL, TIMESTAMPDIFF(SECOND, started_at, NOW()), seconds) AS seconds
          FROM join_time_entries WHERE task_id IN ($in)
          ORDER BY ended_at IS NULL, ended_at, started_at"
@@ -163,6 +174,7 @@ function groupTimeEntries(array $rows): array
             'note'      => $row['note'],
             'startedAt' => $row['started_at'],
             'running'   => (bool) $row['running'],
+            'target'    => $row['target_minutes'] === null ? null : (int) $row['target_minutes'],
             'seconds'   => max(0, (int) $row['seconds']),
         ];
     }
@@ -178,11 +190,44 @@ function startTimer(PDO $pdo, string $boardId, string $taskId, array $body): voi
     requireTimeTracking($pdo, $boardId);
     requireOwnTask($pdo, $boardId, $taskId);
     $phaseId = ownPhaseOrNull($pdo, $boardId, $body);
-    $id = inTransaction($pdo, function () use ($pdo, $boardId, $taskId, $phaseId) {
+    $target = focusTarget($body);
+    $id = inTransaction($pdo, function () use ($pdo, $boardId, $taskId, $phaseId, $target) {
         stopRunningOn($pdo, $boardId);
-        return insertTimeRow($pdo, $taskId, $phaseId, 0, null);
+        $id = insertTimeRow($pdo, $taskId, $phaseId, 0, null);
+        $pdo->prepare('UPDATE join_time_entries SET target_minutes = ? WHERE id = ?')->execute([$target, $id]);
+        return $id;
     });
     respond(201, ['id' => $id]);
+}
+
+/** The focus length asked for, or null for a timer that runs open-ended. */
+function focusTarget(array $body): ?int
+{
+    $target = $body['targetMinutes'] ?? null;
+    if ($target === null) {
+        return null;
+    }
+    if (!in_array($target, J0IN_FOCUS_LENGTHS, true)) {
+        fail(422, 'time.bad_target');
+    }
+    return $target;
+}
+
+/**
+ * Ends focus runs whose time is up while nobody was looking, for instance
+ * with the tab closed. They end exactly on their target, not when the board
+ * happens to be read again.
+ */
+function closeFinishedFocus(PDO $pdo, string $boardId): void
+{
+    $pdo->prepare(
+        'UPDATE join_time_entries e
+         JOIN join_tasks t ON t.id = e.task_id
+         JOIN join_columns c ON c.id = t.column_id
+         SET e.ended_at = e.started_at + INTERVAL e.target_minutes MINUTE, e.seconds = e.target_minutes * 60
+         WHERE c.board_id = ? AND e.ended_at IS NULL AND e.target_minutes IS NOT NULL
+           AND e.started_at + INTERVAL e.target_minutes MINUTE <= NOW()'
+    )->execute([$boardId]);
 }
 
 /** Stops the timer of a card, if one runs there. */
@@ -213,10 +258,8 @@ function stopRunning(PDO $pdo, string $where, array $params): void
         "DELETE e FROM {$scope}
          WHERE {$where} AND e.ended_at IS NULL AND TIMESTAMPDIFF(SECOND, e.started_at, NOW()) < 60"
     )->execute($params);
-    $pdo->prepare(
-        "UPDATE {$scope} SET e.ended_at = NOW(), e.seconds = TIMESTAMPDIFF(SECOND, e.started_at, NOW())
-         WHERE {$where} AND e.ended_at IS NULL"
-    )->execute($params);
+    $pdo->prepare("UPDATE {$scope} SET " . J0IN_STOP_FIELDS . " WHERE {$where} AND e.ended_at IS NULL")
+        ->execute($params);
 }
 
 /**

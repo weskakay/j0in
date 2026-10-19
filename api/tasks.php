@@ -2,6 +2,9 @@
 
 const J0IN_PRIORITIES = ['urgent', 'medium', 'low'];
 
+/** The longest estimate a card may carry: 100 hours. */
+const J0IN_MAX_ESTIMATE = 6000;
+
 /**
  * Runs the given work inside one transaction and rolls it back on failure.
  * Several writes belong together here, and half of them would be worse than
@@ -26,8 +29,10 @@ function createTask(PDO $pdo, string $boardId, array $body): void
     $columnId = bodyString($body, 'columnId');
     requireOwnColumn($pdo, $boardId, $columnId);
     requireValidTask($body);
+    requireOwnCategoryIfAny($pdo, $boardId, $body);
     $id = inTransaction($pdo, function () use ($pdo, $columnId, $boardId, $body) {
         $id = insertTaskRow($pdo, $columnId, $body);
+        syncDoneAt($pdo, $boardId, $id);
         replaceSubtasks($pdo, $id, $body['subtasks'] ?? []);
         replaceAssignees($pdo, $boardId, $id, $body['contactIds'] ?? []);
         return $id;
@@ -48,6 +53,20 @@ function requireValidTask(array $body): void
     if ($priority !== '' && !in_array($priority, J0IN_PRIORITIES, true)) {
         fail(422, 'task.bad_priority');
     }
+    estimateOf($body);
+}
+
+/** The estimate in minutes, null when none was given. Ends with 422 when it makes no sense. */
+function estimateOf(array $body): ?int
+{
+    $value = $body['estimateMinutes'] ?? null;
+    if ($value === null || $value === '') {
+        return null;
+    }
+    if (!is_int($value) || $value < 0 || $value > J0IN_MAX_ESTIMATE) {
+        fail(422, 'task.bad_estimate');
+    }
+    return $value;
 }
 
 /** Writes the task row itself and returns its id. */
@@ -55,13 +74,14 @@ function insertTaskRow(PDO $pdo, string $columnId, array $body): string
 {
     $id = uuid();
     $stmt = $pdo->prepare(
-        'INSERT INTO join_tasks (id, column_id, category_id, title, description, due_date, priority, position)
-         VALUES (?, ?, ?, ?, ?, ?, ?, (SELECT COALESCE(MAX(position), 0) + 1 FROM join_tasks t WHERE t.column_id = ?))'
+        'INSERT INTO join_tasks
+           (id, column_id, category_id, title, description, due_date, priority, estimate_minutes, position)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, (SELECT COALESCE(MAX(position), 0) + 1 FROM join_tasks t WHERE t.column_id = ?))'
     );
     $stmt->execute([
         $id, $columnId, blankToNull(bodyString($body, 'categoryId')),
         bodyString($body, 'title'), blankToNull(bodyString($body, 'description')),
-        bodyString($body, 'dueDate'), bodyString($body, 'priority') ?: 'medium', $columnId,
+        bodyString($body, 'dueDate'), bodyString($body, 'priority') ?: 'medium', estimateOf($body), $columnId,
     ]);
     return $id;
 }
@@ -119,6 +139,7 @@ function updateTask(PDO $pdo, string $boardId, string $taskId, array $body): voi
 {
     requireOwnTask($pdo, $boardId, $taskId);
     requireValidTask($body);
+    requireOwnCategoryIfAny($pdo, $boardId, $body);
     inTransaction($pdo, function () use ($pdo, $taskId, $boardId, $body) {
         applyTaskFields($pdo, $taskId, $body);
         replaceSubtasks($pdo, $taskId, $body['subtasks'] ?? []);
@@ -127,16 +148,26 @@ function updateTask(PDO $pdo, string $boardId, string $taskId, array $body): voi
     respond(200, ['ok' => true]);
 }
 
-/** Writes the editable fields of a task. The category stays as it is. */
+/** A category picked in the form has to belong to this board. */
+function requireOwnCategoryIfAny(PDO $pdo, string $boardId, array $body): void
+{
+    $categoryId = bodyString($body, 'categoryId');
+    if ($categoryId !== '') {
+        requireOwnCategory($pdo, $boardId, $categoryId);
+    }
+}
+
+/** Writes the editable fields of a task, the category included. */
 function applyTaskFields(PDO $pdo, string $taskId, array $body): void
 {
     $stmt = $pdo->prepare(
-        'UPDATE join_tasks SET title = ?, description = ?, due_date = ?, priority = ?,
-         demo_index = NULL WHERE id = ?'
+        'UPDATE join_tasks SET category_id = ?, title = ?, description = ?, due_date = ?, priority = ?,
+         estimate_minutes = ?, demo_index = NULL WHERE id = ?'
     );
     $stmt->execute([
+        blankToNull(bodyString($body, 'categoryId')),
         bodyString($body, 'title'), blankToNull(bodyString($body, 'description')),
-        bodyString($body, 'dueDate'), bodyString($body, 'priority') ?: 'medium', $taskId,
+        bodyString($body, 'dueDate'), bodyString($body, 'priority') ?: 'medium', estimateOf($body), $taskId,
     ]);
 }
 
@@ -152,13 +183,46 @@ function moveTask(PDO $pdo, string $boardId, string $taskId, array $body): void
     requireOwnColumn($pdo, $boardId, $columnId);
     $position = max(1, (int) ($body['position'] ?? 1));
     $from = columnOfTask($pdo, $taskId);
-    inTransaction($pdo, function () use ($pdo, $columnId, $position, $taskId, $from) {
+    inTransaction($pdo, function () use ($pdo, $boardId, $columnId, $position, $taskId, $from) {
         placeTask($pdo, $columnId, $taskId, $position);
         if ($from !== $columnId) {
             renumber($pdo, $from);
+            syncDoneAt($pdo, $boardId, $taskId);
         }
     });
     respond(200, ['ok' => true]);
+}
+
+/**
+ * Stamps a card as finished once it sits in the board's last column and takes
+ * the stamp away again when it leaves. An existing stamp is kept, so moving a
+ * card around inside the last column does not make it finished anew.
+ */
+function syncDoneAt(PDO $pdo, string $boardId, string $taskId): void
+{
+    $pdo->prepare(
+        'UPDATE join_tasks SET done_at = IF(column_id = ?, COALESCE(done_at, NOW()), NULL) WHERE id = ?'
+    )->execute([lastColumnId($pdo, $boardId), $taskId]);
+}
+
+/**
+ * Stamps the cards that ended up in the last column after the columns
+ * themselves changed. Stamps elsewhere stay: a column added on the right
+ * should not wipe out when the old ones were finished. Whether a card counts
+ * as done is decided by its column, the stamp only says since when.
+ */
+function syncBoardDone(PDO $pdo, string $boardId): void
+{
+    $pdo->prepare('UPDATE join_tasks SET done_at = COALESCE(done_at, NOW()) WHERE column_id = ?')
+        ->execute([lastColumnId($pdo, $boardId)]);
+}
+
+/** The column on the far right, the one that means done. */
+function lastColumnId(PDO $pdo, string $boardId): string
+{
+    $stmt = $pdo->prepare('SELECT id FROM join_columns WHERE board_id = ? ORDER BY position DESC LIMIT 1');
+    $stmt->execute([$boardId]);
+    return (string) $stmt->fetchColumn();
 }
 
 /** The column a task currently sits in. */

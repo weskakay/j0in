@@ -13,6 +13,7 @@ function createColumn(PDO $pdo, string $boardId, array $body): void
          VALUES (?, ?, ?, (SELECT COALESCE(MAX(position), 0) + 1 FROM join_columns c WHERE c.board_id = ?))'
     );
     $stmt->execute([$id, $boardId, $name, $boardId]);
+    syncBoardDone($pdo, $boardId);
     respond(201, ['id' => $id, 'name' => $name]);
 }
 
@@ -29,6 +30,7 @@ function updateColumn(PDO $pdo, string $boardId, string $columnId, array $body):
     $values[] = $columnId;
     $pdo->prepare('UPDATE join_columns SET ' . implode(', ', $fields) . ' WHERE id = ?')
         ->execute($values);
+    syncBoardDone($pdo, $boardId);
     respond(200, ['ok' => true]);
 }
 
@@ -59,6 +61,7 @@ function deleteColumn(PDO $pdo, string $boardId, array $user, string $columnId, 
         dropEventsOf($pdo, $user, stillIn($pdo, $columnId, $doomed));
     }
     $pdo->prepare('DELETE FROM join_columns WHERE id = ?')->execute([$columnId]);
+    syncBoardDone($pdo, $boardId);
     respond(200, ['ok' => true]);
 }
 
