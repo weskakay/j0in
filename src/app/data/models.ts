@@ -36,18 +36,43 @@ export interface Column {
   position: number;
 }
 
-/** A category a task can belong to, editable like the columns. */
+/** Where a project stands. */
+export type ProjectStatus = 'planning' | 'active' | 'review' | 'shipped';
+
+/**
+ * A project a task can belong to. The database still calls it a category,
+ * which is why the type keeps that name.
+ */
 export interface Category {
   id: string;
   name: string;
   color: string;
   position: number;
+  icon: string | null;
+  description: string | null;
+  status: ProjectStatus;
+  dueDate: string | null;
+  pinned: boolean;
 }
 
-/** What the category form collects. */
+/** What the project forms collect; the short form in the settings sends name and colour only. */
 export interface CategoryInput {
   name: string;
   color: string;
+  icon?: string | null;
+  description?: string | null;
+  status?: ProjectStatus;
+  dueDate?: string | null;
+}
+
+/** The figures a board is tuned to. */
+export interface Preferences {
+  /** Hours a person has in a week, for the workload on the team page. */
+  weekCapacity: number;
+  /** Minutes of focus a day aims for. */
+  focusGoal: number;
+  /** The length a focus run starts with, in minutes. */
+  focusDefault: number;
 }
 
 /** One step inside a task. */
@@ -145,6 +170,7 @@ export interface BoardData {
   name: string;
   /** Whether this board offers the timer and the time log on its cards. */
   timeTracking: boolean;
+  preferences: Preferences;
   columns: Column[];
   categories: Category[];
   phases: TimePhase[];

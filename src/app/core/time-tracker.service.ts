@@ -2,7 +2,7 @@ import { Injectable, computed, effect, inject, signal } from '@angular/core';
 import { type Observable, tap } from 'rxjs';
 import type { Task, TimeEntry, TimeEntryInput } from '../data/models';
 import { lastPhaseId, pickPhase, taskSeconds } from '../data/format';
-import { focusLeft, focusShare, type FocusLength } from '../data/focus';
+import { focusLeft, focusLengthOf, focusShare, type FocusLength } from '../data/focus';
 import { ApiService } from './api.service';
 import { BoardStore } from './board.store';
 import { LanguageService } from './language.service';
@@ -51,6 +51,9 @@ export class TimeTracker {
   readonly nextPhaseId = computed(() =>
     pickPhase(this.store.phases(), this.chosen(), lastPhaseId(this.store.tasks())),
   );
+
+  /** The length a focus run starts with, as the board is set. */
+  readonly defaultLength = computed(() => focusLengthOf(this.store.preferences().focusDefault));
 
   /** Seconds left of a running focus, or null when none runs or it is open-ended. */
   readonly left = computed(() => {

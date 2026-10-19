@@ -110,7 +110,7 @@ export function localeOf(lang: Lang): string {
   return lang === 'de' ? 'de-DE' : 'en-GB';
 }
 
-/** Seconds as hours with at most one decimal, written the way the language does: 2,5 or 2.5. */
-export function hoursIn(seconds: number, lang: Lang): string {
-  return new Intl.NumberFormat(localeOf(lang), { maximumFractionDigits: 1 }).format(seconds / 3600);
+/** Seconds as hours with at most one decimal (or as many as asked), written the way the language does: 2,5 or 2.5. */
+export function hoursIn(seconds: number, lang: Lang, digits = 1): string {
+  return new Intl.NumberFormat(localeOf(lang), { maximumFractionDigits: digits }).format(seconds / 3600);
 }

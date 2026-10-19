@@ -120,8 +120,8 @@ describe('weekCounts', () => {
 
 describe('categoryProgress', () => {
   const kinds: Category[] = [
-    { id: 'c1', name: 'Story', color: 'blue', position: 1 },
-    { id: 'c2', name: 'Leer', color: 'red', position: 2 },
+    { id: 'c1', name: 'Story', color: 'blue', position: 1, icon: null, description: null, status: 'active', dueDate: null, pinned: false },
+    { id: 'c2', name: 'Leer', color: 'red', position: 2, icon: null, description: null, status: 'active', dueDate: null, pinned: false },
   ];
 
   it('shares finished cards per category', () => {
@@ -174,7 +174,7 @@ describe('lastWeekTotal', () => {
 
 describe('categoryRows', () => {
   it('adds open cards, the next date and the people of a category', () => {
-    const kinds: Category[] = [{ id: 'c1', name: 'Story', color: 'blue', position: 1 }];
+    const kinds: Category[] = [{ id: 'c1', name: 'Story', color: 'blue', position: 1, icon: null, description: null, status: 'active', dueDate: null, pinned: false }];
     const cards = [
       task({ categoryId: 'c1', dueDate: '2026-10-20', contactIds: ['p1'] }),
       task({ id: 'b', categoryId: 'c1', dueDate: '2026-10-16', contactIds: ['p1', 'p2'] }),

@@ -11,11 +11,12 @@ const MIN_WAIT = 1400;
 const BOARD: BoardData = {
   name: 'Mein Board',
   timeTracking: true,
+  preferences: { weekCapacity: 32, focusGoal: 120, focusDefault: 25 },
   columns: [
     { id: 'c1', name: 'ToDo', position: 1 },
     { id: 'c2', name: 'Fertig', position: 2 },
   ],
-  categories: [{ id: 'k1', name: 'Technisch', color: '#29abe2', position: 1 }],
+  categories: [{ id: 'k1', name: 'Technisch', color: '#29abe2', position: 1, icon: null, description: null, status: 'active', dueDate: null, pinned: false }],
   phases: [],
   contacts: [],
   tasks: [

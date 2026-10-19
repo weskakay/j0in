@@ -74,6 +74,7 @@ export class ScheduleService {
   private done(date: string): void {
     this.pending.set(null);
     this.calendar.loadDay(date);
+    this.calendar.reloadSpan();
   }
 
   /** Keeps the reason, so the day can say what went wrong. */

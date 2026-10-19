@@ -7,6 +7,7 @@ import type {
   Column,
   Contact,
   ContactInput,
+  Preferences,
   Task,
   TaskInput,
   TimePhase,
@@ -70,6 +71,11 @@ export class BoardStore {
    * until the board has arrived, so nothing flashes up that is switched off.
    */
   readonly timeTracking = computed(() => this.data()?.timeTracking ?? false);
+
+  /** The figures this board is tuned to; the defaults until it has arrived. */
+  readonly preferences = computed<Preferences>(
+    () => this.data()?.preferences ?? { weekCapacity: 32, focusGoal: 120, focusDefault: 25 },
+  );
 
   /** The phases time is booked on, in their stored order. */
   readonly phases = computed<TimePhase[]>(() => this.data()?.phases ?? []);
@@ -155,6 +161,16 @@ export class BoardStore {
   /** Saves an edited category. */
   updateCategory(categoryId: string, input: CategoryInput): Observable<unknown> {
     return this.api.put(`/categories/${categoryId}`, input).pipe(tap(() => this.load()));
+  }
+
+  /** Pins a project to the sidebar or takes it off. */
+  pinCategory(categoryId: string, pinned: boolean): Observable<unknown> {
+    return this.api.put(`/categories/${categoryId}/pin`, { pinned }).pipe(tap(() => this.refresh()));
+  }
+
+  /** Saves some of the board's figures. */
+  savePreferences(change: Partial<Preferences>): Observable<unknown> {
+    return this.api.put('/board/preferences', change).pipe(tap(() => this.refresh()));
   }
 
   /** Removes a category; the cards keep existing and simply lose it. */

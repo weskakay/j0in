@@ -1,4 +1,5 @@
-import { Injectable, signal } from '@angular/core';
+import { Injectable, computed, inject, signal } from '@angular/core';
+import { LookService } from './look.service';
 
 const NAV_KEY = 'j0in-nav';
 const WIDTH_KEY = 'j0in-column-width';
@@ -18,8 +19,23 @@ const COLUMN_DEFAULT = 280;
  */
 @Injectable({ providedIn: 'root' })
 export class LayoutService {
-  /** True while the side navigation shows icons only. */
+  private readonly looks = inject(LookService);
+
+  /** True while the side navigation shows icons only because someone folded it. */
   readonly navFolded = signal(read(NAV_KEY) === 'folded');
+
+  /** Whether the screen is between 900 and 1100 pixels wide, kept current. */
+  private readonly narrow = signal(narrowNow());
+
+  /** True when the glass look folds the navigation on its own on a narrow desktop. */
+  readonly autoFolded = computed(() => this.narrow() && this.looks.look() === 'glass');
+
+  /** Whether the navigation shows icons only, by hand or on its own. */
+  readonly folded = computed(() => this.navFolded() || this.autoFolded());
+
+  constructor() {
+    window.matchMedia?.(NARROW).addEventListener?.('change', (event) => this.narrow.set(event.matches));
+  }
 
   /** How wide one board column is, in pixels. */
   readonly columnWidth = signal(readWidth());
@@ -47,6 +63,14 @@ export class LayoutService {
     this.columnWidth.set(kept);
     save(WIDTH_KEY, String(kept));
   }
+}
+
+/** The width at which the glass look keeps the navigation to icons. */
+const NARROW = '(min-width: 900px) and (max-width: 1099px)';
+
+/** Whether the screen is that width right now. */
+function narrowNow(): boolean {
+  return window.matchMedia?.(NARROW).matches ?? false;
 }
 
 /** Reads the stored width, falling back to the built-in one. */

@@ -7,8 +7,10 @@ export const FOCUS_LENGTHS = [15, 25, 50] as const;
 /** One of the focus lengths. */
 export type FocusLength = (typeof FOCUS_LENGTHS)[number];
 
-/** The length a focus starts with when nothing else was picked. */
-export const DEFAULT_FOCUS: FocusLength = 25;
+/** A stored length as one on offer, 25 minutes when it is not. */
+export function focusLengthOf(minutes: number): FocusLength {
+  return FOCUS_LENGTHS.find((length) => length === minutes) ?? 25;
+}
 
 /** Seconds left of a focus run, never below zero; null for an open-ended timer. */
 export function focusLeft(entry: TimeEntry, sinceRead: number): number | null {

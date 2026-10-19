@@ -1,4 +1,5 @@
 import { Injectable, inject, signal } from '@angular/core';
+import { today } from '../data/format';
 import { ApiService } from './api.service';
 
 /** What the API says about the connection to Google. */
@@ -58,6 +59,49 @@ export class CalendarService {
 
   /** Set when the day could not be fetched. */
   readonly dayError = signal<string | null>(null);
+
+  /** The events of the span the calendar page shows, a week or a month. */
+  readonly spanEvents = signal<DayEvent[]>([]);
+
+  /** The events of today, whatever span is on screen. */
+  readonly todayEvents = signal<DayEvent[]>([]);
+
+  /** The span last asked for, so a change can read it again and late answers are dropped. */
+  private span: [string, string] | null = null;
+
+  /** Fetches the events from one day to another, at most six weeks. */
+  loadSpan(from: string, to: string): void {
+    const span: [string, string] = [from, to];
+    this.span = span;
+    const query = `date=${from}&to=${to}&tz=${encodeURIComponent(zone())}`;
+    this.api.get<DayAnswer>(`/calendar/events?${query}`).subscribe({
+      next: (answer) => this.takeSpan(span, answer.events),
+      error: () => this.takeSpan(span, []),
+    });
+  }
+
+  /** Keeps the events of a span, unless another span was asked for since. */
+  private takeSpan(span: [string, string], events: DayEvent[]): void {
+    if (this.span === span) {
+      this.spanEvents.set(events);
+    }
+  }
+
+  /** Fetches today on its own, so a list of today stays put while the span moves. */
+  loadToday(): void {
+    this.api.get<DayAnswer>(`/calendar/events?date=${today()}&tz=${encodeURIComponent(zone())}`).subscribe({
+      next: (answer) => this.todayEvents.set(answer.events),
+      error: () => this.todayEvents.set([]),
+    });
+  }
+
+  /** Reads the last span and today again, after a card was planned. */
+  reloadSpan(): void {
+    if (this.span) {
+      this.loadSpan(...this.span);
+      this.loadToday();
+    }
+  }
 
   /** Moves to another day and fetches it. */
   showDay(date: string): void {
@@ -119,13 +163,6 @@ export class CalendarService {
     this.status.set(status);
     this.busy.set(false);
   }
-}
-
-/** Today, as YYYY-MM-DD in the local time zone. */
-function today(): string {
-  const now = new Date();
-  const month = `${now.getMonth() + 1}`.padStart(2, '0');
-  return `${now.getFullYear()}-${month}-${`${now.getDate()}`.padStart(2, '0')}`;
 }
 
 /** The time zone this browser sits in, so the day is cut at the right hours. */
